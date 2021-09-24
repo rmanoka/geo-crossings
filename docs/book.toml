@@ -1,0 +1,8 @@
+[book]
+authors = ["Rajsekar Manokaran"]
+language = "en"
+multilingual = false
+src = "src"
+title = "Geo Crossings"
+
+[preprocessor.katex]
