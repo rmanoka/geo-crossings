@@ -122,21 +122,34 @@ Note that collinear segments (and even segments with the same end
 points) must still be ordered. This may be arbitrary, but fixed
 ordering such as by their index in an array, or a unique id.
 
-This can be generalized to any set of segments $(p_i, q_i)$
-satisfying $p_i < q_j$ for all $i, j.$ The ordering is consistent
-with any sweep-line upto the first $r_{ij}$ computed for each
-pair $i, j.$
-
 ### Tracking Active Segments
 
-To track the active segments, we insert a segment into the
-set when we encounter the left end point, and remove it at
-the right end point. The lexicographic ordering of points
-described above ensures that the active segments satisfy:
-$p_i \le q_j$ for any pair $i, j$ of active segments. To
-make the inequality strict, we must also ensure that the
-heap orders any right end-point $q_j$ before all coinciding
-left end-points $p_i = q_j.$
+The above ordering generalizes to any set of segments $(p_i,
+q_i)$ satisfying $p_i < q_j$ for all $i, j.$ The ordering is
+consistent with any sweep-line upto (and including) the first
+$r_{ij}$ computed for each pair $i, j.$
+
+To track the active segments, we insert a segment into the set
+when we encounter (during the sweep) the left end point, and
+remove it at the right end point. The lexicographic ordering of
+points described above ensures that the active segments satisfy:
+$p_i \le q_j$ for any pair $i, j$ of active segments. To make the
+inequality strict, we also ensure that the heap orders any right
+end-point $q_j$ before all coinciding left end-points $p_i =
+q_j.$
+
+### Adding an Active Segment
+
+When the sweep hits the end point $p$ of a segment $(p, q),$ we
+use the ordered active segments to find (at most) two adjacent
+segments $(p_i, q_i)$ between which it will be inserted. This
+query is valid as all the right end points $q_j$ (and $q$ itself)
+are strictly larger than $p,$ and the current sweep line is at
+$p$ which is before any future intersection point.
+
+For each adjacent segment, we check
+
+When the sweep hits When the left end point of a segment is
 
 As described in the outline, we look for intersections
 before inserting a new segment, or after removing a segment.

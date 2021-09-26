@@ -1,4 +1,6 @@
-mod segments;
 mod events;
+mod segments;
+mod sweep;
 
-pub use segments::Crossable;
+pub mod crossable;
+pub use crossable::Crossable;
