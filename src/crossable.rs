@@ -1,28 +1,30 @@
-use geo::{GeoFloat, Line, Point};
+use geo::{Coordinate, GeoFloat, Line, Point};
 
-use crate::segments::LineOrPoint;
+use crate::line_or_point::LineOrPoint;
 
+/// Geometry associated with a [`Crossable`] type.
+///
+/// This is wrapper around an internal enum that represents either a
+/// line segment or a point. Use the [`From`] implementations to
+/// convert from corresponding geo types: [`Line`], or [`Point`].
 #[derive(Debug, Clone, PartialEq)]
 pub struct CrossableGeom<T: GeoFloat>(pub(crate) LineOrPoint<T>);
 
 impl<T: GeoFloat> From<Line<T>> for CrossableGeom<T> {
     fn from(l: Line<T>) -> Self {
-        let start = l.start.into();
-        let end = l.end.into();
-        if start < end {
-            LineOrPoint::Line(start, end)
-        } else if start > end {
-            LineOrPoint::Line(end, start)
-        } else {
-            LineOrPoint::Point(start).into()
-        }
-        .into()
+        Into::<LineOrPoint<_>>::into(l).into()
+    }
+}
+
+impl<T: GeoFloat> From<Coordinate<T>> for CrossableGeom<T> {
+    fn from(c: Coordinate<T>) -> Self {
+        Into::<LineOrPoint<_>>::into(c).into()
     }
 }
 
 impl<T: GeoFloat> From<Point<T>> for CrossableGeom<T> {
     fn from(p: Point<T>) -> Self {
-        LineOrPoint::Point(p.0.into()).into()
+        p.0.into()
     }
 }
 
@@ -33,7 +35,37 @@ impl<T: GeoFloat> From<LineOrPoint<T>> for CrossableGeom<T> {
 }
 
 /// Interface for types that can be processed to detect crossings.
+///
+/// This type is implemented by [`Line`] and [`Point`], but users may
+/// also implement this on custom types to store extra information.
 pub trait Crossable: Sized {
+    /// Scalar used the coordinates.
     type Scalar: GeoFloat;
+    /// The geometry associated with this type. Must be a line or a
+    /// point.
     fn geom(&self) -> CrossableGeom<Self::Scalar>;
+}
+
+impl<T: GeoFloat> Crossable for Coordinate<T> {
+    type Scalar = T;
+
+    fn geom(&self) -> CrossableGeom<Self::Scalar> {
+        (*self).into()
+    }
+}
+
+impl<T: GeoFloat> Crossable for Point<T> {
+    type Scalar = T;
+
+    fn geom(&self) -> CrossableGeom<Self::Scalar> {
+        self.0.geom()
+    }
+}
+
+impl<T: GeoFloat> Crossable for Line<T> {
+    type Scalar = T;
+
+    fn geom(&self) -> CrossableGeom<Self::Scalar> {
+        (*self).into()
+    }
 }

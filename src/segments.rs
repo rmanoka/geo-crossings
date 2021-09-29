@@ -1,75 +1,11 @@
-use std::cmp::Ordering;
-
-use geo::{
-    kernels::{Kernel, Orientation},
-    GeoFloat,
-};
+use std::{cmp::Ordering};
 use slab::Slab;
 
-use crate::{crossable::Crossable, events::SweepPoint};
+use crate::{crossable::Crossable, events::SweepPoint, line_or_point::LineOrPoint};
 
-#[derive(Debug, Clone, Copy)]
-pub enum LineOrPoint<T: GeoFloat> {
-    Point(SweepPoint<T>),
-    Line(SweepPoint<T>, SweepPoint<T>),
-}
 
-impl<T: GeoFloat> PartialEq for LineOrPoint<T> {
-    fn eq(&self, other: &Self) -> bool {
-        self.partial_cmp(other) == Some(Ordering::Equal)
-    }
-}
-impl<T: GeoFloat> PartialOrd for LineOrPoint<T> {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        match (self, other) {
-            (LineOrPoint::Point(p), LineOrPoint::Point(q)) => {
-                if p == q {
-                    Some(Ordering::Equal)
-                } else {
-                    // Unequal points do not satisfy pre-condition and
-                    // can't be ordered.
-                    None
-                }
-            }
-            (LineOrPoint::Point(_), LineOrPoint::Line(_, _)) => {
-                other.partial_cmp(self).map(Ordering::reverse)
-            }
-            (LineOrPoint::Line(p, q), LineOrPoint::Point(r)) => {
-                if r > q || p > r {
-                    return None;
-                }
-                Some(
-                    orientation_as_ordering(T::Ker::orient2d(p.0, q.0, r.0))
-                        .then(Ordering::Greater),
-                )
-            }
-            (LineOrPoint::Line(p1, q1), LineOrPoint::Line(p2, q2)) => {
-                if p1 > p2 {
-                    return other.partial_cmp(self).map(Ordering::reverse);
-                }
-                if p1 >= q2 || p2 >= q2 {
-                    return None;
-                }
-
-                // Assertion: p1 <= p2
-                // Assertion: pi < q_j
-                Some(
-                    orientation_as_ordering(T::Ker::orient2d(p1.0, q1.0, p2.0))
-                        .then_with(|| orientation_as_ordering(T::Ker::orient2d(p1.0, q1.0, q2.0))),
-                )
-            }
-        }
-    }
-}
-
-fn orientation_as_ordering(orientation: Orientation) -> Ordering {
-    match orientation {
-        Orientation::CounterClockwise => Ordering::Less,
-        Orientation::Clockwise => Ordering::Greater,
-        Orientation::Collinear => Ordering::Equal,
-    }
-}
-
+/// A segment is an internal [`LineOrPoint`] generated during the
+/// sweep.
 #[derive(Debug)]
 pub struct Segment<'a, C: Crossable> {
     geom: LineOrPoint<C::Scalar>,
