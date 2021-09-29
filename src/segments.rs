@@ -1,10 +1,11 @@
+use geo::GeoFloat;
 use slab::Slab;
-use std::{borrow::Borrow, cmp::Ordering, collections::{BTreeSet, BinaryHeap}, ops::Bound};
+use std::{cmp::Ordering, collections::BTreeSet, ops::Bound};
 
 use crate::{
     crossable::Crossable,
-    events::{Event, EventType, SweepPoint},
-    line_or_point::LineOrPoint,
+    events::{Event, EventType},
+    line_or_point::LineOrPoint::{self, *},
 };
 
 /// A segment of input [`LineOrPoint`] generated during the sweep.
@@ -13,6 +14,7 @@ pub struct Segment<'a, C: Crossable> {
     geom: LineOrPoint<C::Scalar>,
     key: usize,
     crossable: &'a C,
+    overlapping: Option<usize>,
 }
 
 // Manual implementation to not require `C: Clone`, same as `Copy`.
@@ -27,11 +29,11 @@ impl<'a, C: Crossable> Copy for Segment<'a, C> {}
 impl<'a, C: Crossable> Segment<'a, C> {
     /// Create and store a `Segment` with given `crossable`, and optional `geom`
     /// (or the default geom).
-    pub(crate) fn new(
-        storage: &mut Slab<Self>,
+    pub(crate) fn new<'b>(
+        storage: &'b mut Slab<Self>,
         crossable: &'a C,
         geom: Option<LineOrPoint<C::Scalar>>,
-    ) -> Self {
+    ) -> &'b mut Self {
         let geom = geom.unwrap_or_else(|| crossable.geom().0);
         let entry = storage.vacant_entry();
 
@@ -39,38 +41,137 @@ impl<'a, C: Crossable> Segment<'a, C> {
             key: entry.key(),
             crossable,
             geom,
+            overlapping: None,
         };
-        entry.insert(segment);
-        segment
+        entry.insert(segment)
     }
 
-    pub(crate) fn push_events(&self, events: &mut BinaryHeap<Event<C::Scalar>>) {
+    /// Get an event for the left end-point (start) of this segment.
+    pub(crate) fn left_event(&self) -> Event<C::Scalar> {
         match self.geom {
-            LineOrPoint::Point(p) => {
-                events.push(Event {
-                    point: p,
-                    ty: EventType::PointLeft,
-                    segment_key: self.key,
-                });
-                events.push(Event {
-                    point: p,
-                    ty: EventType::PointRight,
-                    segment_key: self.key,
-                });
+            Point(p) => Event {
+                point: p,
+                ty: EventType::PointLeft,
+                segment_key: self.key,
+            },
+            Line(p, _) => Event {
+                point: p,
+                ty: EventType::LineLeft,
+                segment_key: self.key,
+            },
+        }
+    }
+
+    /// Get an event for the right end-point (end) of this segment.
+    pub(crate) fn right_event(&self) -> Event<C::Scalar> {
+        match self.geom {
+            Point(p) => Event {
+                point: p,
+                ty: EventType::PointRight,
+                segment_key: self.key,
+            },
+            Line(_, q) => Event {
+                point: q,
+                ty: EventType::LineRight,
+                segment_key: self.key,
+            },
+        }
+    }
+
+    /// Get events for both the end-points of this segment.
+    pub(crate) fn events(&self) -> [Event<C::Scalar>; 2] {
+        [self.left_event(), self.right_event()]
+    }
+
+    /// Split a line segment into pieces at points of intersection.
+    ///
+    /// The initial segment is mutated in place such that ordering
+    /// among `ActiveSegment`s does not change. The extra geometries
+    /// are returned.
+    pub(crate) fn adjust_for_intersection(
+        &mut self,
+        intersection: LineOrPoint<C::Scalar>,
+    ) -> SplitSegments<C::Scalar> {
+        use SplitSegments::*;
+
+        // We only support splitting a line segment.
+        let (p, q) = match self.geom() {
+            Point(_) => panic!("attempt to adjust a point segment"),
+            Line(p, q) => (p, q),
+        };
+
+        match intersection {
+            // Handle point intersection
+            Point(r) => {
+                if p == r || q == r {
+                    // If the intersection is at the end point, the
+                    // segment doesn't need to be split.
+                    Unchanged { overlap: false }
+                } else {
+                    // Otherwise, split it. Mutate `self` to be the
+                    // first part, and return the second part.
+                    self.geom = Line(p, r);
+                    SplitOnce {
+                        overlap: None,
+                        right: Line(r, q),
+                    }
+                }
             }
-            LineOrPoint::Line(p, q) => {
-                events.push(Event {
-                    point: p,
-                    ty: EventType::LineLeft,
-                    segment_key: self.key,
-                });
-                events.push(Event {
-                    point: q,
-                    ty: EventType::LineRight,
-                    segment_key: self.key,
-                });
+            // Handle overlapping segments
+            Line(r1, r2) => {
+                if p == r1 {
+                    if r2 == q {
+                        // The whole segment overlaps.
+                        Unchanged { overlap: true }
+                    } else {
+                        self.geom = Line(p, r2);
+                        SplitOnce {
+                            overlap: Some(false),
+                            right: Line(r2, q),
+                        }
+                    }
+                } else if r2 == q {
+                    self.geom = Line(p, r1);
+                    SplitOnce {
+                        overlap: Some(true),
+                        right: Line(r2, q),
+                    }
+                } else {
+                    self.geom = Line(p, r1);
+                    SplitTwice { right: Line(r2, q) }
+                }
             }
         }
+    }
+
+    /// Get a reference to the segment's crossable.
+    pub fn crossable(&self) -> &'a C {
+        self.crossable
+    }
+
+    /// Get a reference to the segment's geom.
+    pub fn geom(&self) -> LineOrPoint<C::Scalar> {
+        self.geom
+    }
+
+    /// Get the segment's key.
+    pub(crate) fn key(&self) -> usize {
+        self.key
+    }
+
+    /// Get segment's overlapping link if set.
+    pub(crate) fn overlapping(&self) -> Option<usize> {
+        self.overlapping
+    }
+
+    /// Set the segment's overlapping.
+    pub(crate) fn set_overlapping(&mut self, overlapping: Option<usize>) {
+        self.overlapping = overlapping;
+    }
+
+    /// Set the segment's geom.
+    pub(crate) fn set_geom(&mut self, geom: LineOrPoint<C::Scalar>) {
+        self.geom = geom;
     }
 }
 
@@ -133,16 +234,24 @@ impl<'a, C: Crossable> Ord for ActiveSegment<'a, C> {
 /// Helper trait to get adjacent segments from ordered set.
 pub(crate) trait AdjacentSegments {
     type SegmentType;
-    fn get_prev_key(&self, segment: &Self::SegmentType, storage: &Slab<Self::SegmentType>)
-        -> Option<usize>;
-    fn get_next_key(&self, segment: &Self::SegmentType, storage: &Slab<Self::SegmentType>)
-        -> Option<usize>;
+    fn prev_key(
+        &self,
+        segment: &Self::SegmentType,
+        storage: &Slab<Self::SegmentType>,
+    ) -> Option<usize>;
+    fn next_key(
+        &self,
+        segment: &Self::SegmentType,
+        storage: &Slab<Self::SegmentType>,
+    ) -> Option<usize>;
+    fn add_segment(&mut self, key: usize, storage: &Slab<Self::SegmentType>);
+    fn remove_segment(&mut self, key: usize, storage: &Slab<Self::SegmentType>);
 }
 
 impl<'a, C: Crossable + 'a> AdjacentSegments for BTreeSet<ActiveSegment<'a, C>> {
     type SegmentType = Segment<'a, C>;
 
-    fn get_prev_key(
+    fn prev_key(
         &self,
         segment: &Self::SegmentType,
         storage: &Slab<Self::SegmentType>,
@@ -153,7 +262,7 @@ impl<'a, C: Crossable + 'a> AdjacentSegments for BTreeSet<ActiveSegment<'a, C>> 
             .map(|s| s.key)
     }
 
-    fn get_next_key(
+    fn next_key(
         &self,
         segment: &Self::SegmentType,
         storage: &Slab<Self::SegmentType>,
@@ -163,4 +272,27 @@ impl<'a, C: Crossable + 'a> AdjacentSegments for BTreeSet<ActiveSegment<'a, C>> 
             .next()
             .map(|s| s.key)
     }
+
+    fn add_segment(&mut self, key: usize, storage: &Slab<Self::SegmentType>) {
+        assert!(storage.contains(key));
+        assert!(self.insert(ActiveSegment::new(key, storage)));
+    }
+
+    fn remove_segment(&mut self, key: usize, storage: &Slab<Self::SegmentType>) {
+        assert!(storage.contains(key));
+        assert!(self.remove(&ActiveSegment::new(key, storage)));
+    }
+}
+
+pub(crate) enum SplitSegments<T: GeoFloat> {
+    Unchanged {
+        overlap: bool,
+    },
+    SplitOnce {
+        overlap: Option<bool>,
+        right: LineOrPoint<T>,
+    },
+    SplitTwice {
+        right: LineOrPoint<T>,
+    },
 }

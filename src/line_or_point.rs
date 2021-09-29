@@ -1,6 +1,10 @@
 use std::cmp::Ordering;
 
-use geo::{Coordinate, GeoFloat, Line, kernels::{Kernel, HasKernel, Orientation}, line_intersection::LineIntersection};
+use geo::{
+    kernels::{HasKernel, Kernel, Orientation},
+    line_intersection::LineIntersection,
+    Coordinate, GeoFloat, Line,
+};
 
 use crate::events::SweepPoint;
 
@@ -58,7 +62,9 @@ impl<T: GeoFloat> LineOrPoint<T> {
     ///
     /// The other argument must be a line variant (panics otherwise).
     pub fn intersect_line(&self, other: &Self) -> Option<Self> {
-        let line = other.line().expect("tried to intersect_line with a point argument");
+        let line = other
+            .line()
+            .expect("tried to intersect_line with a point argument");
         match *self {
             LineOrPoint::Point(p) => {
                 if <T as HasKernel>::Ker::orient2d(line.start, p.0, line.end)
@@ -77,11 +83,9 @@ impl<T: GeoFloat> LineOrPoint<T> {
             }
             LineOrPoint::Line(p, q) => {
                 use geo::algorithm::line_intersection::line_intersection;
-                line_intersection(Line::new(p.0, q.0), line).map(|l| {
-                    match l {
-                        LineIntersection::SinglePoint { intersection, .. } => intersection.into(),
-                        LineIntersection::Collinear { intersection } => intersection.into(),
-                    }
+                line_intersection(Line::new(p.0, q.0), line).map(|l| match l {
+                    LineIntersection::SinglePoint { intersection, .. } => intersection.into(),
+                    LineIntersection::Collinear { intersection } => intersection.into(),
                 })
             }
         }
