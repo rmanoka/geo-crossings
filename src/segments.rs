@@ -11,10 +11,10 @@ use crate::{
 /// A segment of input [`LineOrPoint`] generated during the sweep.
 #[derive(Debug)]
 pub struct Segment<'a, C: Crossable> {
-    geom: LineOrPoint<C::Scalar>,
+    pub(crate) geom: LineOrPoint<C::Scalar>,
     key: usize,
     crossable: &'a C,
-    overlapping: Option<usize>,
+    pub(crate) overlapping: Option<usize>,
 }
 
 // Manual implementation to not require `C: Clone`, same as `Copy`.
@@ -95,7 +95,7 @@ impl<'a, C: Crossable> Segment<'a, C> {
         use SplitSegments::*;
 
         // We only support splitting a line segment.
-        let (p, q) = match self.geom() {
+        let (p, q) = match self.geom {
             Point(_) => panic!("attempt to adjust a point segment"),
             Line(p, q) => (p, q),
         };
@@ -149,29 +149,9 @@ impl<'a, C: Crossable> Segment<'a, C> {
         self.crossable
     }
 
-    /// Get a reference to the segment's geom.
-    pub fn geom(&self) -> LineOrPoint<C::Scalar> {
-        self.geom
-    }
-
     /// Get the segment's key.
     pub(crate) fn key(&self) -> usize {
         self.key
-    }
-
-    /// Get segment's overlapping link if set.
-    pub(crate) fn overlapping(&self) -> Option<usize> {
-        self.overlapping
-    }
-
-    /// Set the segment's overlapping.
-    pub(crate) fn set_overlapping(&mut self, overlapping: Option<usize>) {
-        self.overlapping = overlapping;
-    }
-
-    /// Set the segment's geom.
-    pub(crate) fn set_geom(&mut self, geom: LineOrPoint<C::Scalar>) {
-        self.geom = geom;
     }
 }
 

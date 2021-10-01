@@ -16,7 +16,7 @@ pub struct Sweep<'a, C: Crossable>
 where
     C: Crossable,
 {
-    segments: Slab<Segment<'a, C>>,
+    segments: Box<Slab<Segment<'a, C>>>,
     events: BinaryHeap<Event<C::Scalar>>,
     active_segments: BTreeSet<ActiveSegment<'a, C>>,
 }
@@ -40,7 +40,7 @@ impl<'a, C: Crossable> FromIterator<&'a C> for Sweep<'a, C> {
 impl<'a, C: Crossable> Sweep<'a, C> {
     fn with_capacity(size: usize) -> Self {
         Sweep {
-            segments: Slab::with_capacity(size),
+            segments: Slab::with_capacity(size).into(),
             events: BinaryHeap::with_capacity(size),
             active_segments: Default::default(),
         }
@@ -56,9 +56,9 @@ impl<'a, C: Crossable> Sweep<'a, C> {
         let segment_key = segment.key();
 
         if let Some(parent) = parent {
-            let segment_geom = segment.geom();
+            let segment_geom = segment.geom;
 
-            let mut child = self.segments[parent].overlapping();
+            let mut child = self.segments[parent].overlapping;
             let mut target_key = segment_key;
 
             while let Some(child_key) = child {
@@ -69,10 +69,10 @@ impl<'a, C: Crossable> Sweep<'a, C> {
                     child_segment.crossable(),
                     Some(segment_geom),
                 ).key();
-                self.segments[target_key].set_overlapping(Some(new_key));
+                self.segments[target_key].overlapping = Some(new_key);
 
                 target_key = new_key;
-                child = child_segment.overlapping();
+                child = child_segment.overlapping;
             }
         }
         segment_key
@@ -81,12 +81,12 @@ impl<'a, C: Crossable> Sweep<'a, C> {
     fn adjust_for_intersection(&mut self, key: usize, adj_intersection: LineOrPoint<C::Scalar>) -> SplitSegments<C::Scalar> {
         let segment = &mut self.segments[key];
         let adjust_output = segment.adjust_for_intersection(adj_intersection);
-        let new_geom = segment.geom();
-        let mut child = segment.overlapping();
+        let new_geom = segment.geom;
+        let mut child = segment.overlapping;
         while let Some(child_key) = child {
             let child_seg = &mut self.segments[child_key];
-            child_seg.set_geom(new_geom);
-            child = child_seg.overlapping();
+            child_seg.geom = new_geom;
+            child = child_seg.overlapping;
         }
         adjust_output
     }
@@ -125,18 +125,18 @@ impl<'a, C: Crossable> Sweep<'a, C> {
         let segment = *{
             let maybe_segment = self.segments.get(event.segment_key);
             if let LineRight = event.ty {
-                match maybe_segment.map(|s| s.geom()) {
+                match maybe_segment.map(|s| s.geom) {
                     Some(Line(_, q)) if q == event.point => maybe_segment.unwrap(),
                     _ => return,
                 }
             } else {
                 let segment = maybe_segment.expect("segment for event not found in storage");
                 match event.ty {
-                    LineLeft => match segment.geom() {
+                    LineLeft => match segment.geom {
                         Line(p, _) => assert_eq!(p, event.point),
                         _ => panic!("unexpected segment type for event"),
                     },
-                    PointLeft | PointRight => match segment.geom() {
+                    PointLeft | PointRight => match segment.geom {
                         Point(p) => assert_eq!(p, event.point),
                         _ => panic!("unexpected segment type for event"),
                     },
@@ -157,7 +157,7 @@ impl<'a, C: Crossable> Sweep<'a, C> {
                         .get_mut(adj_key)
                         .expect("active segment not found in storage");
                     if let Some(adj_intersection) =
-                        segment.geom().intersect_line(&adj_segment.geom())
+                        segment.geom.intersect_line(&adj_segment.geom)
                     {
                         // 1. Split adj_segment, and extra splits to storage
                         let adj_overlap_key = self.adjust_one_segment(adj_key, adj_intersection);
