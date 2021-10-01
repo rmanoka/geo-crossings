@@ -46,7 +46,21 @@ impl<'a, C: Crossable> Sweep<'a, C> {
         }
     }
 
-    fn create_segment(&mut self, crossable: &'a C, geom: Option<LineOrPoint<C::Scalar>>, parent: Option<usize>) -> usize {
+    /// Create a segment, and add its events into the heap.
+    ///
+    /// # Arguments
+    ///
+    /// - `crossable` - the user input associated with this segment
+    /// - `geom` - the geometry (if `None`, takes the default geom from
+    /// crossable)
+    /// - `parent` - the chain of overlapping segments to copy from (`None` if
+    /// no overlap)
+    fn create_segment(
+        &mut self,
+        crossable: &'a C,
+        geom: Option<LineOrPoint<C::Scalar>>,
+        parent: Option<usize>,
+    ) -> usize {
         let segment = Segment::new(&mut self.segments, crossable, geom);
 
         // Push events to process the created segment.
@@ -68,7 +82,8 @@ impl<'a, C: Crossable> Sweep<'a, C> {
                     &mut self.segments,
                     child_segment.crossable(),
                     Some(segment_geom),
-                ).key();
+                )
+                .key();
                 self.segments[target_key].overlapping = Some(new_key);
 
                 target_key = new_key;
@@ -78,10 +93,27 @@ impl<'a, C: Crossable> Sweep<'a, C> {
         segment_key
     }
 
-    fn adjust_for_intersection(&mut self, key: usize, adj_intersection: LineOrPoint<C::Scalar>) -> SplitSegments<C::Scalar> {
+    /// Adjust the segment at `key` for a detected intersection
+    /// (`adj_intersection`).
+    ///
+    /// This is a wrapper around [`Segment::adjust_for_intersection`]
+    /// but also pushes right-end event if the segment geometry
+    /// changed. Also handles overlaps by adjusting the geom on all
+    /// overlapping segments.
+    fn adjust_for_intersection(
+        &mut self,
+        key: usize,
+        adj_intersection: LineOrPoint<C::Scalar>,
+    ) -> SplitSegments<C::Scalar> {
         let segment = &mut self.segments[key];
         let adjust_output = segment.adjust_for_intersection(adj_intersection);
         let new_geom = segment.geom;
+
+        use SplitSegments::*;
+        if matches!(adjust_output, SplitOnce { .. } | SplitTwice { .. }) {
+            self.events.push(segment.right_event());
+        }
+
         let mut child = segment.overlapping;
         while let Some(child_key) = child {
             let child_seg = &mut self.segments[child_key];
@@ -91,6 +123,10 @@ impl<'a, C: Crossable> Sweep<'a, C> {
         adjust_output
     }
 
+    /// Adjust the segment at `key` for a detected intersection
+    /// (`adj_intersection`). Splits the segment, and adds the extra
+    /// segments (copying overlaps appropriately). Returns the key of
+    /// the overlapping segment, if any.
     fn adjust_one_segment(
         &mut self,
         key: usize,
@@ -111,23 +147,29 @@ impl<'a, C: Crossable> Sweep<'a, C> {
             }
             SplitTwice { right } => {
                 self.create_segment(adj_cross, Some(right), Some(key));
-                Some(self.create_segment(adj_cross, Some(adj_intersection), Some(key)))
+                let middle_key = self.create_segment(adj_cross, Some(adj_intersection), Some(key));
+                Some(middle_key)
             }
         }
     }
 
-    fn handle_event(&mut self, event: Event<C::Scalar>) {
+    /// Check event is valid, and return the segment associated with it.
+    ///
+    /// If a segment was adjusted, we may have spurious event for the
+    /// right end point (`LineRight`) which is no longer valid.
+    /// Returns `None` in this case.
+    fn segment_for_event(&self, event: &Event<C::Scalar>) -> Option<&Segment<'a, C>> {
         use EventType::*;
         use LineOrPoint::*;
-
-        // If a segment was adjusted, we may have spurious event for
-        // LineRight that should be ignored.
-        let segment = *{
+        Some({
             let maybe_segment = self.segments.get(event.segment_key);
             if let LineRight = event.ty {
-                match maybe_segment.map(|s| s.geom) {
-                    Some(Line(_, q)) if q == event.point => maybe_segment.unwrap(),
-                    _ => return,
+                match maybe_segment {
+                    Some(segment) if !segment.is_overlapping => match segment.geom {
+                        Line(_, q) if q == event.point => segment,
+                        _ => return None,
+                    },
+                    _ => return None,
                 }
             } else {
                 let segment = maybe_segment.expect("segment for event not found in storage");
@@ -144,6 +186,26 @@ impl<'a, C: Crossable> Sweep<'a, C> {
                 }
                 segment
             }
+        })
+    }
+
+    /// Chain a new segment at `tgt_key` detected as overlapping with
+    /// an existing segment at `src_key`.
+    fn chain_overlap(&mut self, src_key: usize, tgt_key: usize) {
+        let mut segment = &mut self.segments[src_key];
+        while let Some(ovlp_key) = segment.overlapping {
+            segment = &mut self.segments[ovlp_key];
+        }
+        segment.overlapping = Some(tgt_key);
+        self.segments[tgt_key].is_overlapping = true;
+    }
+
+    fn handle_event(&mut self, event: Event<C::Scalar>) -> bool {
+        use EventType::*;
+
+        let mut segment = *match self.segment_for_event(&event) {
+            Some(s) => s,
+            None => return false,
         };
 
         let prev = self.active_segments.prev_key(&segment, &self.segments);
@@ -156,37 +218,76 @@ impl<'a, C: Crossable> Sweep<'a, C> {
                         .segments
                         .get_mut(adj_key)
                         .expect("active segment not found in storage");
-                    if let Some(adj_intersection) =
-                        segment.geom.intersect_line(&adj_segment.geom)
-                    {
+                    if let Some(adj_intersection) = segment.geom.intersect_line(&adj_segment.geom) {
                         // 1. Split adj_segment, and extra splits to storage
                         let adj_overlap_key = self.adjust_one_segment(adj_key, adj_intersection);
+
+                        // A special case is if adj_segment was split, and the
+                        // intersection is at the start of this segment. In this
+                        // case, there is an right-end event in the heap, that
+                        // needs to be handled before finishing up this event.
+                        let handle_end_event = {
+                            // Get first point of intersection
+                            let int_pt = adj_intersection.first();
+                            // Check its not first point of the adjusted, but is
+                            // first point of current segment
+                            int_pt != self.segments[adj_key].geom.first() && int_pt == segment.geom.first()
+                        };
+                        if handle_end_event {
+                            let event = self.events.pop().unwrap();
+                            assert!(
+                                self.handle_event(event),
+                                "special right-end event handling failed"
+                            )
+                        }
 
                         // 2. Split segment, adding extra segments as needed.
                         let seg_overlap_key =
                             self.adjust_one_segment(event.segment_key, adj_intersection);
+                        // Update segment as it may have changed in storage
+                        segment = self.segments[event.segment_key];
 
-                        // match segment.adjust_for_intersection(adj_intersection) {
-                        //     Unchanged { overlap } => todo!(),
-                        //     SplitOnce { overlap, right } => todo!(),
-                        //     SplitTwice { right } => todo!(),
-                        // }
+
+                        assert_eq!(
+                            adj_overlap_key.is_some(),
+                            seg_overlap_key.is_some(),
+                            "one of the intersecting segments had an overlap, but not the other!"
+                        );
+                        if let Some(adj_ovl_key) = adj_overlap_key {
+                            let tgt_key = seg_overlap_key.unwrap();
+                            self.chain_overlap(adj_ovl_key, tgt_key);
+
+                            if tgt_key == event.segment_key {
+                                // The whole event segment is now overlapping
+                                // some other active segment.
+                                return true;
+                            }
+                        }
                     }
                 }
 
                 // Add current segment as active
-                self.segments[event.segment_key] = segment;
                 self.active_segments
                     .add_segment(event.segment_key, &self.segments);
             }
             LineRight => {
-                match (prev, next) {
-                    (Some(prev_key), Some(next_key)) => todo!(),
-                    _ => {}
-                }
                 self.active_segments
                     .remove_segment(event.segment_key, &self.segments);
-                self.segments.remove(event.segment_key);
+
+                if let (Some(prev_key), Some(next_key)) = (prev, next) {
+                    let prev_segment = self.segments[prev_key];
+                    let next_segment = self.segments[next_key];
+                    if let Some(adj_intersection) =
+                        prev_segment.geom.intersect_line(&next_segment.geom)
+                    {
+                        // 1. Split prev_segment, and extra splits to storage
+                        assert!(
+                            self.adjust_one_segment(prev_key, adj_intersection).is_none()
+                                && self.adjust_one_segment(next_key, adj_intersection).is_none(),
+                            "adjacent segments @ removal can't overlap!"
+                        );
+                    }
+                }
             }
             PointLeft => {
                 todo!()
@@ -195,11 +296,11 @@ impl<'a, C: Crossable> Sweep<'a, C> {
                 todo!()
             }
         }
-        todo!()
+        true
     }
 
     #[allow(dead_code)]
-    pub fn next_event(&mut self) -> Option<SweepPoint<C::Scalar>> {
+    fn next_event(&mut self) -> Option<SweepPoint<C::Scalar>> {
         self.events.pop().map(|event| {
             let pt = event.point;
             self.handle_event(event);

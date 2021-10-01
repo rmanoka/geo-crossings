@@ -14,7 +14,9 @@ pub struct Segment<'a, C: Crossable> {
     pub(crate) geom: LineOrPoint<C::Scalar>,
     key: usize,
     crossable: &'a C,
+    first: bool,
     pub(crate) overlapping: Option<usize>,
+    pub(crate) is_overlapping: bool,
 }
 
 // Manual implementation to not require `C: Clone`, same as `Copy`.
@@ -34,6 +36,7 @@ impl<'a, C: Crossable> Segment<'a, C> {
         crossable: &'a C,
         geom: Option<LineOrPoint<C::Scalar>>,
     ) -> &'b mut Self {
+        let first = geom.is_none();
         let geom = geom.unwrap_or_else(|| crossable.geom().0);
         let entry = storage.vacant_entry();
 
@@ -41,7 +44,9 @@ impl<'a, C: Crossable> Segment<'a, C> {
             key: entry.key(),
             crossable,
             geom,
+            first,
             overlapping: None,
+            is_overlapping: false,
         };
         entry.insert(segment)
     }
@@ -111,6 +116,7 @@ impl<'a, C: Crossable> Segment<'a, C> {
                     // Otherwise, split it. Mutate `self` to be the
                     // first part, and return the second part.
                     self.geom = Line(p, r);
+                    self.first = false;
                     SplitOnce {
                         overlap: None,
                         right: Line(r, q),
@@ -125,6 +131,7 @@ impl<'a, C: Crossable> Segment<'a, C> {
                         Unchanged { overlap: true }
                     } else {
                         self.geom = Line(p, r2);
+                        self.first = false;
                         SplitOnce {
                             overlap: Some(false),
                             right: Line(r2, q),
@@ -132,12 +139,14 @@ impl<'a, C: Crossable> Segment<'a, C> {
                     }
                 } else if r2 == q {
                     self.geom = Line(p, r1);
+                    self.first = false;
                     SplitOnce {
                         overlap: Some(true),
                         right: Line(r2, q),
                     }
                 } else {
                     self.geom = Line(p, r1);
+                    self.first = false;
                     SplitTwice { right: Line(r2, q) }
                 }
             }

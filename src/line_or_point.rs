@@ -58,9 +58,16 @@ impl<T: GeoFloat> LineOrPoint<T> {
         }
     }
 
+    pub fn first(&self) -> SweepPoint<T> {
+        *match self {
+            LineOrPoint::Point(p) => p,
+            LineOrPoint::Line(p, _) => p,
+        }
+    }
+
     /// Intersect a line with self and return a point, a overlapping segment or `None`.
     ///
-    /// The other argument must be a line variant (panics otherwise).
+    /// The `other` argument must be a line variant (panics otherwise).
     pub fn intersect_line(&self, other: &Self) -> Option<Self> {
         let line = other
             .line()
