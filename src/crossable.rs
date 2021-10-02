@@ -7,8 +7,43 @@ use crate::line_or_point::LineOrPoint;
 /// This is wrapper around an internal enum that represents either a
 /// line segment or a point. Use the [`From`] implementations to
 /// convert from corresponding geo types: [`Line`], or [`Point`].
-#[derive(Debug, Clone, PartialEq)]
+///
+/// # Semantics
+///
+/// Line segment must have two distinct points. The constructors
+/// convert a degenerate `Line` into a point variant.
+#[derive(Debug, Clone, PartialEq, Copy)]
 pub struct CrossableGeom<T: GeoFloat>(pub(crate) LineOrPoint<T>);
+
+impl<T: GeoFloat> CrossableGeom<T> {
+    /// Check if the enum is a point.
+    #[inline]
+    pub fn is_point(&self) -> bool {
+        matches!(self.0, LineOrPoint::Point(..))
+    }
+
+    /// Return the coordinate if the enum is a point variant.
+    pub fn point(&self) -> Option<Coordinate<T>> {
+        match self.0 {
+            LineOrPoint::Point(p) => Some(p.0),
+            LineOrPoint::Line(_, _) => None,
+        }
+    }
+
+    /// Check if the enum is a line.
+    #[inline]
+    pub fn is_line(&self) -> bool {
+        !self.is_point()
+    }
+
+    /// Return the line if the enum is a line variant.
+    ///
+    /// The returned line may have coordinates swapped from the one
+    /// used for construction.
+    pub fn line(&self) -> Option<Line<T>> {
+        self.0.line()
+    }
+}
 
 impl<T: GeoFloat> From<Line<T>> for CrossableGeom<T> {
     fn from(l: Line<T>) -> Self {

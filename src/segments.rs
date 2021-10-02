@@ -6,6 +6,7 @@ use crate::{
     crossable::Crossable,
     events::{Event, EventType},
     line_or_point::LineOrPoint::{self, *},
+    Crossing,
 };
 
 /// A segment of input [`LineOrPoint`] generated during the sweep.
@@ -14,7 +15,7 @@ pub struct Segment<'a, C: Crossable> {
     pub(crate) geom: LineOrPoint<C::Scalar>,
     key: usize,
     crossable: &'a C,
-    first: bool,
+    first_segment: bool,
     pub(crate) overlapping: Option<usize>,
     pub(crate) is_overlapping: bool,
 }
@@ -44,7 +45,7 @@ impl<'a, C: Crossable> Segment<'a, C> {
             key: entry.key(),
             crossable,
             geom,
-            first,
+            first_segment: first,
             overlapping: None,
             is_overlapping: false,
         };
@@ -108,6 +109,10 @@ impl<'a, C: Crossable> Segment<'a, C> {
         match intersection {
             // Handle point intersection
             Point(r) => {
+                assert!(
+                    p <= r && r <= q,
+                    "intersection point was not ordered within the line!"
+                );
                 if p == r || q == r {
                     // If the intersection is at the end point, the
                     // segment doesn't need to be split.
@@ -116,7 +121,7 @@ impl<'a, C: Crossable> Segment<'a, C> {
                     // Otherwise, split it. Mutate `self` to be the
                     // first part, and return the second part.
                     self.geom = Line(p, r);
-                    self.first = false;
+                    self.first_segment = false;
                     SplitOnce {
                         overlap: None,
                         right: Line(r, q),
@@ -125,13 +130,17 @@ impl<'a, C: Crossable> Segment<'a, C> {
             }
             // Handle overlapping segments
             Line(r1, r2) => {
+                assert!(
+                    p <= r1 && r2 <= q,
+                    "overlapping segment was not ordered within the line!"
+                );
                 if p == r1 {
                     if r2 == q {
                         // The whole segment overlaps.
                         Unchanged { overlap: true }
                     } else {
                         self.geom = Line(p, r2);
-                        self.first = false;
+                        self.first_segment = false;
                         SplitOnce {
                             overlap: Some(false),
                             right: Line(r2, q),
@@ -139,14 +148,14 @@ impl<'a, C: Crossable> Segment<'a, C> {
                     }
                 } else if r2 == q {
                     self.geom = Line(p, r1);
-                    self.first = false;
+                    self.first_segment = false;
                     SplitOnce {
                         overlap: Some(true),
                         right: Line(r2, q),
                     }
                 } else {
                     self.geom = Line(p, r1);
-                    self.first = false;
+                    self.first_segment = false;
                     SplitTwice { right: Line(r2, q) }
                 }
             }
@@ -161,6 +170,17 @@ impl<'a, C: Crossable> Segment<'a, C> {
     /// Get the segment's key.
     pub(crate) fn key(&self) -> usize {
         self.key
+    }
+
+    /// Convert `self` into a `Crossing` to return to user.
+    pub(crate) fn into_crossing(self, event_ty: EventType) -> Crossing<'a, C> {
+        Crossing {
+            crossable: self.crossable,
+            geom: self.geom.into(),
+            first_segment: self.first_segment,
+            has_overlap: self.overlapping.is_some(),
+            at_left: event_ty == EventType::LineLeft,
+        }
     }
 }
 

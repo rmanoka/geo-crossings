@@ -46,7 +46,7 @@ impl<T: GeoFloat> Ord for Event<T> {
 /// points in the sweep to support a consistent total ordering of the
 /// "active segments". The point variants handle edge case involving
 /// point-line intersections.
-#[derive(Debug, PartialOrd, Ord, PartialEq, Eq, Clone)]
+#[derive(Debug, PartialOrd, Ord, PartialEq, Eq, Clone, Copy)]
 pub(crate) enum EventType {
     PointLeft,
     LineRight,

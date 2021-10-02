@@ -43,17 +43,9 @@ impl<T: GeoFloat> From<Coordinate<T>> for LineOrPoint<T> {
 
 impl<T: GeoFloat> LineOrPoint<T> {
     /// Return a [`Line`] if it is one, otherwise `None`.
-    fn line(&self) -> Option<Line<T>> {
+    pub(crate) fn line(&self) -> Option<Line<T>> {
         match self {
             LineOrPoint::Line(p, q) => Some(Line::new(p.0, q.0)),
-            _ => None,
-        }
-    }
-
-    /// Return a [`Coordinate`] if it is one, otherwise `None`.
-    fn point(&self) -> Option<Coordinate<T>> {
-        match self {
-            LineOrPoint::Point(p) => Some(p.0),
             _ => None,
         }
     }

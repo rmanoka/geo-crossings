@@ -1,7 +1,4 @@
-use std::{
-    collections::{BTreeSet, BinaryHeap},
-    iter::FromIterator,
-};
+use std::collections::{BTreeSet, BinaryHeap};
 
 use slab::Slab;
 
@@ -9,7 +6,7 @@ use crate::{
     events::{Event, EventType, SweepPoint},
     line_or_point::LineOrPoint,
     segments::{ActiveSegment, AdjacentSegments, Segment, SplitSegments},
-    Crossable,
+    Crossable, Crossing,
 };
 
 pub struct Sweep<'a, C: Crossable>
@@ -21,29 +18,24 @@ where
     active_segments: BTreeSet<ActiveSegment<'a, C>>,
 }
 
-impl<'a, C: Crossable> FromIterator<&'a C> for Sweep<'a, C> {
-    fn from_iter<T: IntoIterator<Item = &'a C>>(iter: T) -> Self {
+impl<'a, C: Crossable> Sweep<'a, C> {
+    pub fn new<I: IntoIterator<Item = &'a C>>(iter: I) -> Self {
         let iter = iter.into_iter();
-        let mut sweep = Sweep::with_capacity({
+        let size = {
             let (min_size, max_size) = iter.size_hint();
             max_size.unwrap_or(min_size)
-        });
+        };
 
+        let mut sweep = Sweep {
+            segments: Slab::with_capacity(size).into(),
+            events: BinaryHeap::with_capacity(size),
+            active_segments: Default::default(),
+        };
         for cr in iter {
             sweep.create_segment(cr, None, None);
         }
 
         sweep
-    }
-}
-
-impl<'a, C: Crossable> Sweep<'a, C> {
-    fn with_capacity(size: usize) -> Self {
-        Sweep {
-            segments: Slab::with_capacity(size).into(),
-            events: BinaryHeap::with_capacity(size),
-            active_segments: Default::default(),
-        }
     }
 
     /// Create a segment, and add its events into the heap.
@@ -200,7 +192,11 @@ impl<'a, C: Crossable> Sweep<'a, C> {
         self.segments[tgt_key].is_overlapping = true;
     }
 
-    fn handle_event(&mut self, event: Event<C::Scalar>) -> bool {
+    fn handle_event<F: FnMut(Crossing<'a, C>)>(
+        &mut self,
+        event: Event<C::Scalar>,
+        cb: &mut F,
+    ) -> bool {
         use EventType::*;
 
         let mut segment = *match self.segment_for_event(&event) {
@@ -231,12 +227,13 @@ impl<'a, C: Crossable> Sweep<'a, C> {
                             let int_pt = adj_intersection.first();
                             // Check its not first point of the adjusted, but is
                             // first point of current segment
-                            int_pt != self.segments[adj_key].geom.first() && int_pt == segment.geom.first()
+                            int_pt != self.segments[adj_key].geom.first()
+                                && int_pt == segment.geom.first()
                         };
                         if handle_end_event {
                             let event = self.events.pop().unwrap();
                             assert!(
-                                self.handle_event(event),
+                                self.handle_event(event, cb),
                                 "special right-end event handling failed"
                             )
                         }
@@ -246,7 +243,6 @@ impl<'a, C: Crossable> Sweep<'a, C> {
                             self.adjust_one_segment(event.segment_key, adj_intersection);
                         // Update segment as it may have changed in storage
                         segment = self.segments[event.segment_key];
-
 
                         assert_eq!(
                             adj_overlap_key.is_some(),
@@ -269,10 +265,25 @@ impl<'a, C: Crossable> Sweep<'a, C> {
                 // Add current segment as active
                 self.active_segments
                     .add_segment(event.segment_key, &self.segments);
+
+                let mut segment_key = Some(event.segment_key);
+                while let Some(key) = segment_key {
+                    let segment = self.segments[key];
+                    cb(segment.into_crossing(event.ty));
+                    segment_key = segment.overlapping;
+                }
             }
             LineRight => {
                 self.active_segments
                     .remove_segment(event.segment_key, &self.segments);
+
+                let mut segment_key = Some(event.segment_key);
+                while let Some(key) = segment_key {
+                    let segment = self.segments[key];
+                    cb(segment.into_crossing(event.ty));
+                    self.segments.remove(key);
+                    segment_key = segment.overlapping;
+                }
 
                 if let (Some(prev_key), Some(next_key)) = (prev, next) {
                     let prev_segment = self.segments[prev_key];
@@ -282,8 +293,11 @@ impl<'a, C: Crossable> Sweep<'a, C> {
                     {
                         // 1. Split prev_segment, and extra splits to storage
                         assert!(
-                            self.adjust_one_segment(prev_key, adj_intersection).is_none()
-                                && self.adjust_one_segment(next_key, adj_intersection).is_none(),
+                            self.adjust_one_segment(prev_key, adj_intersection)
+                                .is_none()
+                                && self
+                                    .adjust_one_segment(next_key, adj_intersection)
+                                    .is_none(),
                             "adjacent segments @ removal can't overlap!"
                         );
                     }
@@ -299,13 +313,23 @@ impl<'a, C: Crossable> Sweep<'a, C> {
         true
     }
 
-    #[allow(dead_code)]
-    fn next_event(&mut self) -> Option<SweepPoint<C::Scalar>> {
+    /// Process the next event in heap.
+    ///
+    /// Calls the callback unless the event is spurious.
+    pub fn next_event<F: FnMut(Crossing<'a, C>)>(
+        &mut self,
+        mut cb: F,
+    ) -> Option<SweepPoint<C::Scalar>> {
         self.events.pop().map(|event| {
             let pt = event.point;
-            self.handle_event(event);
+            self.handle_event(event, &mut cb);
 
             pt
         })
+    }
+
+    /// Peek and return the next point in the sweep.
+    pub fn peek_point(&self) -> Option<SweepPoint<C::Scalar>> {
+        self.events.peek().map(|e| e.point)
     }
 }
