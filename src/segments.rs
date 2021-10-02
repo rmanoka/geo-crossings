@@ -1,6 +1,6 @@
 use geo::GeoFloat;
 use slab::Slab;
-use std::{cmp::Ordering, collections::BTreeSet, ops::Bound};
+use std::{cmp::Ordering, collections::BTreeSet, fmt::Debug, ops::Bound};
 
 use crate::{
     crossable::Crossable,
@@ -151,7 +151,7 @@ impl<'a, C: Crossable> Segment<'a, C> {
                     self.first_segment = false;
                     SplitOnce {
                         overlap: Some(true),
-                        right: Line(r2, q),
+                        right: Line(r1, q),
                     }
                 } else {
                     self.geom = Line(p, r1);
@@ -188,6 +188,15 @@ impl<'a, C: Crossable> Segment<'a, C> {
 pub(crate) struct ActiveSegment<'a, C: Crossable> {
     key: usize,
     storage: *const Slab<Segment<'a, C>>,
+}
+
+impl<'a, C: Crossable> Debug for ActiveSegment<'a, C> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("ActiveSegment")
+            .field("key", &self.key)
+            .field("segment", &self.get())
+            .finish()
+    }
 }
 
 impl<'a, C: Crossable> ActiveSegment<'a, C> {
@@ -236,11 +245,12 @@ impl<'a, C: Crossable> PartialOrd for ActiveSegment<'a, C> {
 /// Assert total ordering same as `PartialOrd` impl.
 impl<'a, C: Crossable> Ord for ActiveSegment<'a, C> {
     fn cmp(&self, other: &Self) -> Ordering {
-        self.partial_cmp(other).unwrap()
+        self.partial_cmp(other)
+            .expect("unable to compare active segments!")
     }
 }
 
-/// Helper trait to get adjacent segments from ordered set.
+/// Helper trait to insert, remove and get adjacent segments from ordered set.
 pub(crate) trait AdjacentSegments {
     type SegmentType;
     fn prev_key(
@@ -293,6 +303,9 @@ impl<'a, C: Crossable + 'a> AdjacentSegments for BTreeSet<ActiveSegment<'a, C>> 
     }
 }
 
+/// Stores the type of split and extra geometries from adjusting a
+/// segment for intersection.
+#[derive(Debug)]
 pub(crate) enum SplitSegments<T: GeoFloat> {
     Unchanged {
         overlap: bool,
@@ -304,4 +317,140 @@ pub(crate) enum SplitSegments<T: GeoFloat> {
     SplitTwice {
         right: LineOrPoint<T>,
     },
+}
+
+#[cfg(test)]
+mod tests {
+    use geo::Line;
+
+    use super::*;
+
+    impl<T: GeoFloat> PartialEq for SplitSegments<T> {
+        fn eq(&self, other: &Self) -> bool {
+            match (self, other) {
+                (
+                    Self::Unchanged { overlap: l_overlap },
+                    Self::Unchanged { overlap: r_overlap },
+                ) => l_overlap == r_overlap,
+                (
+                    Self::SplitOnce {
+                        overlap: l_overlap,
+                        right: l_right,
+                    },
+                    Self::SplitOnce {
+                        overlap: r_overlap,
+                        right: r_right,
+                    },
+                ) => l_overlap == r_overlap && l_right.coords_equal(r_right),
+                (Self::SplitTwice { right: l_right }, Self::SplitTwice { right: r_right }) => {
+                    l_right.coords_equal(r_right)
+                }
+                _ => false,
+            }
+        }
+    }
+
+    #[test]
+    fn test_split() {
+        let mut slab = Slab::new();
+        let lines = vec![
+            Line::from([(0., 0.), (10., 10.)]),
+            [(10.0, 0.), (0., 10.)].into(),
+            [(0., 0.), (0., 10.)].into(),
+            [(0., 0.), (5., 5.)].into(),
+            [(10., 10.), (5., 5.)].into(),
+        ];
+        lines.iter().enumerate().for_each(|(i, l)| {
+            assert_eq!(Segment::new(&mut slab, l, None).key(), i);
+        });
+
+        struct TestCase {
+            a: usize,
+            b: usize,
+            isec: Option<LineOrPoint<f64>>,
+            split: Option<SplitSegments<f64>>,
+        }
+
+        impl TestCase {
+            fn assert_equality<'a>(&self, slab: &Slab<Segment<'a, Line<f64>>>) {
+                let isec = slab[self.a]
+                    .geom
+                    .intersect_line(&slab[self.b].geom);
+                assert_eq!(isec, self.isec);
+
+                if isec.is_none() {
+                    return;
+                }
+                let isec = isec.unwrap();
+                let mut copy_seg = slab[self.a];
+                let split = copy_seg.adjust_for_intersection(isec);
+                assert_eq!(
+                    &split,
+                    self.split.as_ref().unwrap(),
+                )
+            }
+        }
+
+        let test_cases = vec![
+            TestCase {
+                a: 0,
+                b: 0,
+                isec: Some(
+                    slab[0].geom.clone(),
+                ),
+                split: Some(
+                    SplitSegments::Unchanged {
+                        overlap: true,
+                    }
+                ),
+            },
+            TestCase {
+                a: 0,
+                b: 1,
+                isec: Some(LineOrPoint::Point((5., 5.).into())),
+                split: Some(
+                    SplitSegments::SplitOnce {
+                        overlap: None,
+                        right: LineOrPoint::Line((5., 5.).into(), (10., 10.).into()),
+                    }
+                ),
+            },
+            TestCase {
+                a: 0,
+                b: 2,
+                isec: Some(
+                    LineOrPoint::Point((0., 0.).into()),
+                ),
+                split: Some(
+                    SplitSegments::Unchanged {
+                        overlap: false,
+                    }
+                ),
+            },
+            TestCase {
+                a: 0,
+                b: 3,
+                isec: Some(LineOrPoint::Line((0., 0.).into(), (5., 5.).into())),
+                split: Some(
+                    SplitSegments::SplitOnce {
+                        overlap: Some(false),
+                        right: LineOrPoint::Line((5., 5.).into(), (10., 10.).into()),
+                    }
+                ),
+            },
+            TestCase {
+                a: 0,
+                b: 4,
+                isec: Some(LineOrPoint::Line((5., 5.).into(), (10., 10.).into())),
+                split: Some(
+                    SplitSegments::SplitOnce {
+                        overlap: Some(true),
+                        right: LineOrPoint::Line((5., 5.).into(), (10., 10.).into()),
+                    }
+                ),
+            },
+        ];
+
+        test_cases.iter().for_each(|t| t.assert_equality(&slab));
+    }
 }

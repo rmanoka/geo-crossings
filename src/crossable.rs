@@ -1,3 +1,5 @@
+use std::fmt::Debug;
+
 use geo::{Coordinate, GeoFloat, Line, Point};
 
 use crate::line_or_point::LineOrPoint;
@@ -73,7 +75,7 @@ impl<T: GeoFloat> From<LineOrPoint<T>> for CrossableGeom<T> {
 ///
 /// This type is implemented by [`Line`] and [`Point`], but users may
 /// also implement this on custom types to store extra information.
-pub trait Crossable: Sized {
+pub trait Crossable: Sized + Debug {
     /// Scalar used the coordinates.
     type Scalar: GeoFloat;
     /// The geometry associated with this type. Must be a line or a

@@ -1,5 +1,6 @@
 use std::collections::{BTreeSet, BinaryHeap};
 
+use log::{debug, trace};
 use slab::Slab;
 
 use crate::{
@@ -98,7 +99,9 @@ impl<'a, C: Crossable> Sweep<'a, C> {
         adj_intersection: LineOrPoint<C::Scalar>,
     ) -> SplitSegments<C::Scalar> {
         let segment = &mut self.segments[key];
+        debug!("adjust_for_intersection: {:?}\n\twith: {:?}", segment, adj_intersection);
         let adjust_output = segment.adjust_for_intersection(adj_intersection);
+        debug!("adjust_output: {:?}", adjust_output);
         let new_geom = segment.geom;
 
         use SplitSegments::*;
@@ -192,6 +195,9 @@ impl<'a, C: Crossable> Sweep<'a, C> {
         self.segments[tgt_key].is_overlapping = true;
     }
 
+    /// Handle one event.
+    ///
+    /// Returns `true` if the event was not spurious.
     fn handle_event<F: FnMut(Crossing<'a, C>)>(
         &mut self,
         event: Event<C::Scalar>,
@@ -199,6 +205,7 @@ impl<'a, C: Crossable> Sweep<'a, C> {
     ) -> bool {
         use EventType::*;
 
+        trace!("handling event: {:?}", event);
         let mut segment = *match self.segment_for_event(&event) {
             Some(s) => s,
             None => return false,
@@ -215,6 +222,7 @@ impl<'a, C: Crossable> Sweep<'a, C> {
                         .get_mut(adj_key)
                         .expect("active segment not found in storage");
                     if let Some(adj_intersection) = segment.geom.intersect_line(&adj_segment.geom) {
+                        debug!("Found intersection:\n\tsegment1: {:?}\n\tsegment2: {:?}\n\tintersection: {:?}", segment, adj_segment, adj_intersection);
                         // 1. Split adj_segment, and extra splits to storage
                         let adj_overlap_key = self.adjust_one_segment(adj_key, adj_intersection);
 

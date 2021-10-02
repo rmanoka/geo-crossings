@@ -78,11 +78,19 @@ mod tests {
 
     use super::*;
 
+    fn init_log() {
+        let _ = env_logger::builder().is_test(true).try_init();
+    }
+
     #[test]
-    fn simple_iter() {
+    fn simple_intersect() {
+        init_log();
+
         let input = vec![
             Line::from([(0., 0.), (1., 1.)]),
             [(1., 0.), (0., 1.)].into(),
+            [(0., 0.5), (1., 0.5)].into(),
+            [(-1., 0.5), (0.5, 0.5)].into(),
         ];
 
         let iter: CrossingsIterator<_> = input.iter().collect();

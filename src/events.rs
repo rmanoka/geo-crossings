@@ -64,8 +64,14 @@ pub(crate) enum EventType {
 /// Note that the trait impls exist even when `T` is not `Eq` or
 /// `Ord`. We must ensure that any sweep point only contains values
 /// that can be consistently ordered.
-#[derive(Debug, PartialEq, Clone, Copy)]
+#[derive(PartialEq, Clone, Copy)]
 pub struct SweepPoint<T: GeoFloat>(pub Coordinate<T>);
+
+impl<T: GeoFloat> std::fmt::Debug for SweepPoint<T> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_tuple("Pt").field(&self.0.x).field(&self.0.y).finish()
+    }
+}
 
 /// Implememnt lexicographic ordering by `x` and then by `y`
 /// coordinate.
@@ -100,6 +106,11 @@ impl<T: GeoFloat> From<Coordinate<T>> for SweepPoint<T> {
             "sweep point requires a finite y-coordinate"
         );
         SweepPoint(pt)
+    }
+}
+impl<T: GeoFloat> From<(T, T)> for SweepPoint<T> {
+    fn from(coords: (T, T)) -> Self {
+        Coordinate::from(coords).into()
     }
 }
 

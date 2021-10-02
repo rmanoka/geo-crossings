@@ -89,6 +89,15 @@ impl<T: GeoFloat> LineOrPoint<T> {
             }
         }
     }
+
+    #[cfg(test)]
+    pub fn coords_equal(&self, other: &LineOrPoint<T>) -> bool {
+        match (self, other) {
+            (LineOrPoint::Point(p), LineOrPoint::Point(q)) => p == q,
+            (LineOrPoint::Line(p1, q1), LineOrPoint::Line(p2, q2)) => p1 == p2 && q1 == q2,
+            _ => false,
+        }
+    }
 }
 
 /// Equality based on ordering defined for segments as per algorithm.
