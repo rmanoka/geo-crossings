@@ -13,33 +13,52 @@ pub struct Crossing<'a, C: Crossable> {
     pub crossable: &'a C,
 
     /// The geometry of this segment.
+    ///
+    /// This is a part of the input `crossable` geometry. The parts
+    /// are formed by splitting the input geometry as and when
+    /// intersection points are witnessed. If this geometry ends at
+    /// the intersection point (`at_left` is `false`), then it is
+    /// guaranteed to not contain any intersection point.
     pub geom: CrossableGeom<C::Scalar>,
 
     /// Whether this is the first segment of the input line (not
     /// relevant if input is a point).
     pub first_segment: bool,
 
-    /// Whether the next segment returned from sweep overlaps with
-    /// this.
+    /// Flag that is `true` if the next geom in the sequence overlaps
+    /// with this.
     pub has_overlap: bool,
 
-    /// Whether the left or the right-end point is at the point of
-    /// intersection.
+    /// Flag that is `true` if the `geom` starts at the intersection point.
     pub at_left: bool,
 }
 
-pub struct CrossingsIterator<'a, C: Crossable> {
+/// Iterator that yields all crossings.
+///
+/// Yields all end points, intersections and overlaps of a set of
+/// line-segments and points. Construct it by `collect`-ing an
+/// iterator of references to [`Crossable`].
+///
+/// The implementation uses the [Bentley-Ottman] algorithm and runs in
+/// time O((n + k) log(n)) time; this is faster than a brute-force
+/// search for intersections across all pairs of input segments if k,
+/// the number of intersections is small compared to n^2.
+///
+/// [Bentley-Ottman]: //en.wikipedia.org/wiki/Bentley%E2%80%93Ottmann_algorithm
+pub struct CrossingsIter<'a, C: Crossable> {
     sweep: Sweep<'a, C>,
     segments: Vec<Crossing<'a, C>>,
 }
 
-impl<'a, C: Crossable> CrossingsIterator<'a, C> {
+impl<'a, C: Crossable> CrossingsIter<'a, C> {
+    /// Returns the segments that intersect the last point yielded by
+    /// the iterator.
     pub fn intersections(&mut self) -> &mut [Crossing<'a, C>] {
         &mut self.segments
     }
 }
 
-impl<'a, C: Crossable> FromIterator<&'a C> for CrossingsIterator<'a, C> {
+impl<'a, C: Crossable> FromIterator<&'a C> for CrossingsIter<'a, C> {
     fn from_iter<T: IntoIterator<Item = &'a C>>(iter: T) -> Self {
         let iter = iter.into_iter();
         let size = {
@@ -52,7 +71,7 @@ impl<'a, C: Crossable> FromIterator<&'a C> for CrossingsIterator<'a, C> {
     }
 }
 
-impl<'a, C: Crossable> Iterator for CrossingsIterator<'a, C> {
+impl<'a, C: Crossable> Iterator for CrossingsIter<'a, C> {
     type Item = Coordinate<C::Scalar>;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -83,7 +102,19 @@ mod tests {
     }
 
     #[test]
-    fn simple_intersect() {
+    fn simple_iter() {
+        let input = vec![
+            Line::from([(1., 0.), (0., 1.)]),
+            Line::from([(0., 0.), (1., 1.)]),
+        ];
+        let iter: CrossingsIter<_> = input.iter().collect();
+        for pt in iter {
+            eprintln!("{:?}", pt);
+        }
+    }
+
+    #[test]
+    fn overlap_intersect() {
         init_log();
 
         let input = vec![
@@ -95,7 +126,7 @@ mod tests {
             Coordinate::from((0., 0.)).into(),
         ];
 
-        let mut iter: CrossingsIterator<_> = input.iter().collect();
+        let mut iter: CrossingsIter<_> = input.iter().collect();
         while let Some(pt) = iter.next() {
             eprintln!("{:?} has {} segments", pt, iter.intersections().len());
         }
