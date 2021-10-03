@@ -106,3 +106,11 @@ impl<T: GeoFloat> Crossable for Line<T> {
         (*self).into()
     }
 }
+
+impl<T: GeoFloat> Crossable for CrossableGeom<T> {
+    type Scalar = T;
+
+    fn geom(&self) -> CrossableGeom<Self::Scalar> {
+        *self
+    }
+}

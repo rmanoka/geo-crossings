@@ -87,15 +87,17 @@ mod tests {
         init_log();
 
         let input = vec![
-            Line::from([(0., 0.), (1., 1.)]),
-            [(1., 0.), (0., 1.)].into(),
-            [(0., 0.5), (1., 0.5)].into(),
-            [(-1., 0.5), (0.5, 0.5)].into(),
+            CrossableGeom::from(Line::from([(0., 0.), (1., 1.)])),
+            Line::from([(1., 0.), (0., 1.)]).into(),
+            Line::from([(0., 0.5), (1., 0.5)]).into(),
+            Line::from([(-1., 0.5), (0.5, 0.5)]).into(),
+            Coordinate::from((0.5, 0.5)).into(),
+            Coordinate::from((0., 0.)).into(),
         ];
 
-        let iter: CrossingsIterator<_> = input.iter().collect();
-        for pt in iter {
-            eprintln!("{:?}", pt);
+        let mut iter: CrossingsIterator<_> = input.iter().collect();
+        while let Some(pt) = iter.next() {
+            eprintln!("{:?} has {} segments", pt, iter.intersections().len());
         }
     }
 }

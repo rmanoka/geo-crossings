@@ -312,10 +312,28 @@ impl<'a, C: Crossable> Sweep<'a, C> {
                 }
             }
             PointLeft => {
-                todo!()
+                for adj_key in prev.into_iter().chain(next.into_iter()) {
+                    let adj_segment = self
+                        .segments
+                        .get_mut(adj_key)
+                        .expect("active segment not found in storage");
+                    if let Some(adj_intersection) = segment.geom.intersect_line(&adj_segment.geom) {
+                        debug!("Found intersection:\n\tsegment1: {:?}\n\tsegment2: {:?}\n\tintersection: {:?}", segment, adj_segment, adj_intersection);
+                        // 1. Split adj_segment, and extra splits to storage
+                        let adj_overlap_key = self.adjust_one_segment(adj_key, adj_intersection);
+
+                        // Can't have overlap with a point
+                        assert!(adj_overlap_key.is_none());
+                    }
+                }
+
+                // Points need not be active segments.
+                // Send the point-segment to callback.
+                cb(segment.into_crossing(event.ty));
             }
             PointRight => {
-                todo!()
+                // Nothing to do. We could remove this variant once we
+                // are confident about the logic.
             }
         }
         true
