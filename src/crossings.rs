@@ -1,35 +1,57 @@
-use std::iter::FromIterator;
+use std::{fmt::Debug, iter::FromIterator};
+use geo::{Coordinate, GeoFloat, Line};
 
-use geo::Coordinate;
+use crate::sweep::Sweep;
 
-use crate::{sweep::Sweep, Crossable, CrossableGeom};
+/// Interface for types that can be processed to detect crossings.
+///
+/// This type is implemented by [`Line`], but users may also implement
+/// this on custom types to store extra information.
+pub trait Crossable: Sized + Debug {
+    /// Scalar used the coordinates.
+    type Scalar: GeoFloat;
 
-/// A segment of a [`Crossable`].
+    /// The geometry associated with this type. Use a `Line` with the
+    /// `start` and `end` coordinates to represent a point.
+    fn line(&self) -> Line<Self::Scalar>;
+}
+
+impl<T: GeoFloat> Crossable for Line<T> {
+    type Scalar = T;
+
+    fn line(&self) -> Line<Self::Scalar> {
+        *self
+    }
+}
+
+/// A segment of a input [`Crossable`] type.
 ///
 /// This type is used to convey the part of the input geometry that is
-/// intersecting at a given intersection.
+/// intersecting at a given intersection. This is returned by the
+/// [`CrossingsIter::intersections`] method.
 pub struct Crossing<'a, C: Crossable> {
     /// The input associated with this segment.
     pub crossable: &'a C,
 
     /// The geometry of this segment.
     ///
-    /// This is a part of the input `crossable` geometry. The parts
-    /// are formed by splitting the input geometry as and when
-    /// intersection points are witnessed. If this geometry ends at
-    /// the intersection point (`at_left` is `false`), then it is
-    /// guaranteed to not contain any intersection point.
-    pub geom: CrossableGeom<C::Scalar>,
+    /// This is a part of the input `crossable` geometry and either
+    /// starts or ends at the intersection point last yielded by
+    /// [`CrossingsIter`]. If it ends at the point (`at_left` is
+    /// `false`), then it is guaranteed to not contain any other
+    /// intersection point in its interior.
+    pub line: Line<C::Scalar>,
 
-    /// Whether this is the first segment of the input line (not
-    /// relevant if input is a point).
+    /// Whether this is the first segment of the input line.
     pub first_segment: bool,
 
     /// Flag that is `true` if the next geom in the sequence overlaps
-    /// with this.
+    /// (i.e. intersects at more than one point) with this. Not
+    /// relevant and `false` if this is a point.
     pub has_overlap: bool,
 
-    /// Flag that is `true` if the `geom` starts at the intersection point.
+    /// Flag that is `true` if the `geom` starts at the intersection
+    /// point. Otherwise, it ends at the intersection point.
     pub at_left: bool,
 }
 
@@ -118,12 +140,12 @@ mod tests {
         init_log();
 
         let input = vec![
-            CrossableGeom::from(Line::from([(0., 0.), (1., 1.)])),
-            Line::from([(1., 0.), (0., 1.)]).into(),
-            Line::from([(0., 0.5), (1., 0.5)]).into(),
-            Line::from([(-1., 0.5), (0.5, 0.5)]).into(),
-            Coordinate::from((0.5, 0.5)).into(),
-            Coordinate::from((0., 0.)).into(),
+            Line::from([(0., 0.), (1., 1.)]),
+            [(1., 0.), (0., 1.)].into(),
+            [(0., 0.5), (1., 0.5)].into(),
+            [(-1., 0.5), (0.5, 0.5)].into(),
+            [(0.5, 0.5), (0.5, 0.5)].into(),
+            [(0., 0.), (0., 0.)].into(),
         ];
 
         let mut iter: CrossingsIter<_> = input.iter().collect();

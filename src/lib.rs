@@ -2,18 +2,17 @@
 //!
 //! # Line Crossings
 //!
-//! This is an implementation of the [Bentley-Ottman] algorithm for
-//! fast iteration of all intersection points of a collection of line
-//! segments and points. The iteration yields end-point(s) of the
+//! This is an implementation of the [Bentley-Ottman] algorithm to
+//! efficiently compute all intersection points of a collection of
+//! line segments and points. The iteration yields end-point(s) of the
 //! inputs, intersection points, and end-points of overlapping
 //! segments.
 //!
 //! ## Usage
 //!
 //! Construct a [`CrossingsIter`] from a collection of refs to any
-//! type implementing the [`Crossable`] trait. The geo-types [`Line`],
-//! [`Point`] and [`Coordinate`] implement this trait, as well as the
-//! enum [`CrossableGeom`] to represent a mix of lines and points.
+//! type implementing the [`Crossable`] trait. The geo-type [`Line`]
+//! implements this trait.
 //!
 //! ```rust
 //! use geo::Line;
@@ -41,8 +40,5 @@ mod line_or_point;
 mod segments;
 mod sweep;
 
-pub mod crossable;
-pub use crossable::{Crossable, CrossableGeom};
-
 pub mod crossings;
-pub use crossings::{Crossing, CrossingsIter};
+pub use crossings::{Crossable, Crossing, CrossingsIter};

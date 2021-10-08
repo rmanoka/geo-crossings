@@ -3,10 +3,9 @@ use slab::Slab;
 use std::{cmp::Ordering, collections::BTreeSet, fmt::Debug, ops::Bound};
 
 use crate::{
-    crossable::Crossable,
     events::{Event, EventType},
     line_or_point::LineOrPoint::{self, *},
-    Crossing,
+    Crossing, Crossable,
 };
 
 /// A segment of input [`LineOrPoint`] generated during the sweep.
@@ -38,7 +37,7 @@ impl<'a, C: Crossable> Segment<'a, C> {
         geom: Option<LineOrPoint<C::Scalar>>,
     ) -> &'b mut Self {
         let first = geom.is_none();
-        let geom = geom.unwrap_or_else(|| crossable.geom().0);
+        let geom = geom.unwrap_or_else(|| crossable.line().into());
         let entry = storage.vacant_entry();
 
         let segment = Segment {
@@ -176,7 +175,7 @@ impl<'a, C: Crossable> Segment<'a, C> {
     pub(crate) fn into_crossing(self, event_ty: EventType) -> Crossing<'a, C> {
         Crossing {
             crossable: self.crossable,
-            geom: self.geom.into(),
+            line: self.geom.line(),
             first_segment: self.first_segment,
             has_overlap: self.overlapping.is_some(),
             at_left: event_ty == EventType::LineLeft,

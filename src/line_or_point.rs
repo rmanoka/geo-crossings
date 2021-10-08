@@ -42,15 +42,24 @@ impl<T: GeoFloat> From<Coordinate<T>> for LineOrPoint<T> {
 }
 
 impl<T: GeoFloat> LineOrPoint<T> {
-    /// Return a [`Line`] if it is one, otherwise `None`.
-    pub(crate) fn line(&self) -> Option<Line<T>> {
+    /// Checks if the variant is a line.
+    pub fn is_line(&self) -> bool {
         match self {
-            LineOrPoint::Line(p, q) => Some(Line::new(p.0, q.0)),
-            _ => None,
+            LineOrPoint::Line(_, _) => true,
+            _ => false,
         }
     }
 
-    pub fn first(&self) -> SweepPoint<T> {
+    /// Return a [`Line`] if it is one, otherwise `None`.
+    pub fn line(&self) -> Line<T> {
+        match self {
+            LineOrPoint::Line(p, q) => Line::new(p.0, q.0),
+            LineOrPoint::Point(p) => Line::new(p.0, p.0),
+        }
+    }
+
+    /// Returns the lexicographic first coordinate of the geometry.
+    pub(crate) fn first(&self) -> SweepPoint<T> {
         *match self {
             LineOrPoint::Point(p) => p,
             LineOrPoint::Line(p, _) => p,
@@ -61,9 +70,9 @@ impl<T: GeoFloat> LineOrPoint<T> {
     ///
     /// The `other` argument must be a line variant (panics otherwise).
     pub fn intersect_line(&self, other: &Self) -> Option<Self> {
-        let line = other
-            .line()
-            .expect("tried to intersect_line with a point argument");
+        assert!(other.is_line(), "tried to intersect with a point variant!");
+
+        let line = other.line();
         match *self {
             LineOrPoint::Point(p) => {
                 if <T as HasKernel>::Ker::orient2d(line.start, p.0, line.end)

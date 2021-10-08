@@ -58,12 +58,9 @@ line-segments, we also accept input geoms to represent points.
 These are represented internally as infinitesimally small
 vertical segments centered at the point. This is independent of
 the scalar accuracy (`f32` or `f64`), and is handled by tweaking
-the ordering of segments to represent these.
-
-The user provides a line or a point by associating a
-`CrossableGeom` that is constructed from a `Line` or a `Point`.
-Note that `geo::Line` allows the end-points to be the same, but
-we convert such a geom internally into a point.
+the ordering of segments to represent these. A user provides a
+point by associating a `Line` with the same `start` and `end`
+coordinates.
 
 ## Numerical Precision
 
