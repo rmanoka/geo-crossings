@@ -1,5 +1,8 @@
+use geo::{
+    line_intersection::{line_intersection, LineIntersection},
+    Coordinate, GeoFloat, Line,
+};
 use std::{fmt::Debug, iter::FromIterator};
-use geo::{Coordinate, GeoFloat, Line};
 
 use crate::sweep::Sweep;
 
@@ -113,6 +116,97 @@ impl<'a, C: Crossable> Iterator for CrossingsIter<'a, C> {
     }
 }
 
+pub struct Intersections<'a, C: Crossable> {
+    inner: CrossingsIter<'a, C>,
+    idx: usize,
+    jdx: usize,
+    is_overlap: bool,
+    pt: Option<Coordinate<C::Scalar>>,
+}
+
+impl<'a, C: Crossable> FromIterator<&'a C> for Intersections<'a, C> {
+    fn from_iter<T: IntoIterator<Item = &'a C>>(iter: T) -> Self {
+        Self {
+            inner: FromIterator::from_iter(iter),
+            idx: 0,
+            jdx: 0,
+            is_overlap: false,
+            pt: None,
+        }
+    }
+}
+
+impl<'a, C: Crossable> Intersections<'a, C> {
+    fn intersection(&mut self) -> Option<(&'a C, &'a C, LineIntersection<C::Scalar>)> {
+        let (si, sj) = {
+            let segments = self.inner.intersections();
+            (&segments[self.idx], &segments[self.jdx])
+        };
+        // Ignore intersections that have already been processed
+        let should_compute = if self.is_overlap {
+            // For overlap, we only return intersection if at least
+            // one segment is the first, and both are at left
+            debug_assert_eq!(si.at_left, sj.at_left);
+            si.at_left && (si.first_segment || sj.first_segment)
+        } else {
+            (!si.at_left || si.first_segment) && (!sj.at_left || sj.first_segment)
+        };
+
+        should_compute.then(|| {
+            let si = si.crossable;
+            let sj = sj.crossable;
+
+            (
+                si,
+                sj,
+                line_intersection(si.line(), sj.line())
+                    .expect("line_intersection returned `None` disagreeing with `CrossingsIter`"),
+            )
+        })
+    }
+
+    fn step(&mut self) -> bool {
+        let seg_len = self.inner.intersections().len();
+        if 1 + self.jdx < seg_len {
+            self.is_overlap = self.is_overlap && self.inner.intersections()[self.jdx].has_overlap;
+            self.jdx += 1;
+        } else {
+            self.idx += 1;
+            if 1 + self.idx >= seg_len {
+                loop {
+                    self.pt = self.inner.next();
+                    if self.pt.is_none() {
+                        return false;
+                    }
+                    if self.inner.intersections().len() > 1 {
+                        break;
+                    }
+                }
+                self.idx = 0;
+            }
+            self.is_overlap = self.inner.intersections()[self.idx].has_overlap;
+            self.jdx = self.idx + 1;
+        }
+        true
+    }
+}
+
+impl<'a, C: Crossable> Iterator for Intersections<'a, C> {
+    type Item = (&'a C, &'a C, LineIntersection<C::Scalar>);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        loop {
+            if !self.step() {
+                return None;
+            }
+
+            if let Some(result) = self.intersection() {
+                return Some(result);
+            }
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use geo::Line;
@@ -130,14 +224,16 @@ mod tests {
             Line::from([(0., 0.), (1., 1.)]),
         ];
         let iter: CrossingsIter<_> = input.iter().collect();
-        for pt in iter {
-            eprintln!("{:?}", pt);
-        }
+        assert_eq!(iter.count(), 5);
     }
 
     #[test]
     fn overlap_intersect() {
         init_log();
+
+        fn pp_line(line: &Line<f64>) -> String {
+            format!("Line {{({}, {}) - ({}, {})}}", line.start.x, line.start.y, line.end.x, line.end.y)
+        }
 
         let input = vec![
             Line::from([(0., 0.), (1., 1.)]),
@@ -147,10 +243,15 @@ mod tests {
             [(0.5, 0.5), (0.5, 0.5)].into(),
             [(0., 0.), (0., 0.)].into(),
         ];
+        // Intersections (by_idx):
+        // (0, 1), (0, 2), (0, 3), (0, 4), (0, 5),
+        // (1, 2), (1, 3), (1, 4),
+        // (2, 3)
 
-        let mut iter: CrossingsIter<_> = input.iter().collect();
-        while let Some(pt) = iter.next() {
-            eprintln!("{:?} has {} segments", pt, iter.intersections().len());
-        }
+        let iter: Intersections<_> = input.iter().collect();
+        let count = iter.inspect(|(a, b, int)| {
+            eprintln!("{} intersects {}\n\t{:?}", pp_line(a), pp_line(b), int);
+        }).count();
+        assert_eq!(count, 9);
     }
 }
