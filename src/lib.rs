@@ -41,4 +41,4 @@ mod segments;
 mod sweep;
 
 pub mod crossings;
-pub use crossings::{Crossable, Crossing, CrossingsIter};
+pub use crossings::{Crossable, Crossing, CrossingsIter, Intersections};

@@ -10,17 +10,17 @@ use crate::{
     Crossable, Crossing,
 };
 
-pub struct Sweep<'a, C: Crossable>
+pub struct Sweep<C: Crossable>
 where
-    C: Crossable,
+    C: Crossable + Copy,
 {
-    segments: Box<Slab<Segment<'a, C>>>,
+    segments: Box<Slab<Segment<C>>>,
     events: BinaryHeap<Event<C::Scalar>>,
-    active_segments: BTreeSet<ActiveSegment<'a, C>>,
+    active_segments: BTreeSet<ActiveSegment<C>>,
 }
 
-impl<'a, C: Crossable> Sweep<'a, C> {
-    pub fn new<I: IntoIterator<Item = &'a C>>(iter: I) -> Self {
+impl<C: Crossable + Copy> Sweep<C> {
+    pub fn new<I: IntoIterator<Item = C>>(iter: I) -> Self {
         let iter = iter.into_iter();
         let size = {
             let (min_size, max_size) = iter.size_hint();
@@ -50,7 +50,7 @@ impl<'a, C: Crossable> Sweep<'a, C> {
     /// no overlap)
     fn create_segment(
         &mut self,
-        crossable: &'a C,
+        crossable: C,
         geom: Option<LineOrPoint<C::Scalar>>,
         parent: Option<usize>,
     ) -> usize {
@@ -73,7 +73,7 @@ impl<'a, C: Crossable> Sweep<'a, C> {
 
                 let new_key = Segment::new(
                     &mut self.segments,
-                    child_segment.crossable(),
+                    *child_segment.crossable(),
                     Some(segment_geom),
                 )
                 .key();
@@ -128,7 +128,7 @@ impl<'a, C: Crossable> Sweep<'a, C> {
         adj_intersection: LineOrPoint<C::Scalar>,
     ) -> Option<usize> {
         let adj_segment = &mut self.segments[key];
-        let adj_cross = adj_segment.crossable();
+        let adj_cross = *adj_segment.crossable();
         use SplitSegments::*;
         match self.adjust_for_intersection(key, adj_intersection) {
             Unchanged { overlap } => overlap.then(|| key),
@@ -153,7 +153,7 @@ impl<'a, C: Crossable> Sweep<'a, C> {
     /// If a segment was adjusted, we may have spurious event for the
     /// right end point (`LineRight`) which is no longer valid.
     /// Returns `None` in this case.
-    fn segment_for_event(&self, event: &Event<C::Scalar>) -> Option<&Segment<'a, C>> {
+    fn segment_for_event(&self, event: &Event<C::Scalar>) -> Option<&Segment<C>> {
         use EventType::*;
         use LineOrPoint::*;
         Some({
@@ -198,7 +198,7 @@ impl<'a, C: Crossable> Sweep<'a, C> {
     /// Handle one event.
     ///
     /// Returns `true` if the event was not spurious.
-    fn handle_event<F: FnMut(Crossing<'a, C>)>(
+    fn handle_event<F: FnMut(Crossing<C>)>(
         &mut self,
         event: Event<C::Scalar>,
         cb: &mut F,
@@ -342,7 +342,7 @@ impl<'a, C: Crossable> Sweep<'a, C> {
     /// Process the next event in heap.
     ///
     /// Calls the callback unless the event is spurious.
-    pub fn next_event<F: FnMut(Crossing<'a, C>)>(
+    pub fn next_event<F: FnMut(Crossing<C>)>(
         &mut self,
         mut cb: F,
     ) -> Option<SweepPoint<C::Scalar>> {

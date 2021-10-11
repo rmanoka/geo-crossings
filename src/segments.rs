@@ -9,33 +9,24 @@ use crate::{
 };
 
 /// A segment of input [`LineOrPoint`] generated during the sweep.
-#[derive(Debug)]
-pub struct Segment<'a, C: Crossable> {
+#[derive(Debug, Clone, Copy)]
+pub struct Segment<C: Crossable> {
     pub(crate) geom: LineOrPoint<C::Scalar>,
     key: usize,
-    crossable: &'a C,
+    crossable: C,
     first_segment: bool,
     pub(crate) overlapping: Option<usize>,
     pub(crate) is_overlapping: bool,
 }
 
-// Manual implementation to not require `C: Clone`, same as `Copy`.
-impl<'a, C: Crossable> Clone for Segment<'a, C> {
-    fn clone(&self) -> Self {
-        *self
-    }
-}
-// Manual implementation to not require `C: Copy`.
-impl<'a, C: Crossable> Copy for Segment<'a, C> {}
-
-impl<'a, C: Crossable> Segment<'a, C> {
+impl<C: Crossable> Segment<C> {
     /// Create and store a `Segment` with given `crossable`, and optional `geom`
     /// (or the default geom).
-    pub(crate) fn new<'b>(
-        storage: &'b mut Slab<Self>,
-        crossable: &'a C,
+    pub(crate) fn new(
+        storage: &mut Slab<Self>,
+        crossable: C,
         geom: Option<LineOrPoint<C::Scalar>>,
-    ) -> &'b mut Self {
+    ) -> &mut Self {
         let first = geom.is_none();
         let geom = geom.unwrap_or_else(|| crossable.line().into());
         let entry = storage.vacant_entry();
@@ -162,8 +153,8 @@ impl<'a, C: Crossable> Segment<'a, C> {
     }
 
     /// Get a reference to the segment's crossable.
-    pub fn crossable(&self) -> &'a C {
-        self.crossable
+    pub fn crossable(&self) -> &C {
+        &self.crossable
     }
 
     /// Get the segment's key.
@@ -172,7 +163,7 @@ impl<'a, C: Crossable> Segment<'a, C> {
     }
 
     /// Convert `self` into a `Crossing` to return to user.
-    pub(crate) fn into_crossing(self, event_ty: EventType) -> Crossing<'a, C> {
+    pub(crate) fn into_crossing(self, event_ty: EventType) -> Crossing<C> {
         Crossing {
             crossable: self.crossable,
             line: self.geom.line(),
@@ -184,12 +175,12 @@ impl<'a, C: Crossable> Segment<'a, C> {
 }
 
 /// Internal representation used in ordered sets.
-pub(crate) struct ActiveSegment<'a, C: Crossable> {
+pub(crate) struct ActiveSegment<C: Crossable> {
     key: usize,
-    storage: *const Slab<Segment<'a, C>>,
+    storage: *const Slab<Segment<C>>,
 }
 
-impl<'a, C: Crossable> Debug for ActiveSegment<'a, C> {
+impl<C: Crossable> Debug for ActiveSegment<C> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("ActiveSegment")
             .field("key", &self.key)
@@ -198,14 +189,14 @@ impl<'a, C: Crossable> Debug for ActiveSegment<'a, C> {
     }
 }
 
-impl<'a, C: Crossable> ActiveSegment<'a, C> {
-    fn new(key: usize, storage: &Slab<Segment<'a, C>>) -> Self {
+impl<C: Crossable> ActiveSegment<C> {
+    fn new(key: usize, storage: &Slab<Segment<C>>) -> Self {
         ActiveSegment {
             key,
             storage: storage as *const _,
         }
     }
-    fn get(&self) -> Option<&Segment<'a, C>> {
+    fn get(&self) -> Option<&Segment<C>> {
         let slab = unsafe { &*self.storage as &Slab<Segment<_>> };
         slab.get(self.key)
     }
@@ -214,19 +205,19 @@ impl<'a, C: Crossable> ActiveSegment<'a, C> {
 /// Partial equality based on key.
 ///
 /// This is consistent with the `PartialOrd` impl.
-impl<'a, C: Crossable> PartialEq for ActiveSegment<'a, C> {
+impl<C: Crossable> PartialEq for ActiveSegment<C> {
     fn eq(&self, other: &Self) -> bool {
         self.key == other.key
     }
 }
 
 /// Assert total equality.
-impl<'a, C: Crossable> Eq for ActiveSegment<'a, C> {}
+impl<C: Crossable> Eq for ActiveSegment<C> {}
 
 /// Partial ordering defined as per algorithm.
 ///
 /// This is requires the same pre-conditions as for [`LineOrPoint`].
-impl<'a, C: Crossable> PartialOrd for ActiveSegment<'a, C> {
+impl<C: Crossable> PartialOrd for ActiveSegment<C> {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         self.get()
             .expect("ActiveSegment::partial_cmp: could not find key in storage")
@@ -242,7 +233,7 @@ impl<'a, C: Crossable> PartialOrd for ActiveSegment<'a, C> {
 }
 
 /// Assert total ordering same as `PartialOrd` impl.
-impl<'a, C: Crossable> Ord for ActiveSegment<'a, C> {
+impl<C: Crossable> Ord for ActiveSegment<C> {
     fn cmp(&self, other: &Self) -> Ordering {
         self.partial_cmp(other)
             .expect("unable to compare active segments!")
@@ -266,8 +257,8 @@ pub(crate) trait AdjacentSegments {
     fn remove_segment(&mut self, key: usize, storage: &Slab<Self::SegmentType>);
 }
 
-impl<'a, C: Crossable + 'a> AdjacentSegments for BTreeSet<ActiveSegment<'a, C>> {
-    type SegmentType = Segment<'a, C>;
+impl<C: Crossable> AdjacentSegments for BTreeSet<ActiveSegment<C>> {
+    type SegmentType = Segment<C>;
 
     fn prev_key(
         &self,
@@ -359,7 +350,7 @@ mod tests {
             [(0., 0.), (5., 5.)].into(),
             [(10., 10.), (5., 5.)].into(),
         ];
-        lines.iter().enumerate().for_each(|(i, l)| {
+        lines.into_iter().enumerate().for_each(|(i, l)| {
             assert_eq!(Segment::new(&mut slab, l, None).key(), i);
         });
 
@@ -371,7 +362,7 @@ mod tests {
         }
 
         impl TestCase {
-            fn assert_equality<'a>(&self, slab: &Slab<Segment<'a, Line<f64>>>) {
+            fn assert_equality(&self, slab: &Slab<Segment<Line<f64>>>) {
                 let isec = slab[self.a]
                     .geom
                     .intersect_line(&slab[self.b].geom);

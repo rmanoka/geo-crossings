@@ -27,14 +27,22 @@ impl<T: GeoFloat> Crossable for Line<T> {
     }
 }
 
+impl<'a, T: Crossable> Crossable for &'a T {
+    type Scalar = T::Scalar;
+
+    fn line(&self) -> Line<Self::Scalar> {
+        T::line(*self)
+    }
+}
+
 /// A segment of a input [`Crossable`] type.
 ///
 /// This type is used to convey the part of the input geometry that is
 /// intersecting at a given intersection. This is returned by the
 /// [`CrossingsIter::intersections`] method.
-pub struct Crossing<'a, C: Crossable> {
+pub struct Crossing<C: Crossable> {
     /// The input associated with this segment.
-    pub crossable: &'a C,
+    pub crossable: C,
 
     /// The geometry of this segment.
     ///
@@ -62,7 +70,7 @@ pub struct Crossing<'a, C: Crossable> {
 ///
 /// Yields all end points, intersections and overlaps of a set of
 /// line-segments and points. Construct it by `collect`-ing an
-/// iterator of references to [`Crossable`].
+/// iterator of [`Crossable`].
 ///
 /// The implementation uses the [Bentley-Ottman] algorithm and runs in
 /// time O((n + k) log(n)) time; this is faster than a brute-force
@@ -70,21 +78,21 @@ pub struct Crossing<'a, C: Crossable> {
 /// the number of intersections is small compared to n^2.
 ///
 /// [Bentley-Ottman]: //en.wikipedia.org/wiki/Bentley%E2%80%93Ottmann_algorithm
-pub struct CrossingsIter<'a, C: Crossable> {
-    sweep: Sweep<'a, C>,
-    segments: Vec<Crossing<'a, C>>,
+pub struct CrossingsIter<C: Crossable + Copy> {
+    sweep: Sweep<C>,
+    segments: Vec<Crossing<C>>,
 }
 
-impl<'a, C: Crossable> CrossingsIter<'a, C> {
+impl<C: Crossable + Copy> CrossingsIter<C> {
     /// Returns the segments that intersect the last point yielded by
     /// the iterator.
-    pub fn intersections(&mut self) -> &mut [Crossing<'a, C>] {
+    pub fn intersections(&mut self) -> &mut [Crossing<C>] {
         &mut self.segments
     }
 }
 
-impl<'a, C: Crossable> FromIterator<&'a C> for CrossingsIter<'a, C> {
-    fn from_iter<T: IntoIterator<Item = &'a C>>(iter: T) -> Self {
+impl<C: Crossable + Copy> FromIterator<C> for CrossingsIter<C> {
+    fn from_iter<T: IntoIterator<Item = C>>(iter: T) -> Self {
         let iter = iter.into_iter();
         let size = {
             let (min_size, max_size) = iter.size_hint();
@@ -96,7 +104,7 @@ impl<'a, C: Crossable> FromIterator<&'a C> for CrossingsIter<'a, C> {
     }
 }
 
-impl<'a, C: Crossable> Iterator for CrossingsIter<'a, C> {
+impl<C: Crossable + Copy> Iterator for CrossingsIter<C> {
     type Item = Coordinate<C::Scalar>;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -116,16 +124,29 @@ impl<'a, C: Crossable> Iterator for CrossingsIter<'a, C> {
     }
 }
 
-pub struct Intersections<'a, C: Crossable> {
-    inner: CrossingsIter<'a, C>,
+/// Iterator over all intersections of a collection of lines.
+///
+/// Yields tuples `(C, C, LineIntersection)` for each pair of input
+/// crossables that intersect or overlap. This is a drop-in
+/// replacement for computing [`LineIntersection`] over all pairs of
+/// the collection, but is typically more efficient.
+///
+/// The implementation uses the [Bentley-Ottman] algorithm and runs in
+/// time O((n + k) log(n)) time; this is faster than a brute-force
+/// search for intersections across all pairs of input segments if k,
+/// the number of intersections is small compared to n^2.
+///
+/// [Bentley-Ottman]: //en.wikipedia.org/wiki/Bentley%E2%80%93Ottmann_algorithm
+pub struct Intersections<C: Crossable + Copy> {
+    inner: CrossingsIter<C>,
     idx: usize,
     jdx: usize,
     is_overlap: bool,
     pt: Option<Coordinate<C::Scalar>>,
 }
 
-impl<'a, C: Crossable> FromIterator<&'a C> for Intersections<'a, C> {
-    fn from_iter<T: IntoIterator<Item = &'a C>>(iter: T) -> Self {
+impl<C: Crossable + Copy> FromIterator<C> for Intersections<C> {
+    fn from_iter<T: IntoIterator<Item = C>>(iter: T) -> Self {
         Self {
             inner: FromIterator::from_iter(iter),
             idx: 0,
@@ -136,8 +157,8 @@ impl<'a, C: Crossable> FromIterator<&'a C> for Intersections<'a, C> {
     }
 }
 
-impl<'a, C: Crossable> Intersections<'a, C> {
-    fn intersection(&mut self) -> Option<(&'a C, &'a C, LineIntersection<C::Scalar>)> {
+impl<C: Crossable + Copy> Intersections<C> {
+    fn intersection(&mut self) -> Option<(C, C, LineIntersection<C::Scalar>)> {
         let (si, sj) = {
             let segments = self.inner.intersections();
             (&segments[self.idx], &segments[self.jdx])
@@ -191,8 +212,8 @@ impl<'a, C: Crossable> Intersections<'a, C> {
     }
 }
 
-impl<'a, C: Crossable> Iterator for Intersections<'a, C> {
-    type Item = (&'a C, &'a C, LineIntersection<C::Scalar>);
+impl<C: Crossable + Copy> Iterator for Intersections<C> {
+    type Item = (C, C, LineIntersection<C::Scalar>);
 
     fn next(&mut self) -> Option<Self::Item> {
         loop {
@@ -220,10 +241,10 @@ mod tests {
     #[test]
     fn simple_iter() {
         let input = vec![
-            Line::from([(1., 0.), (0., 1.)]),
-            Line::from([(0., 0.), (1., 1.)]),
+            Box::from(Line::from([(1., 0.), (0., 1.)])),
+            Line::from([(0., 0.), (1., 1.)]).into(),
         ];
-        let iter: CrossingsIter<_> = input.iter().collect();
+        let iter: CrossingsIter<_> = input.iter().map(|r| r.as_ref()).collect();
         assert_eq!(iter.count(), 5);
     }
 
@@ -232,7 +253,10 @@ mod tests {
         init_log();
 
         fn pp_line(line: &Line<f64>) -> String {
-            format!("Line {{({}, {}) - ({}, {})}}", line.start.x, line.start.y, line.end.x, line.end.y)
+            format!(
+                "Line {{({}, {}) - ({}, {})}}",
+                line.start.x, line.start.y, line.end.x, line.end.y
+            )
         }
 
         let input = vec![
@@ -249,9 +273,11 @@ mod tests {
         // (2, 3)
 
         let iter: Intersections<_> = input.iter().collect();
-        let count = iter.inspect(|(a, b, int)| {
-            eprintln!("{} intersects {}\n\t{:?}", pp_line(a), pp_line(b), int);
-        }).count();
+        let count = iter
+            .inspect(|(a, b, int)| {
+                eprintln!("{} intersects {}\n\t{:?}", pp_line(a), pp_line(b), int);
+            })
+            .count();
         assert_eq!(count, 9);
     }
 }
