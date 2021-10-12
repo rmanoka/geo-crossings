@@ -1,0 +1,1 @@
+initSidebarItems({"trait":[["ClosestPoint","Find the closest `Point` between a given geometry and an input `Point`. The closest point may intersect the geometry, be a single point, or be indeterminate, as indicated by the value of the returned enum."]]});

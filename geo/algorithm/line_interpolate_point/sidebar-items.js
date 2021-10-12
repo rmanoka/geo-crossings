@@ -1,0 +1,1 @@
+initSidebarItems({"trait":[["LineInterpolatePoint","Returns an option of the point that lies a given fraction along the line."]]});

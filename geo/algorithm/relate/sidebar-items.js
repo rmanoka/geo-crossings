@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["IntersectionMatrix","Models a Dimensionally Extended Nine-Intersection Model (DE-9IM) matrix."]],"trait":[["Relate","Topologically relate two geometries based on DE-9IM semantics."]]});

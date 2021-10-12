@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Direction","By default, a properly-oriented Polygon has its outer ring oriented counter-clockwise, and its inner ring(s) oriented clockwise. Selecting `Reversed` will result in a Polygon with a clockwise-oriented exterior ring, and counter-clockwise interior ring(s)"]],"trait":[["Orient",""]]});

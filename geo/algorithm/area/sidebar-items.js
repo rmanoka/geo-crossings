@@ -1,0 +1,1 @@
+initSidebarItems({"trait":[["Area","Signed and unsigned planar area of a geometry."]]});

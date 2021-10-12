@@ -1,0 +1,1 @@
+initSidebarItems({"trait":[["Bearing","Returns the bearing to another Point in degrees."]]});

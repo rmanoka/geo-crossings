@@ -1,0 +1,1 @@
+initSidebarItems({"trait":[["IsConvex","Predicates to test the convexity of a [ `LineString` ]. A closed `LineString` is said to be convex if it encloses a convex set. It is said to be strictly convex if in addition, no three consecutive vertices are collinear. It is collinear if all the vertices lie on the same line."]]});

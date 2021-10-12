@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["nearest_neighbour_distance","Uses an R* tree and nearest-neighbour lookups to calculate minimum distances"]],"trait":[["EuclideanDistance","Returns the distance between two geometries."]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"trait":[["GeodesicLength","Determine the length of a geometry on an ellipsoidal model of the earth."]]});

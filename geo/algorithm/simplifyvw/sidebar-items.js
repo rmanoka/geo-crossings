@@ -1,0 +1,1 @@
+initSidebarItems({"trait":[["SimplifyVW","Simplifies a geometry."],["SimplifyVWPreserve","Simplifies a geometry, preserving its topology by removing self-intersections"],["SimplifyVwIdx","Simplifies a geometry, returning the retained indices of the output"]]});

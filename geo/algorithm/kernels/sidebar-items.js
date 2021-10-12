@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["Orientation",""]],"mod":[["robust",""],["simple",""]],"trait":[["HasKernel","Marker trait to assign Kernel for scalars"],["Kernel","Kernel trait to provide predicates to operate on different scalar types."]]});

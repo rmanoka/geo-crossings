@@ -1,0 +1,1 @@
+initSidebarItems({"trait":[["LineLocatePoint","Returns a (option of the) fraction of the line’s total length representing the location of the closest point on the line to the given point."]]});

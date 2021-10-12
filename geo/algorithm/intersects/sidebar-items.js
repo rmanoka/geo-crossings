@@ -1,0 +1,1 @@
+initSidebarItems({"trait":[["Intersects","Checks if the geometry Self intersects the geometry Rhs. More formally, either boundary or interior of Self has non-empty (set-theoretic) intersection with the boundary or interior of Rhs. In other words, the DE-9IM intersection matrix for (Self, Rhs) is not `FF*FF****`."]]});

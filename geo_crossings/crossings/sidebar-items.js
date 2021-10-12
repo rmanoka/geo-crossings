@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Crossing","A segment of a input [`Crossable`] type."],["CrossingsIter","Iterator that yields all crossings."],["Intersections","Iterator over all intersections of a collection of lines."]],"trait":[["Crossable","Interface for types that can be processed to detect crossings."]]});

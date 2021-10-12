@@ -1,0 +1,1 @@
+initSidebarItems({"trait":[["VincentyLength","Determine the length of a geometry using Vincenty’s formulae."]]});

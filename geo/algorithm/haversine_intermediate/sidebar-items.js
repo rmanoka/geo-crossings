@@ -1,0 +1,1 @@
+initSidebarItems({"trait":[["HaversineIntermediate","Returns a new Point along a great circle route between two existing points"]]});

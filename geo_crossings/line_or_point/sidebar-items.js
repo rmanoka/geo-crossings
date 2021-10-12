@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["LineOrPoint","Either a line segment or a point."]],"fn":[["orientation_as_ordering","Helper to convert orientation-2d into an ordering"]]});

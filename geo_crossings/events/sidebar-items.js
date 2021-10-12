@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["EventType","Event type to associate with event."]],"struct":[["Event","A sweep event for sweep-line algorithms."],["SweepPoint","Wraps a [`Coordinate`] to support lexicographic ordering."]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"trait":[["MapCoords","Map a function over all the coordinates in an object, returning a new one"],["MapCoordsInplace","Map a function over all the coordinates in an object in place"],["TryMapCoords","Map a fallible function over all the coordinates in a geometry, returning a Result"]]});

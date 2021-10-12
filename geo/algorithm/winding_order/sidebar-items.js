@@ -1,0 +1,1 @@
+initSidebarItems({"enum":[["WindingOrder","How a linestring is wound, clockwise or counter-clockwise"]],"struct":[["Points","Iterates through a list of `Point`s"]],"trait":[["Winding","Determine and operate on how a [`LineString`] is wound. This functionality, and our implementation is based on CGAL’s Polygon_2::orientation."]]});

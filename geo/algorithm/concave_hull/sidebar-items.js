@@ -1,0 +1,1 @@
+initSidebarItems({"trait":[["ConcaveHull","Returns a polygon which covers a geometry. Unlike convex hulls, which also cover their geometry, a concave hull does so while trying to further minimize its area by constructing edges such that the exterior of the polygon incorporates points that would be interior points in a convex hull."]]});

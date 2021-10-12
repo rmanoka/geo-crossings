@@ -1,0 +1,1 @@
+initSidebarItems({"trait":[["GeodesicDistance","Determine the distance between two geometries on an ellipsoidal model of the earth."]]});

@@ -1,0 +1,1 @@
+initSidebarItems({"trait":[["ChamberlainDuquetteArea","Calculate the signed approximate geodesic area of a `Geometry`."]]});

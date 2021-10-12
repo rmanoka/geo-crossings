@@ -1,0 +1,1 @@
+initSidebarItems({"trait":[["CoordsIter","Iterate over geometry coordinates."]]});

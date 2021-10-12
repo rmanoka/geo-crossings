@@ -1,0 +1,75 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="The `geo-types` library provides geospatial primitive types for the GeoRust ecosystem."><meta name="keywords" content="rust, rustlang, rust-lang, geo_types"><title>geo_types - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../ayu.css" disabled ><script id="default-settings" ></script><script src="../storage.js"></script><script src="../crates.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../favicon.svg"><link rel="alternate icon" type="image/png" href="../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../geo_types/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;georust&#x2F;meta&#x2F;master&#x2F;logo&#x2F;logo.png' alt='logo'></div></a><p class="location">Crate geo_types</p><div class="block version"><p>Version 0.7.2</p></div><div class="sidebar-elems"><a id="all-types" href="all.html"><p>See all geo_types's items</p></a><div class="block items"><ul><li><a href="#macros">Macros</a></li><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#traits">Traits</a></li></ul></div><div id="sidebar-vars" data-name="geo_types" data-ty="mod" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input"name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../wheel.svg"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">geo_types</a><button id="copy-path" onclick="copy_path(this)" title="copy path"><img src="../clipboard.svg" width="19" height="18" alt="Copy item import" title="Copy item import to clipboard"></button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/geo_types/lib.rs.html#1-238" title="goto source code">[src]</a></span></h1><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>The <code>geo-types</code> library provides geospatial primitive types for the <a href="https://georust.org">GeoRust</a> ecosystem.</p>
+<p>In most cases, you will only need to use this crate if you’re a crate author and want
+compatibility with other GeoRust crates. Otherwise, the <a href="https://crates.io/crates/geo"><code>geo</code></a>
+crate re-exports these types and provides geospatial algorithms.</p>
+<h1 id="types" class="section-header"><a href="#types">Types</a></h1>
+<ul>
+<li><strong><a href="struct.Coordinate.html" title="Coordinate"><code>Coordinate</code></a></strong>: A two-dimensional coordinate. All geometry types are composed of <a href="struct.Coordinate.html" title="Coordinate"><code>Coordinate</code></a>s, though <a href="struct.Coordinate.html" title="Coordinate"><code>Coordinate</code></a> itself is not a <a href="enum.Geometry.html" title="Geometry"><code>Geometry</code></a> type.</li>
+<li><strong><a href="struct.Point.html" title="Point"><code>Point</code></a></strong>: A single point represented by one <a href="struct.Coordinate.html" title="Coordinate"><code>Coordinate</code></a></li>
+<li><strong><a href="struct.MultiPoint.html" title="MultiPoint"><code>MultiPoint</code></a></strong>: A collection of <a href="struct.Point.html" title="Point"><code>Point</code></a>s</li>
+<li><strong><a href="struct.Line.html" title="Line"><code>Line</code></a></strong>: A line segment represented by two <a href="struct.Coordinate.html" title="Coordinate"><code>Coordinate</code></a>s</li>
+<li><strong><a href="struct.LineString.html" title="LineString"><code>LineString</code></a></strong>: A series of contiguous line segments represented by two or more
+<a href="struct.Coordinate.html" title="Coordinate"><code>Coordinate</code></a>s</li>
+<li><strong><a href="struct.MultiLineString.html" title="MultiLineString"><code>MultiLineString</code></a></strong>: A collection of <a href="struct.LineString.html" title="LineString"><code>LineString</code></a>s</li>
+<li><strong><a href="struct.Polygon.html" title="Polygon"><code>Polygon</code></a></strong>: A bounded area represented by one <a href="struct.LineString.html" title="LineString"><code>LineString</code></a> exterior ring, and zero or
+more <a href="struct.LineString.html" title="LineString"><code>LineString</code></a> interior rings</li>
+<li><strong><a href="struct.MultiPolygon.html" title="MultiPolygon"><code>MultiPolygon</code></a></strong>: A collection of <a href="struct.Polygon.html" title="Polygon"><code>Polygon</code></a>s</li>
+<li><strong><a href="struct.Rect.html" title="Rect"><code>Rect</code></a></strong>: An axis-aligned bounded rectangle represented by minimum and maximum
+<a href="struct.Coordinate.html" title="Coordinate"><code>Coordinate</code></a>s</li>
+<li><strong><a href="struct.Triangle.html" title="Triangle"><code>Triangle</code></a></strong>: A bounded area represented by three <a href="struct.Coordinate.html" title="Coordinate"><code>Coordinate</code></a> vertices</li>
+<li><strong><a href="struct.GeometryCollection.html" title="GeometryCollection"><code>GeometryCollection</code></a></strong>: A collection of <a href="enum.Geometry.html" title="Geometry"><code>Geometry</code></a>s</li>
+<li><strong><a href="enum.Geometry.html" title="Geometry"><code>Geometry</code></a></strong>: An enumeration of all geometry types, excluding <a href="struct.Coordinate.html" title="Coordinate"><code>Coordinate</code></a></li>
+</ul>
+<h1 id="semantics" class="section-header"><a href="#semantics">Semantics</a></h1>
+<p>The geospatial types provided here aim to adhere to the <a href="https://www.ogc.org/standards/sfa">OpenGIS Simple feature access</a>
+standards. Thus, the types here are inter-operable with other implementations of the standards:
+<a href="https://github.com/locationtech/jts">JTS</a>, <a href="https://trac.osgeo.org/geos">GEOS</a>, etc.</p>
+<h1 id="features" class="section-header"><a href="#features">Features</a></h1>
+<p>The following optional <a href="https://doc.rust-lang.org/cargo/reference/features.html">Cargo features</a> are available:</p>
+<ul>
+<li><code>approx</code>: Allows geometry types to be checked for approximate equality with <a href="https://github.com/brendanzab/approx">approx</a></li>
+<li><code>arbitrary</code>: Allows geometry types to be created from unstructured input with <a href="https://github.com/rust-fuzz/arbitrary">arbitrary</a></li>
+<li><code>serde</code>: Allows geometry types to be serialized and deserialized with <a href="https://serde.rs/">Serde</a></li>
+<li><code>use-rstar</code>: Allows geometry types to be inserted into <a href="https://github.com/Stoeoef/rstar">rstar</a> R*-trees</li>
+</ul>
+</div></details><h2 id="macros" class="section-header"><a href="#macros">Macros</a></h2>
+<table><tr class="module-item"><td><a class="macro" href="macro.line_string.html" title="geo_types::line_string macro">line_string</a></td><td class="docblock-short"><p>Creates a <a href="./line_string/struct.LineString.html"><code>LineString</code></a> containing the given coordinates.</p>
+</td></tr><tr class="module-item"><td><a class="macro" href="macro.point.html" title="geo_types::point macro">point</a></td><td class="docblock-short"><p>Creates a <a href="./struct.Point.html"><code>Point</code></a> from the given coordinates.</p>
+</td></tr><tr class="module-item"><td><a class="macro" href="macro.polygon.html" title="geo_types::polygon macro">polygon</a></td><td class="docblock-short"><p>Creates a <a href="./struct.Polygon.html"><code>Polygon</code></a> containing the given coordinates.</p>
+</td></tr></table><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
+<table><tr class="module-item"><td><a class="struct" href="struct.Coordinate.html" title="geo_types::Coordinate struct">Coordinate</a></td><td class="docblock-short"><p>A lightweight struct used to store coordinates on the 2-dimensional
+Cartesian plane.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.GeometryCollection.html" title="geo_types::GeometryCollection struct">GeometryCollection</a></td><td class="docblock-short"><p>A collection of <a href="enum.Geometry.html"><code>Geometry</code></a> types.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.InvalidRectCoordinatesError.html" title="geo_types::InvalidRectCoordinatesError struct">InvalidRectCoordinatesError</a></td><td class="docblock-short"><span class="stab deprecated" title="">Deprecated</span></td></tr><tr class="module-item"><td><a class="struct" href="struct.Line.html" title="geo_types::Line struct">Line</a></td><td class="docblock-short"><p>A line segment made up of exactly two
+<a href="struct.Coordinate.html"><code>Coordinate</code>s</a>.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.LineString.html" title="geo_types::LineString struct">LineString</a></td><td class="docblock-short"><p>An ordered collection of two or more <a href="struct.Coordinate.html" title="Coordinate"><code>Coordinate</code></a>s, representing a
+path between locations.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.MultiLineString.html" title="geo_types::MultiLineString struct">MultiLineString</a></td><td class="docblock-short"><p>A collection of
+<a href="line_string/struct.LineString.html"><code>LineString</code>s</a>. Can
+be created from a <code>Vec</code> of <code>LineString</code>s or from an
+Iterator which yields <code>LineString</code>s. Iterating over this
+object yields the component <code>LineString</code>s.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.MultiPoint.html" title="geo_types::MultiPoint struct">MultiPoint</a></td><td class="docblock-short"><p>A collection of <a href="struct.Point.html"><code>Point</code>s</a>. Can
+be created from a <code>Vec</code> of <code>Point</code>s, or from an
+Iterator which yields <code>Point</code>s. Iterating over this
+object yields the component <code>Point</code>s.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.MultiPolygon.html" title="geo_types::MultiPolygon struct">MultiPolygon</a></td><td class="docblock-short"><p>A collection of <a href="struct.Polygon.html"><code>Polygon</code>s</a>. Can
+be created from a <code>Vec</code> of <code>Polygon</code>s, or from an
+Iterator which yields <code>Polygon</code>s. Iterating over this
+object yields the component <code>Polygon</code>s.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.Point.html" title="geo_types::Point struct">Point</a></td><td class="docblock-short"><p>A single point in 2D space.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.PointsIter.html" title="geo_types::PointsIter struct">PointsIter</a></td><td class="docblock-short"><p>A <code>Point</code> iterator returned by the <code>points_iter</code> method</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.Polygon.html" title="geo_types::Polygon struct">Polygon</a></td><td class="docblock-short"><p>A bounded two-dimensional area.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.Rect.html" title="geo_types::Rect struct">Rect</a></td><td class="docblock-short"><p>An <em>axis-aligned</em> bounded 2D rectangle whose area is
+defined by minimum and maximum <code>Coordinate</code>s.</p>
+</td></tr><tr class="module-item"><td><a class="struct" href="struct.Triangle.html" title="geo_types::Triangle struct">Triangle</a></td><td class="docblock-short"><p>A bounded 2D area whose three vertices are defined by
+<code>Coordinate</code>s. The semantics and validity are that of
+the equivalent <a href="struct.Polygon.html" title="Polygon"><code>Polygon</code></a>; in addition, the three
+vertices must not be collinear and they must be distinct.</p>
+</td></tr></table><h2 id="enums" class="section-header"><a href="#enums">Enums</a></h2>
+<table><tr class="module-item"><td><a class="enum" href="enum.Error.html" title="geo_types::Error enum">Error</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="enum" href="enum.Geometry.html" title="geo_types::Geometry enum">Geometry</a></td><td class="docblock-short"><p>An enum representing any possible geometry type.</p>
+</td></tr></table><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
+<table><tr class="module-item"><td><a class="trait" href="trait.CoordFloat.html" title="geo_types::CoordFloat trait">CoordFloat</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="trait" href="trait.CoordNum.html" title="geo_types::CoordNum trait">CoordNum</a></td><td class="docblock-short"><p>The type of an x or y value of a point/coordinate.</p>
+</td></tr><tr class="module-item"><td><a class="trait" href="trait.CoordinateType.html" title="geo_types::CoordinateType trait">CoordinateType</a></td><td class="docblock-short"><span class="stab deprecated" title="">Deprecated</span></td></tr></table></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="geo_types" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
+    <script src="../main.js"></script>
+</body></html>

@@ -1,0 +1,589 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;rajsekar&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;geo-0.18.0&#x2F;src&#x2F;lib.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>lib.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../geo/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;georust&#x2F;meta&#x2F;master&#x2F;logo&#x2F;logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input"name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<span id="2">  2</span>
+<span id="3">  3</span>
+<span id="4">  4</span>
+<span id="5">  5</span>
+<span id="6">  6</span>
+<span id="7">  7</span>
+<span id="8">  8</span>
+<span id="9">  9</span>
+<span id="10"> 10</span>
+<span id="11"> 11</span>
+<span id="12"> 12</span>
+<span id="13"> 13</span>
+<span id="14"> 14</span>
+<span id="15"> 15</span>
+<span id="16"> 16</span>
+<span id="17"> 17</span>
+<span id="18"> 18</span>
+<span id="19"> 19</span>
+<span id="20"> 20</span>
+<span id="21"> 21</span>
+<span id="22"> 22</span>
+<span id="23"> 23</span>
+<span id="24"> 24</span>
+<span id="25"> 25</span>
+<span id="26"> 26</span>
+<span id="27"> 27</span>
+<span id="28"> 28</span>
+<span id="29"> 29</span>
+<span id="30"> 30</span>
+<span id="31"> 31</span>
+<span id="32"> 32</span>
+<span id="33"> 33</span>
+<span id="34"> 34</span>
+<span id="35"> 35</span>
+<span id="36"> 36</span>
+<span id="37"> 37</span>
+<span id="38"> 38</span>
+<span id="39"> 39</span>
+<span id="40"> 40</span>
+<span id="41"> 41</span>
+<span id="42"> 42</span>
+<span id="43"> 43</span>
+<span id="44"> 44</span>
+<span id="45"> 45</span>
+<span id="46"> 46</span>
+<span id="47"> 47</span>
+<span id="48"> 48</span>
+<span id="49"> 49</span>
+<span id="50"> 50</span>
+<span id="51"> 51</span>
+<span id="52"> 52</span>
+<span id="53"> 53</span>
+<span id="54"> 54</span>
+<span id="55"> 55</span>
+<span id="56"> 56</span>
+<span id="57"> 57</span>
+<span id="58"> 58</span>
+<span id="59"> 59</span>
+<span id="60"> 60</span>
+<span id="61"> 61</span>
+<span id="62"> 62</span>
+<span id="63"> 63</span>
+<span id="64"> 64</span>
+<span id="65"> 65</span>
+<span id="66"> 66</span>
+<span id="67"> 67</span>
+<span id="68"> 68</span>
+<span id="69"> 69</span>
+<span id="70"> 70</span>
+<span id="71"> 71</span>
+<span id="72"> 72</span>
+<span id="73"> 73</span>
+<span id="74"> 74</span>
+<span id="75"> 75</span>
+<span id="76"> 76</span>
+<span id="77"> 77</span>
+<span id="78"> 78</span>
+<span id="79"> 79</span>
+<span id="80"> 80</span>
+<span id="81"> 81</span>
+<span id="82"> 82</span>
+<span id="83"> 83</span>
+<span id="84"> 84</span>
+<span id="85"> 85</span>
+<span id="86"> 86</span>
+<span id="87"> 87</span>
+<span id="88"> 88</span>
+<span id="89"> 89</span>
+<span id="90"> 90</span>
+<span id="91"> 91</span>
+<span id="92"> 92</span>
+<span id="93"> 93</span>
+<span id="94"> 94</span>
+<span id="95"> 95</span>
+<span id="96"> 96</span>
+<span id="97"> 97</span>
+<span id="98"> 98</span>
+<span id="99"> 99</span>
+<span id="100">100</span>
+<span id="101">101</span>
+<span id="102">102</span>
+<span id="103">103</span>
+<span id="104">104</span>
+<span id="105">105</span>
+<span id="106">106</span>
+<span id="107">107</span>
+<span id="108">108</span>
+<span id="109">109</span>
+<span id="110">110</span>
+<span id="111">111</span>
+<span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
+<span id="187">187</span>
+<span id="188">188</span>
+<span id="189">189</span>
+<span id="190">190</span>
+<span id="191">191</span>
+<span id="192">192</span>
+<span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
+<span id="288">288</span>
+<span id="289">289</span>
+<span id="290">290</span>
+<span id="291">291</span>
+<span id="292">292</span>
+</pre><pre class="rust">
+<span class="attribute">#![<span class="ident">doc</span>(<span class="ident">html_logo_url</span> <span class="op">=</span> <span class="string">&quot;https://raw.githubusercontent.com/georust/meta/master/logo/logo.png&quot;</span>)]</span>
+
+<span class="doccomment">//! The `geo` crate provides geospatial primitive types and algorithms.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Types</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! - **[`Coordinate`]**: A two-dimensional coordinate. All geometry types are composed of [`Coordinate`]s, though [`Coordinate`] itself is not a [`Geometry`] type.</span>
+<span class="doccomment">//! - **[`Point`]**: A single point represented by one [`Coordinate`]</span>
+<span class="doccomment">//! - **[`MultiPoint`]**: A collection of [`Point`]s</span>
+<span class="doccomment">//! - **[`Line`]**: A line segment represented by two [`Coordinate`]s</span>
+<span class="doccomment">//! - **[`LineString`]**: A series of contiguous line segments represented by two or more</span>
+<span class="doccomment">//!   [`Coordinate`]s</span>
+<span class="doccomment">//! - **[`MultiLineString`]**: A collection of [`LineString`]s</span>
+<span class="doccomment">//! - **[`Polygon`]**: A bounded area represented by one [`LineString`] exterior ring, and zero or</span>
+<span class="doccomment">//!   more [`LineString`] interior rings</span>
+<span class="doccomment">//! - **[`MultiPolygon`]**: A collection of [`Polygon`]s</span>
+<span class="doccomment">//! - **[`Rect`]**: An axis-aligned bounded rectangle represented by minimum and maximum</span>
+<span class="doccomment">//!   [`Coordinate`]s</span>
+<span class="doccomment">//! - **[`Triangle`]**: A bounded area represented by three [`Coordinate`] vertices</span>
+<span class="doccomment">//! - **[`GeometryCollection`]**: A collection of [`Geometry`]s</span>
+<span class="doccomment">//! - **[`Geometry`]**: An enumeration of all geometry types, excluding [`Coordinate`]</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The preceding types are reexported from the [`geo-types`] crate. Consider using that crate</span>
+<span class="doccomment">//! if you only need access to these types and no other `geo` functionality.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Semantics</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The geospatial types provided here aim to adhere to the [OpenGIS Simple feature access][OGC-SFA]</span>
+<span class="doccomment">//! standards. Thus, the types here are inter-operable with other implementations of the standards:</span>
+<span class="doccomment">//! [JTS], [GEOS], etc.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Algorithms</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Area</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! - **[`Area`](algorithm::area::Area)**: Calculate the planar area of a geometry</span>
+<span class="doccomment">//! - **[`ChamberlainDuquetteArea`](algorithm::chamberlain_duquette_area::ChamberlainDuquetteArea)**: Calculate the geodesic area of a geometry</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Distance</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! - **[`EuclideanDistance`](algorithm::euclidean_distance::EuclideanDistance)**: Calculate the minimum euclidean distance between geometries</span>
+<span class="doccomment">//! - **[`GeodesicDistance`](algorithm::geodesic_distance::GeodesicDistance)**: Calculate the minimum geodesic distance between geometries using the algorithm presented in _Algorithms for geodesics_ by Charles Karney (2013)</span>
+<span class="doccomment">//! - **[`HaversineDistance`](algorithm::haversine_distance::HaversineDistance)**: Calculate the minimum geodesic distance between geometries using the haversine formula</span>
+<span class="doccomment">//! - **[`VincentyDistance`](algorithm::vincenty_distance::VincentyDistance)**: Calculate the minimum geodesic distance between geometries using Vincenty’s formula</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Length</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! - **[`EuclideanLength`](algorithm::euclidean_length::EuclideanLength)**: Calculate the euclidean length of a geometry</span>
+<span class="doccomment">//! - **[`GeodesicLength`](algorithm::geodesic_length::GeodesicLength)**: Calculate the geodesic length of a geometry using the algorithm presented in _Algorithms for geodesics_ by Charles Karney (2013)</span>
+<span class="doccomment">//! - **[`HaversineLength`](algorithm::haversine_length::HaversineLength)**: Calculate the geodesic length of a geometry using the haversine formula</span>
+<span class="doccomment">//! - **[`VincentyLength`](algorithm::vincenty_length::VincentyLength)**: Calculate the geodesic length of a geometry using Vincenty’s formula</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Simplification</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! - **[`Simplify`](algorithm::simplify::Simplify)**: Simplify a geometry using the Ramer–Douglas–Peucker algorithm</span>
+<span class="doccomment">//! - **[`SimplifyIdx`](algorithm::simplify::SimplifyIdx)**: Calculate a simplified geometry using the Ramer–Douglas–Peucker algorithm, returning coordinate indices</span>
+<span class="doccomment">//! - **[`SimplifyVW`](algorithm::simplifyvw::SimplifyVW)**: Simplify a geometry using the Visvalingam-Whyatt algorithm</span>
+<span class="doccomment">//! - **[`SimplifyVWPreserve`](algorithm::simplifyvw::SimplifyVWPreserve)**: Simplify a geometry using a topology-preserving variant of the Visvalingam-Whyatt algorithm</span>
+<span class="doccomment">//! - **[`SimplifyVwIdx`](algorithm::simplifyvw::SimplifyVwIdx)**: Calculate a simplified geometry using a topology-preserving variant of the Visvalingam-Whyatt algorithm, returning coordinate indices</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Query</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! - **[`Bearing`](algorithm::bearing::Bearing)**: Calculate the bearing between points</span>
+<span class="doccomment">//! - **[`ClosestPoint`](algorithm::closest_point::ClosestPoint)**: Find the point on a geometry</span>
+<span class="doccomment">//!   closest to a given point</span>
+<span class="doccomment">//! - **[`IsConvex`](algorithm::is_convex::IsConvex)**: Calculate the convexity of a</span>
+<span class="doccomment">//!   [`LineString`]</span>
+<span class="doccomment">//! - **[`LineInterpolatePoint`](algorithm::line_interpolate_point::LineInterpolatePoint)**:</span>
+<span class="doccomment">//!   Generates a point that lies a given fraction along the line</span>
+<span class="doccomment">//! - **[`LineLocatePoint`](algorithm::line_locate_point::LineLocatePoint)**: Calculate the</span>
+<span class="doccomment">//!   fraction of a line’s total length representing the location of the closest point on the</span>
+<span class="doccomment">//!   line to the given point</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Similarity</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! - **[`FrechetDistance`](algorithm::frechet_distance::FrechetDistance)**: Calculate the similarity between [`LineString`]s using the Fréchet distance</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Topology</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! - **[`Contains`](algorithm::contains::Contains)**: Calculate if a geometry contains another</span>
+<span class="doccomment">//!   geometry</span>
+<span class="doccomment">//! - **[`CoordinatePosition`](algorithm::coordinate_position::CoordinatePosition)**: Calculate</span>
+<span class="doccomment">//!   the position of a coordinate relative to a geometry</span>
+<span class="doccomment">//! - **[`HasDimensions`](algorithm::dimensions::HasDimensions)**: Determine the dimensions of a geometry</span>
+<span class="doccomment">//! - **[`Intersects`](algorithm::intersects::Intersects)**: Calculate if a geometry intersects</span>
+<span class="doccomment">//!   another geometry</span>
+<span class="doccomment">//! - **[`line_intersection`](algorithm::line_intersection::line_intersection)**: Calculates the</span>
+<span class="doccomment">//!   intersection, if any, between two lines.</span>
+<span class="doccomment">//! - **[`Relate`](algorithm::relate::Relate)**: Topologically relate two geometries based on</span>
+<span class="doccomment">//!   [DE-9IM](https://en.wikipedia.org/wiki/DE-9IM) semantics.</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Winding</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! - **[`Orient`](algorithm::orient::Orient)**: Apply a specified [`Winding`](algorithm::winding_order::Winding) to a [`Polygon`]’s interior and exterior rings</span>
+<span class="doccomment">//! - **[`Winding`](algorithm::winding_order::Winding)**: Calculate and manipulate the winding order of a [`LineString`]</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Iteration</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! - **[`CoordsIter`](algorithm::coords_iter::CoordsIter)**: Iterate over the coordinates of a geometry</span>
+<span class="doccomment">//! - **[`MapCoords`](algorithm::map_coords::MapCoords)**: Map a function over all the coordinates</span>
+<span class="doccomment">//!   in a geometry, returning a new geometry</span>
+<span class="doccomment">//! - **[`MapCoordsInplace`](algorithm::map_coords::MapCoordsInplace)**: Map a function over all the</span>
+<span class="doccomment">//!   coordinates in a geometry in-place</span>
+<span class="doccomment">//! - **[`TryMapCoords`](algorithm::map_coords::TryMapCoords)**: Map a fallible function over all</span>
+<span class="doccomment">//!   the coordinates in a geometry, returning a new geometry wrapped in a `Result`</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Boundary</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! - **[`BoundingRect`](algorithm::bounding_rect::BoundingRect)**: Calculate the axis-aligned</span>
+<span class="doccomment">//!   bounding rectangle of a geometry</span>
+<span class="doccomment">//! - **[`ConcaveHull`](algorithm::concave_hull::ConcaveHull)**: Calculate the concave hull of a</span>
+<span class="doccomment">//!   geometry</span>
+<span class="doccomment">//! - **[`ConvexHull`](algorithm::convex_hull::ConvexHull)**: Calculate the convex hull of a</span>
+<span class="doccomment">//!   geometry</span>
+<span class="doccomment">//! - **[`Extremes`](algorithm::extremes::Extremes)**: Calculate the extreme coordinates and</span>
+<span class="doccomment">//!   indices of a geometry</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Affine transformations</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! - **[`Rotate`](algorithm::rotate::Rotate)**: Rotate a geometry around its centroid</span>
+<span class="doccomment">//! - **[`RotatePoint`](algorithm::rotate::RotatePoint)**: Rotate a geometry around a point</span>
+<span class="doccomment">//! - **[`Translate`](algorithm::translate::Translate)**: Translate a geometry along its axis</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! ## Miscellaneous</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! - **[`Centroid`](algorithm::centroid::Centroid)**: Calculate the centroid of a geometry</span>
+<span class="doccomment">//! - **[`HaversineDestination`](algorithm::haversine_destination::HaversineDestination)**:</span>
+<span class="doccomment">//! - **[`HaversineIntermediate`](algorithm::haversine_intermediate::HaversineIntermediate)**:</span>
+<span class="doccomment">//! - **`Proj`**: Project geometries with the `proj` crate</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Features</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! The following optional [Cargo features] are available:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! - `proj-network`: Enables [network grid] support for the [`proj` crate]. After enabling this feature, [further configuration][proj crate file download] is required to use the network grid</span>
+<span class="doccomment">//! - `use-proj`: Enables coordinate conversion and transformation of `Point` geometries using the [`proj` crate]</span>
+<span class="doccomment">//! - `use-serde`: Allows geometry types to be serialized and deserialized with [Serde]</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! # Ecosystem</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! There’s a wide variety of `geo`-compatible crates in the ecosystem that offer functionality not</span>
+<span class="doccomment">//! included in the `geo` crate, including:</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! * Reading and writing file formats (e.g. [GeoJSON][geojson crate], [WKT][wkt crate],</span>
+<span class="doccomment">//!   [shapefile][shapefile crate])</span>
+<span class="doccomment">//! * [Latitude and longitude parsing][latlng crate]</span>
+<span class="doccomment">//! * [Label placement][polylabel crate]</span>
+<span class="doccomment">//! * [Geocoding][geocoding crate]</span>
+<span class="doccomment">//! * [and much more...][georust website]</span>
+<span class="doccomment">//!</span>
+<span class="doccomment">//! [`geo-types`]: https://crates.io/crates/geo-types</span>
+<span class="doccomment">//! [`proj` crate]: https://github.com/georust/proj</span>
+<span class="doccomment">//! [geojson crate]: https://crates.io/crates/geojson</span>
+<span class="doccomment">//! [wkt crate]: https://crates.io/crates/wkt</span>
+<span class="doccomment">//! [shapefile crate]: https://crates.io/crates/shapefile</span>
+<span class="doccomment">//! [latlng crate]: https://crates.io/crates/latlon</span>
+<span class="doccomment">//! [polylabel crate]: https://crates.io/crates/polylabel</span>
+<span class="doccomment">//! [geocoding crate]: https://crates.io/crates/geocoding</span>
+<span class="doccomment">//! [georust website]: https://georust.org</span>
+<span class="doccomment">//! [Cargo features]: https://doc.rust-lang.org/cargo/reference/features.html</span>
+<span class="doccomment">//! [GEOS]: https://trac.osgeo.org/geos</span>
+<span class="doccomment">//! [JTS]: https://github.com/locationtech/jts</span>
+<span class="doccomment">//! [network grid]: https://proj.org/usage/network.html</span>
+<span class="doccomment">//! [OGC-SFA]: https://www.ogc.org/standards/sfa</span>
+<span class="doccomment">//! [proj crate file download]: https://docs.rs/proj/*/proj/#grid-file-download</span>
+<span class="doccomment">//! [Serde]: https://serde.rs/</span>
+
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">geo_types</span>;
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">num_traits</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;use-serde&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">macro_use</span>]</span>
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">serde</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;use-proj&quot;</span>)]</span>
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">proj</span>;
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">rstar</span>;
+
+<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::algorithm</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">deprecated</span>)]</span>
+<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::traits::ToGeo</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::types::Closest</span>;
+
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">geo_types</span>::{
+    <span class="ident">line_string</span>, <span class="ident">point</span>, <span class="ident">polygon</span>, <span class="ident">CoordFloat</span>, <span class="ident">CoordNum</span>, <span class="ident">Coordinate</span>, <span class="ident">Geometry</span>, <span class="ident">GeometryCollection</span>,
+    <span class="ident">Line</span>, <span class="ident">LineString</span>, <span class="ident">MultiLineString</span>, <span class="ident">MultiPoint</span>, <span class="ident">MultiPolygon</span>, <span class="ident">Point</span>, <span class="ident">Polygon</span>, <span class="ident">Rect</span>, <span class="ident">Triangle</span>,
+};
+
+<span class="doccomment">/// This module includes all the functions of geometric calculations</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">algorithm</span>;
+<span class="kw">mod</span> <span class="ident">geometry_cow</span>;
+<span class="kw">mod</span> <span class="ident">traits</span>;
+<span class="kw">mod</span> <span class="ident">types</span>;
+<span class="kw">mod</span> <span class="ident">utils</span>;
+<span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">use</span> <span class="ident">geometry_cow::GeometryCow</span>;
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
+<span class="attribute">#[<span class="ident">macro_use</span>]</span>
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">approx</span>;
+
+<span class="attribute">#[<span class="ident">macro_use</span>]</span>
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">log</span>;
+
+<span class="doccomment">/// Mean radius of Earth in meters</span>
+<span class="doccomment">/// This is the value recommended by the IUGG:</span>
+<span class="doccomment">/// Moritz, H. (2000). Geodetic Reference System 1980. Journal of Geodesy, 74(1), 128–133. doi:10.1007/s001900050278</span>
+<span class="doccomment">/// &quot;Derived Geometric Constants: mean radius&quot; (p133)</span>
+<span class="doccomment">/// https://link.springer.com/article/10.1007%2Fs001900050278</span>
+<span class="doccomment">/// https://sci-hub.se/https://doi.org/10.1007/s001900050278</span>
+<span class="doccomment">/// https://en.wikipedia.org/wiki/Earth_radius#Mean_radius</span>
+<span class="kw">const</span> <span class="ident">MEAN_EARTH_RADIUS</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">6371008.8</span>;
+
+<span class="comment">// Radius of Earth at the equator in meters (derived from the WGS-84 ellipsoid)</span>
+<span class="kw">const</span> <span class="ident">EQUATORIAL_EARTH_RADIUS</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">6_378_137.0</span>;
+
+<span class="comment">// Radius of Earth at the poles in meters (derived from the WGS-84 ellipsoid)</span>
+<span class="kw">const</span> <span class="ident">POLAR_EARTH_RADIUS</span>: <span class="ident">f64</span> <span class="op">=</span> <span class="number">6_356_752.314_245</span>;
+
+<span class="comment">// Flattening of the WGS-84 ellipsoid - https://en.wikipedia.org/wiki/Flattening</span>
+<span class="kw">const</span> <span class="ident">EARTH_FLATTENING</span>: <span class="ident">f64</span> <span class="op">=</span>
+    (<span class="ident">EQUATORIAL_EARTH_RADIUS</span> <span class="op">-</span> <span class="ident">POLAR_EARTH_RADIUS</span>) <span class="op">/</span> <span class="ident">EQUATORIAL_EARTH_RADIUS</span>;
+
+<span class="doccomment">/// A prelude which re-exports the traits for manipulating objects in this</span>
+<span class="doccomment">/// crate. Typically imported with `use geo::prelude::*`.</span>
+<span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">prelude</span> {
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::algorithm::area::Area</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::algorithm::bearing::Bearing</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::algorithm::bounding_rect::BoundingRect</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::algorithm::centroid::Centroid</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::algorithm::chamberlain_duquette_area::ChamberlainDuquetteArea</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::algorithm::closest_point::ClosestPoint</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::algorithm::contains::Contains</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::algorithm::convex_hull::ConvexHull</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::algorithm::dimensions::HasDimensions</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::algorithm::euclidean_distance::EuclideanDistance</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::algorithm::euclidean_length::EuclideanLength</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::algorithm::extremes::Extremes</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::algorithm::frechet_distance::FrechetDistance</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::algorithm::geodesic_distance::GeodesicDistance</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::algorithm::geodesic_intermediate::GeodesicIntermediate</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::algorithm::geodesic_length::GeodesicLength</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::algorithm::haversine_destination::HaversineDestination</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::algorithm::haversine_distance::HaversineDistance</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::algorithm::haversine_intermediate::HaversineIntermediate</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::algorithm::haversine_length::HaversineLength</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::algorithm::intersects::Intersects</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::algorithm::is_convex::IsConvex</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::algorithm::map_coords::MapCoords</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::algorithm::orient::Orient</span>;
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;use-proj&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::algorithm::proj::Proj</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::algorithm::rotate</span>::{<span class="ident">Rotate</span>, <span class="ident">RotatePoint</span>};
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::algorithm::simplify::Simplify</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::algorithm::simplifyvw::SimplifyVW</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::algorithm::translate::Translate</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::algorithm::vincenty_distance::VincentyDistance</span>;
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::algorithm::vincenty_length::VincentyLength</span>;
+}
+
+<span class="doccomment">/// A common numeric trait used for geo algorithms.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Different numeric types have different tradeoffs. `geo` strives to utilize generics to allow</span>
+<span class="doccomment">/// users to choose their numeric types. If you are writing a function which you&#39;d like to be</span>
+<span class="doccomment">/// generic over all the numeric types supported by geo, you probably want to constraint</span>
+<span class="doccomment">/// your function input to `GeoFloat`. For methods which work for integers, and not just floating</span>
+<span class="doccomment">/// point, see [`GeoNum`].</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Examples</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// ```</span>
+<span class="doccomment">/// use geo::{GeoFloat, MultiPolygon, Polygon, Point};</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// // An admittedly silly method implementation, but the signature shows how to use the GeoFloat trait</span>
+<span class="doccomment">/// fn farthest_from&lt;&#39;a, T: GeoFloat&gt;(point: &amp;Point&lt;T&gt;, polygons: &amp;&#39;a MultiPolygon&lt;T&gt;) -&gt; Option&lt;&amp;&#39;a Polygon&lt;T&gt;&gt; {</span>
+<span class="doccomment">///     polygons.iter().fold(None, |accum, next| {</span>
+<span class="doccomment">///         match accum {</span>
+<span class="doccomment">///             None =&gt; Some(next),</span>
+<span class="doccomment">///             Some(farthest) =&gt; {</span>
+<span class="doccomment">///                 use geo::algorithm::{euclidean_distance::EuclideanDistance};</span>
+<span class="doccomment">///                 if next.euclidean_distance(point) &gt; farthest.euclidean_distance(point) {</span>
+<span class="doccomment">///                     Some(next)</span>
+<span class="doccomment">///                 } else {</span>
+<span class="doccomment">///                     Some(farthest)</span>
+<span class="doccomment">///                 }</span>
+<span class="doccomment">///             }</span>
+<span class="doccomment">///         }</span>
+<span class="doccomment">///     })</span>
+<span class="doccomment">/// }</span>
+<span class="doccomment">/// ```</span>
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">GeoFloat</span>: <span class="ident">num_traits::Float</span> <span class="op">+</span> <span class="ident">GeoNum</span> {}
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">GeoFloat</span> <span class="kw">for</span> <span class="ident">T</span> <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">num_traits::Float</span> <span class="op">+</span> <span class="ident">GeoNum</span> {}
+
+<span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">GeoNum</span>: <span class="ident">CoordNum</span> <span class="op">+</span> <span class="ident">algorithm::kernels::HasKernel</span> {}
+<span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">GeoNum</span> <span class="kw">for</span> <span class="ident">T</span> <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">CoordNum</span> <span class="op">+</span> <span class="ident">algorithm::kernels::HasKernel</span> {}
+</pre></div>
+</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="geo" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
+    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script>
+</body></html>
