@@ -10,6 +10,14 @@ use crate::{
     Crossable, Crossing,
 };
 
+/// Sweep algorithm for detecting all crossings.
+///
+/// This is an internal data-structure that implements the
+/// [Bentley-Ottman] sweep. Maintains a heap of heap of end-points,
+/// and the currently active segments. End-users should use one of the
+/// iterator interfaces built around this sweep.
+///
+/// [Bentley-Ottman]: //en.wikipedia.org/wiki/Bentley%E2%80%93Ottmann_algorithm
 pub struct Sweep<C: Crossable>
 where
     C: Crossable + Clone,

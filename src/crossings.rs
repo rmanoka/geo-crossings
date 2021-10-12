@@ -2,7 +2,7 @@ use geo::{
     line_intersection::{line_intersection, LineIntersection},
     Coordinate, GeoFloat, Line,
 };
-use std::{fmt::Debug, iter::FromIterator};
+use std::{fmt::Debug, iter::FromIterator, rc::Rc, sync::Arc};
 
 use crate::sweep::Sweep;
 
@@ -10,6 +10,13 @@ use crate::sweep::Sweep;
 ///
 /// This type is implemented by [`Line`], but users may also implement
 /// this on custom types to store extra information.
+///
+/// # Cloning
+///
+/// Note that for usage with the crossing iterators, the type must
+/// also impl. `Clone`. If the custom type is not cheap to clone, use
+/// either a reference to the type, a [`Rc`] or an [`Arc`]. All these
+/// are supported via blanket trait implementations.
 pub trait Crossable: Sized + Debug {
     /// Scalar used the coordinates.
     type Scalar: GeoFloat;
@@ -27,6 +34,18 @@ impl<T: GeoFloat> Crossable for Line<T> {
     }
 }
 
+macro_rules! blanket_impl_smart_pointer {
+	  ($ty:ty) => {
+        impl<T: Crossable> Crossable for $ty {
+            type Scalar = T::Scalar;
+
+            fn line(&self) -> Line<Self::Scalar> {
+                T::line(self)
+            }
+        }
+	  };
+}
+
 impl<'a, T: Crossable> Crossable for &'a T {
     type Scalar = T::Scalar;
 
@@ -34,6 +53,12 @@ impl<'a, T: Crossable> Crossable for &'a T {
         T::line(*self)
     }
 }
+
+blanket_impl_smart_pointer!(Box<T>);
+blanket_impl_smart_pointer!(Rc<T>);
+blanket_impl_smart_pointer!(Arc<T>);
+
+
 
 /// A segment of a input [`Crossable`] type.
 ///
@@ -71,12 +96,33 @@ pub struct Crossing<C: Crossable> {
 ///
 /// Yields all end points, intersections and overlaps of a set of
 /// line-segments and points. Construct it by `collect`-ing an
-/// iterator of [`Crossable`].
+/// iterator of [`Crossable`]. The implementation uses the
+/// [Bentley-Ottman] algorithm and runs in time O((n + k) log n) time;
+/// this is faster than a brute-force search for intersections across
+/// all pairs of input segments if k, the number of intersections is
+/// small compared to n^2.
 ///
-/// The implementation uses the [Bentley-Ottman] algorithm and runs in
-/// time O((n + k) log(n)) time; this is faster than a brute-force
-/// search for intersections across all pairs of input segments if k,
-/// the number of intersections is small compared to n^2.
+/// ## Usage
+///
+/// Construct from an iterator of any type implementing the
+/// [`Crossable`] trait. Use the [`CrossingsIter::intersections`]
+/// method to access all segments that start or end at the last
+/// yielded point.
+///
+/// ```rust
+/// use geo::Line;
+/// use geo_crossings::CrossingsIter;
+/// use std::iter::FromIterator;
+/// let input = vec![
+///     Line::from([(1., 0.), (0., 1.)]),
+///     Line::from([(0., 0.75), (1., 0.25)]),
+///     Line::from([(0., 0.25), (1., 0.75)]),
+///     Line::from([(0., 0.), (1., 1.)]),
+/// ];
+/// let iter = CrossingsIter::<_>::from_iter(input);
+/// // 1 intersection point, and 8 end points
+/// assert_eq!(iter.count(), 9);
+/// ```
 ///
 /// [Bentley-Ottman]: //en.wikipedia.org/wiki/Bentley%E2%80%93Ottmann_algorithm
 pub struct CrossingsIter<C: Crossable + Clone> {
@@ -130,12 +176,33 @@ impl<C: Crossable + Clone> Iterator for CrossingsIter<C> {
 /// Yields tuples `(C, C, LineIntersection)` for each pair of input
 /// crossables that intersect or overlap. This is a drop-in
 /// replacement for computing [`LineIntersection`] over all pairs of
-/// the collection, but is typically more efficient.
-///
-/// The implementation uses the [Bentley-Ottman] algorithm and runs in
-/// time O((n + k) log(n)) time; this is faster than a brute-force
+/// the collection, but is typically more efficient. The
+/// implementation uses the [Bentley-Ottman] algorithm and runs in
+/// time O((n + k) log n) time; this is faster than a brute-force
 /// search for intersections across all pairs of input segments if k,
 /// the number of intersections is small compared to n^2.
+///
+/// ## Usage
+///
+/// Construct from an iterator of any type implementing the
+/// [`Crossable`] trait. The geo-type [`Line`] implements this trait.
+/// See the trait documentation for more information on usage with
+/// custom types.
+///
+/// ```rust
+/// use geo::Line;
+/// use geo_crossings::Intersections;
+/// use std::iter::FromIterator;
+/// let input = vec![
+///     Line::from([(1., 0.), (0., 1.)]),
+///     Line::from([(0., 0.75), (1., 0.25)]),
+///     Line::from([(0., 0.25), (1., 0.75)]),
+///     Line::from([(0., 0.), (1., 1.)]),
+/// ];
+/// let iter = Intersections::<_>::from_iter(input);
+/// // All pairs intersect
+/// assert_eq!(iter.count(), 6);
+/// ```
 ///
 /// [Bentley-Ottman]: //en.wikipedia.org/wiki/Bentley%E2%80%93Ottmann_algorithm
 pub struct Intersections<C: Crossable + Clone> {
@@ -240,10 +307,10 @@ mod tests {
     #[test]
     fn simple_iter() {
         let input = vec![
-            Box::from(Line::from([(1., 0.), (0., 1.)])),
+            Rc::from(Line::from([(1., 0.), (0., 1.)])),
             Line::from([(0., 0.), (1., 1.)]).into(),
         ];
-        let iter: CrossingsIter<_> = input.iter().map(|r| r.as_ref()).collect();
+        let iter: CrossingsIter<_> = input.into_iter().collect();
         assert_eq!(iter.count(), 5);
     }
 
