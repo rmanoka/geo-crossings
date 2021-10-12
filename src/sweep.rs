@@ -12,14 +12,14 @@ use crate::{
 
 pub struct Sweep<C: Crossable>
 where
-    C: Crossable + Copy,
+    C: Crossable + Clone,
 {
     segments: Box<Slab<Segment<C>>>,
     events: BinaryHeap<Event<C::Scalar>>,
     active_segments: BTreeSet<ActiveSegment<C>>,
 }
 
-impl<C: Crossable + Copy> Sweep<C> {
+impl<C: Crossable + Clone> Sweep<C> {
     pub fn new<I: IntoIterator<Item = C>>(iter: I) -> Self {
         let iter = iter.into_iter();
         let size = {
@@ -69,18 +69,15 @@ impl<C: Crossable + Copy> Sweep<C> {
             let mut target_key = segment_key;
 
             while let Some(child_key) = child {
-                let child_segment = self.segments[child_key];
+                let child_overlapping = self.segments[child_key].overlapping;
+                let child_crossable = self.segments[child_key].crossable().clone();
 
-                let new_key = Segment::new(
-                    &mut self.segments,
-                    *child_segment.crossable(),
-                    Some(segment_geom),
-                )
-                .key();
+                let new_key =
+                    Segment::new(&mut self.segments, child_crossable, Some(segment_geom)).key();
                 self.segments[target_key].overlapping = Some(new_key);
 
                 target_key = new_key;
-                child = child_segment.overlapping;
+                child = child_overlapping;
             }
         }
         segment_key
@@ -99,7 +96,10 @@ impl<C: Crossable + Copy> Sweep<C> {
         adj_intersection: LineOrPoint<C::Scalar>,
     ) -> SplitSegments<C::Scalar> {
         let segment = &mut self.segments[key];
-        debug!("adjust_for_intersection: {:?}\n\twith: {:?}", segment, adj_intersection);
+        debug!(
+            "adjust_for_intersection: {:?}\n\twith: {:?}",
+            segment, adj_intersection
+        );
         let adjust_output = segment.adjust_for_intersection(adj_intersection);
         debug!("adjust_output: {:?}", adjust_output);
         let new_geom = segment.geom;
@@ -128,7 +128,7 @@ impl<C: Crossable + Copy> Sweep<C> {
         adj_intersection: LineOrPoint<C::Scalar>,
     ) -> Option<usize> {
         let adj_segment = &mut self.segments[key];
-        let adj_cross = *adj_segment.crossable();
+        let adj_cross = adj_segment.crossable().clone();
         use SplitSegments::*;
         match self.adjust_for_intersection(key, adj_intersection) {
             Unchanged { overlap } => overlap.then(|| key),
@@ -141,7 +141,7 @@ impl<C: Crossable + Copy> Sweep<C> {
                 }
             }
             SplitTwice { right } => {
-                self.create_segment(adj_cross, Some(right), Some(key));
+                self.create_segment(adj_cross.clone(), Some(right), Some(key));
                 let middle_key = self.create_segment(adj_cross, Some(adj_intersection), Some(key));
                 Some(middle_key)
             }
@@ -198,18 +198,15 @@ impl<C: Crossable + Copy> Sweep<C> {
     /// Handle one event.
     ///
     /// Returns `true` if the event was not spurious.
-    fn handle_event<F: FnMut(Crossing<C>)>(
-        &mut self,
-        event: Event<C::Scalar>,
-        cb: &mut F,
-    ) -> bool {
+    fn handle_event<F: FnMut(Crossing<C>)>(&mut self, event: Event<C::Scalar>, cb: &mut F) -> bool {
         use EventType::*;
 
         trace!("handling event: {:?}", event);
-        let mut segment = *match self.segment_for_event(&event) {
+        let mut segment = match self.segment_for_event(&event) {
             Some(s) => s,
             None => return false,
-        };
+        }
+        .clone();
 
         let prev = self.active_segments.prev_key(&segment, &self.segments);
         let next = self.active_segments.next_key(&segment, &self.segments);
@@ -250,7 +247,7 @@ impl<C: Crossable + Copy> Sweep<C> {
                         let seg_overlap_key =
                             self.adjust_one_segment(event.segment_key, adj_intersection);
                         // Update segment as it may have changed in storage
-                        segment = self.segments[event.segment_key];
+                        segment = self.segments[event.segment_key].clone();
 
                         assert_eq!(
                             adj_overlap_key.is_some(),
@@ -276,8 +273,8 @@ impl<C: Crossable + Copy> Sweep<C> {
 
                 let mut segment_key = Some(event.segment_key);
                 while let Some(key) = segment_key {
-                    let segment = self.segments[key];
-                    cb(segment.into_crossing(event.ty));
+                    let segment = &self.segments[key];
+                    cb(segment.clone().into_crossing(event.ty));
                     segment_key = segment.overlapping;
                 }
             }
@@ -287,18 +284,16 @@ impl<C: Crossable + Copy> Sweep<C> {
 
                 let mut segment_key = Some(event.segment_key);
                 while let Some(key) = segment_key {
-                    let segment = self.segments[key];
-                    cb(segment.into_crossing(event.ty));
-                    self.segments.remove(key);
+                    let segment = &self.segments[key];
+                    cb(segment.clone().into_crossing(event.ty));
                     segment_key = segment.overlapping;
+                    self.segments.remove(key);
                 }
 
                 if let (Some(prev_key), Some(next_key)) = (prev, next) {
-                    let prev_segment = self.segments[prev_key];
-                    let next_segment = self.segments[next_key];
-                    if let Some(adj_intersection) =
-                        prev_segment.geom.intersect_line(&next_segment.geom)
-                    {
+                    let prev_geom = self.segments[prev_key].geom;
+                    let next_geom = self.segments[next_key].geom;
+                    if let Some(adj_intersection) = prev_geom.intersect_line(&next_geom) {
                         // 1. Split prev_segment, and extra splits to storage
                         assert!(
                             self.adjust_one_segment(prev_key, adj_intersection)

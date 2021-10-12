@@ -40,6 +40,7 @@ impl<'a, T: Crossable> Crossable for &'a T {
 /// This type is used to convey the part of the input geometry that is
 /// intersecting at a given intersection. This is returned by the
 /// [`CrossingsIter::intersections`] method.
+#[derive(Debug, Clone)]
 pub struct Crossing<C: Crossable> {
     /// The input associated with this segment.
     pub crossable: C,
@@ -78,12 +79,12 @@ pub struct Crossing<C: Crossable> {
 /// the number of intersections is small compared to n^2.
 ///
 /// [Bentley-Ottman]: //en.wikipedia.org/wiki/Bentley%E2%80%93Ottmann_algorithm
-pub struct CrossingsIter<C: Crossable + Copy> {
+pub struct CrossingsIter<C: Crossable + Clone> {
     sweep: Sweep<C>,
     segments: Vec<Crossing<C>>,
 }
 
-impl<C: Crossable + Copy> CrossingsIter<C> {
+impl<C: Crossable + Clone> CrossingsIter<C> {
     /// Returns the segments that intersect the last point yielded by
     /// the iterator.
     pub fn intersections(&mut self) -> &mut [Crossing<C>] {
@@ -91,7 +92,7 @@ impl<C: Crossable + Copy> CrossingsIter<C> {
     }
 }
 
-impl<C: Crossable + Copy> FromIterator<C> for CrossingsIter<C> {
+impl<C: Crossable + Clone> FromIterator<C> for CrossingsIter<C> {
     fn from_iter<T: IntoIterator<Item = C>>(iter: T) -> Self {
         let iter = iter.into_iter();
         let size = {
@@ -104,7 +105,7 @@ impl<C: Crossable + Copy> FromIterator<C> for CrossingsIter<C> {
     }
 }
 
-impl<C: Crossable + Copy> Iterator for CrossingsIter<C> {
+impl<C: Crossable + Clone> Iterator for CrossingsIter<C> {
     type Item = Coordinate<C::Scalar>;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -137,7 +138,7 @@ impl<C: Crossable + Copy> Iterator for CrossingsIter<C> {
 /// the number of intersections is small compared to n^2.
 ///
 /// [Bentley-Ottman]: //en.wikipedia.org/wiki/Bentley%E2%80%93Ottmann_algorithm
-pub struct Intersections<C: Crossable + Copy> {
+pub struct Intersections<C: Crossable + Clone> {
     inner: CrossingsIter<C>,
     idx: usize,
     jdx: usize,
@@ -145,7 +146,7 @@ pub struct Intersections<C: Crossable + Copy> {
     pt: Option<Coordinate<C::Scalar>>,
 }
 
-impl<C: Crossable + Copy> FromIterator<C> for Intersections<C> {
+impl<C: Crossable + Clone> FromIterator<C> for Intersections<C> {
     fn from_iter<T: IntoIterator<Item = C>>(iter: T) -> Self {
         Self {
             inner: FromIterator::from_iter(iter),
@@ -157,7 +158,7 @@ impl<C: Crossable + Copy> FromIterator<C> for Intersections<C> {
     }
 }
 
-impl<C: Crossable + Copy> Intersections<C> {
+impl<C: Crossable + Clone> Intersections<C> {
     fn intersection(&mut self) -> Option<(C, C, LineIntersection<C::Scalar>)> {
         let (si, sj) = {
             let segments = self.inner.intersections();
@@ -174,15 +175,13 @@ impl<C: Crossable + Copy> Intersections<C> {
         };
 
         should_compute.then(|| {
-            let si = si.crossable;
-            let sj = sj.crossable;
+            let si = si.crossable.clone();
+            let sj = sj.crossable.clone();
 
-            (
-                si,
-                sj,
-                line_intersection(si.line(), sj.line())
-                    .expect("line_intersection returned `None` disagreeing with `CrossingsIter`"),
-            )
+            let int = line_intersection(si.line(), sj.line())
+                .expect("line_intersection returned `None` disagreeing with `CrossingsIter`");
+
+            (si, sj, int)
         })
     }
 
@@ -212,7 +211,7 @@ impl<C: Crossable + Copy> Intersections<C> {
     }
 }
 
-impl<C: Crossable + Copy> Iterator for Intersections<C> {
+impl<C: Crossable + Clone> Iterator for Intersections<C> {
     type Item = (C, C, LineIntersection<C::Scalar>);
 
     fn next(&mut self) -> Option<Self::Item> {

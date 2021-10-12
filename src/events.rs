@@ -69,7 +69,10 @@ pub struct SweepPoint<T: GeoFloat>(pub Coordinate<T>);
 
 impl<T: GeoFloat> std::fmt::Debug for SweepPoint<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_tuple("Pt").field(&self.0.x).field(&self.0.y).finish()
+        f.debug_tuple("Pt")
+            .field(&self.0.x)
+            .field(&self.0.y)
+            .finish()
     }
 }
 

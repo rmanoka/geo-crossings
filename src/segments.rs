@@ -5,7 +5,7 @@ use std::{cmp::Ordering, collections::BTreeSet, fmt::Debug, ops::Bound};
 use crate::{
     events::{Event, EventType},
     line_or_point::LineOrPoint::{self, *},
-    Crossing, Crossable,
+    Crossable, Crossing,
 };
 
 /// A segment of input [`LineOrPoint`] generated during the sweep.
@@ -363,9 +363,7 @@ mod tests {
 
         impl TestCase {
             fn assert_equality(&self, slab: &Slab<Segment<Line<f64>>>) {
-                let isec = slab[self.a]
-                    .geom
-                    .intersect_line(&slab[self.b].geom);
+                let isec = slab[self.a].geom.intersect_line(&slab[self.b].geom);
                 assert_eq!(isec, self.isec);
 
                 if isec.is_none() {
@@ -374,10 +372,7 @@ mod tests {
                 let isec = isec.unwrap();
                 let mut copy_seg = slab[self.a];
                 let split = copy_seg.adjust_for_intersection(isec);
-                assert_eq!(
-                    &split,
-                    self.split.as_ref().unwrap(),
-                )
+                assert_eq!(&split, self.split.as_ref().unwrap(),)
             }
         }
 
@@ -385,59 +380,41 @@ mod tests {
             TestCase {
                 a: 0,
                 b: 0,
-                isec: Some(
-                    slab[0].geom.clone(),
-                ),
-                split: Some(
-                    SplitSegments::Unchanged {
-                        overlap: true,
-                    }
-                ),
+                isec: Some(slab[0].geom.clone()),
+                split: Some(SplitSegments::Unchanged { overlap: true }),
             },
             TestCase {
                 a: 0,
                 b: 1,
                 isec: Some(LineOrPoint::Point((5., 5.).into())),
-                split: Some(
-                    SplitSegments::SplitOnce {
-                        overlap: None,
-                        right: LineOrPoint::Line((5., 5.).into(), (10., 10.).into()),
-                    }
-                ),
+                split: Some(SplitSegments::SplitOnce {
+                    overlap: None,
+                    right: LineOrPoint::Line((5., 5.).into(), (10., 10.).into()),
+                }),
             },
             TestCase {
                 a: 0,
                 b: 2,
-                isec: Some(
-                    LineOrPoint::Point((0., 0.).into()),
-                ),
-                split: Some(
-                    SplitSegments::Unchanged {
-                        overlap: false,
-                    }
-                ),
+                isec: Some(LineOrPoint::Point((0., 0.).into())),
+                split: Some(SplitSegments::Unchanged { overlap: false }),
             },
             TestCase {
                 a: 0,
                 b: 3,
                 isec: Some(LineOrPoint::Line((0., 0.).into(), (5., 5.).into())),
-                split: Some(
-                    SplitSegments::SplitOnce {
-                        overlap: Some(false),
-                        right: LineOrPoint::Line((5., 5.).into(), (10., 10.).into()),
-                    }
-                ),
+                split: Some(SplitSegments::SplitOnce {
+                    overlap: Some(false),
+                    right: LineOrPoint::Line((5., 5.).into(), (10., 10.).into()),
+                }),
             },
             TestCase {
                 a: 0,
                 b: 4,
                 isec: Some(LineOrPoint::Line((5., 5.).into(), (10., 10.).into())),
-                split: Some(
-                    SplitSegments::SplitOnce {
-                        overlap: Some(true),
-                        right: LineOrPoint::Line((5., 5.).into(), (10., 10.).into()),
-                    }
-                ),
+                split: Some(SplitSegments::SplitOnce {
+                    overlap: Some(true),
+                    right: LineOrPoint::Line((5., 5.).into(), (10., 10.).into()),
+                }),
             },
         ];
 
