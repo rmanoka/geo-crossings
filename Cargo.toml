@@ -12,3 +12,10 @@ log = "0.4.14"
 
 [dev-dependencies]
 env_logger = "0.8.4"
+criterion = "0.3.4"
+rand = "0.8.4"
+rand_distr = "0.4.1"
+
+[[bench]]
+name = "rand-line-crossings"
+harness = false
