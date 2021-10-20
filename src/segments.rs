@@ -190,13 +190,25 @@ impl<C: Crossable> Debug for ActiveSegment<C> {
 }
 
 impl<C: Crossable> ActiveSegment<C> {
-    fn new(key: usize, storage: &Slab<Segment<C>>) -> Self {
+    /// Create a new active segment pointing to the given storage.
+    ///
+    /// # Safety
+    ///
+    /// This function is unsafe. Caller must ensure that the `storage`
+    /// reference is valid and constant during the lifetime of the
+    /// created object. Further, the segment at `key` must remain in
+    /// place, and not be deleted; it may be modified as long as it's
+    /// ordering with respect to other active segments is preserved
+    /// (required by the `PartialOrd` impl.).
+    unsafe fn new(key: usize, storage: &Slab<Segment<C>>) -> Self {
         ActiveSegment {
             key,
             storage: storage as *const _,
         }
     }
     fn get(&self) -> Option<&Segment<C>> {
+        // Safety: reference is guaranteed to be valid by the `new`
+        // method.
         let slab = unsafe { &*self.storage as &Slab<Segment<_>> };
         slab.get(self.key)
     }
@@ -253,7 +265,7 @@ pub(crate) trait AdjacentSegments {
         segment: &Self::SegmentType,
         storage: &Slab<Self::SegmentType>,
     ) -> Option<usize>;
-    fn add_segment(&mut self, key: usize, storage: &Slab<Self::SegmentType>);
+    unsafe fn add_segment(&mut self, key: usize, storage: &Slab<Self::SegmentType>);
     fn remove_segment(&mut self, key: usize, storage: &Slab<Self::SegmentType>);
 }
 
@@ -265,7 +277,9 @@ impl<C: Crossable> AdjacentSegments for BTreeSet<ActiveSegment<C>> {
         segment: &Self::SegmentType,
         storage: &Slab<Self::SegmentType>,
     ) -> Option<usize> {
-        let aseg = ActiveSegment::new(segment.key, storage);
+        // Safety: aseg is only valid till end of function, and we
+        // are holding a immut. reference.
+        let aseg = unsafe {ActiveSegment::new(segment.key, storage)};
         self.range((Bound::Unbounded, Bound::Excluded(aseg)))
             .next_back()
             .map(|s| s.key)
@@ -276,20 +290,24 @@ impl<C: Crossable> AdjacentSegments for BTreeSet<ActiveSegment<C>> {
         segment: &Self::SegmentType,
         storage: &Slab<Self::SegmentType>,
     ) -> Option<usize> {
-        let aseg = ActiveSegment::new(segment.key, storage);
+        // Safety: aseg is only valid till end of function, and we
+        // are holding a immut. reference.
+        let aseg = unsafe { ActiveSegment::new(segment.key, storage) };
         self.range((Bound::Excluded(aseg), Bound::Unbounded))
             .next()
             .map(|s| s.key)
     }
 
-    fn add_segment(&mut self, key: usize, storage: &Slab<Self::SegmentType>) {
+    unsafe fn add_segment(&mut self, key: usize, storage: &Slab<Self::SegmentType>) {
         assert!(storage.contains(key));
         assert!(self.insert(ActiveSegment::new(key, storage)));
     }
 
     fn remove_segment(&mut self, key: usize, storage: &Slab<Self::SegmentType>) {
         assert!(storage.contains(key));
-        assert!(self.remove(&ActiveSegment::new(key, storage)));
+        // Safety: temporary active segment is valid as we're holding
+        // a immut. reference to `storage`.
+        assert!(self.remove(&unsafe {ActiveSegment::new(key, storage)}));
     }
 }
 

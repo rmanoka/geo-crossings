@@ -276,8 +276,13 @@ impl<C: Crossable + Clone> Sweep<C> {
                 }
 
                 // Add current segment as active
-                self.active_segments
-                    .add_segment(event.segment_key, &self.segments);
+
+                // Safety: `self.segments` is a `Box` that is not
+                // de-allocated until `self` is dropped.
+                unsafe {
+                    self.active_segments
+                        .add_segment(event.segment_key, &self.segments);
+                }
 
                 let mut segment_key = Some(event.segment_key);
                 while let Some(key) = segment_key {
@@ -287,6 +292,8 @@ impl<C: Crossable + Clone> Sweep<C> {
                 }
             }
             LineRight => {
+                // Safety: `self.segments` is a `Box` that is not
+                // de-allocated until `self` is dropped.
                 self.active_segments
                     .remove_segment(event.segment_key, &self.segments);
 
