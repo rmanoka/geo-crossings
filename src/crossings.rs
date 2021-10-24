@@ -35,7 +35,7 @@ impl<T: GeoFloat> Crossable for Line<T> {
 }
 
 macro_rules! blanket_impl_smart_pointer {
-	  ($ty:ty) => {
+    ($ty:ty) => {
         impl<T: Crossable> Crossable for $ty {
             type Scalar = T::Scalar;
 
@@ -43,7 +43,7 @@ macro_rules! blanket_impl_smart_pointer {
                 T::line(self)
             }
         }
-	  };
+    };
 }
 
 impl<'a, T: Crossable> Crossable for &'a T {
@@ -57,8 +57,6 @@ impl<'a, T: Crossable> Crossable for &'a T {
 blanket_impl_smart_pointer!(Box<T>);
 blanket_impl_smart_pointer!(Rc<T>);
 blanket_impl_smart_pointer!(Arc<T>);
-
-
 
 /// A segment of a input [`Crossable`] type.
 ///

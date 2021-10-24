@@ -279,7 +279,7 @@ impl<C: Crossable> AdjacentSegments for BTreeSet<ActiveSegment<C>> {
     ) -> Option<usize> {
         // Safety: aseg is only valid till end of function, and we
         // are holding a immut. reference.
-        let aseg = unsafe {ActiveSegment::new(segment.key, storage)};
+        let aseg = unsafe { ActiveSegment::new(segment.key, storage) };
         self.range((Bound::Unbounded, Bound::Excluded(aseg)))
             .next_back()
             .map(|s| s.key)
@@ -307,7 +307,7 @@ impl<C: Crossable> AdjacentSegments for BTreeSet<ActiveSegment<C>> {
         assert!(storage.contains(key));
         // Safety: temporary active segment is valid as we're holding
         // a immut. reference to `storage`.
-        assert!(self.remove(&unsafe {ActiveSegment::new(key, storage)}));
+        assert!(self.remove(&unsafe { ActiveSegment::new(key, storage) }));
     }
 }
 
