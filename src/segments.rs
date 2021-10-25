@@ -218,6 +218,7 @@ impl<C: Crossable> ActiveSegment<C> {
 ///
 /// This is consistent with the `PartialOrd` impl.
 impl<C: Crossable> PartialEq for ActiveSegment<C> {
+    #[inline]
     fn eq(&self, other: &Self) -> bool {
         self.key == other.key
     }
@@ -246,6 +247,7 @@ impl<C: Crossable> PartialOrd for ActiveSegment<C> {
 
 /// Assert total ordering same as `PartialOrd` impl.
 impl<C: Crossable> Ord for ActiveSegment<C> {
+    #[inline]
     fn cmp(&self, other: &Self) -> Ordering {
         self.partial_cmp(other)
             .expect("unable to compare active segments!")
@@ -272,6 +274,7 @@ pub(crate) trait AdjacentSegments {
 impl<C: Crossable> AdjacentSegments for BTreeSet<ActiveSegment<C>> {
     type SegmentType = Segment<C>;
 
+    #[inline]
     fn prev_key(
         &self,
         segment: &Self::SegmentType,
@@ -285,6 +288,7 @@ impl<C: Crossable> AdjacentSegments for BTreeSet<ActiveSegment<C>> {
             .map(|s| s.key)
     }
 
+    #[inline]
     fn next_key(
         &self,
         segment: &Self::SegmentType,
@@ -298,11 +302,13 @@ impl<C: Crossable> AdjacentSegments for BTreeSet<ActiveSegment<C>> {
             .map(|s| s.key)
     }
 
+    #[inline]
     unsafe fn add_segment(&mut self, key: usize, storage: &Slab<Self::SegmentType>) {
         assert!(storage.contains(key));
         assert!(self.insert(ActiveSegment::new(key, storage)));
     }
 
+    #[inline]
     fn remove_segment(&mut self, key: usize, storage: &Slab<Self::SegmentType>) {
         assert!(storage.contains(key));
         // Safety: temporary active segment is valid as we're holding

@@ -43,6 +43,7 @@ impl<T: GeoFloat> From<Coordinate<T>> for LineOrPoint<T> {
 
 impl<T: GeoFloat> LineOrPoint<T> {
     /// Checks if the variant is a line.
+    #[inline]
     pub fn is_line(&self) -> bool {
         match self {
             LineOrPoint::Line(_, _) => true,
@@ -51,6 +52,7 @@ impl<T: GeoFloat> LineOrPoint<T> {
     }
 
     /// Return a [`Line`] if it is one, otherwise `None`.
+    #[inline]
     pub fn line(&self) -> Line<T> {
         match self {
             LineOrPoint::Line(p, q) => Line::new(p.0, q.0),
@@ -111,6 +113,7 @@ impl<T: GeoFloat> LineOrPoint<T> {
 
 /// Equality based on ordering defined for segments as per algorithm.
 impl<T: GeoFloat> PartialEq for LineOrPoint<T> {
+    #[inline]
     fn eq(&self, other: &Self) -> bool {
         self.partial_cmp(other) == Some(Ordering::Equal)
     }
@@ -169,6 +172,7 @@ impl<T: GeoFloat> PartialOrd for LineOrPoint<T> {
 }
 
 /// Helper to convert orientation-2d into an ordering
+#[inline]
 fn orientation_as_ordering(orientation: Orientation) -> Ordering {
     match orientation {
         Orientation::CounterClockwise => Ordering::Less,
