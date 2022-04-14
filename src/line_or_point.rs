@@ -3,7 +3,7 @@ use std::cmp::Ordering;
 use geo::{
     kernels::{HasKernel, Kernel, Orientation},
     line_intersection::LineIntersection,
-    Coordinate, GeoFloat, Line,
+    Coordinate, GeoNum, Line, GeoFloat,
 };
 
 use crate::events::SweepPoint;
@@ -14,13 +14,13 @@ use crate::events::SweepPoint;
 /// segment must have distinct points (use the `Point` variant if the
 /// coordinates are the equal).
 #[derive(Debug, Clone, Copy)]
-pub enum LineOrPoint<T: GeoFloat> {
+pub enum LineOrPoint<T: GeoNum> {
     Point(SweepPoint<T>),
     Line(SweepPoint<T>, SweepPoint<T>),
 }
 
 /// Convert from a [`Line`] ensuring end point ordering.
-impl<T: GeoFloat> From<Line<T>> for LineOrPoint<T> {
+impl<T: GeoNum> From<Line<T>> for LineOrPoint<T> {
     fn from(l: Line<T>) -> Self {
         let start = l.start.into();
         let end = l.end.into();
@@ -35,7 +35,7 @@ impl<T: GeoFloat> From<Line<T>> for LineOrPoint<T> {
 }
 
 /// Convert from a [`Coordinate`]
-impl<T: GeoFloat> From<Coordinate<T>> for LineOrPoint<T> {
+impl<T: GeoNum> From<Coordinate<T>> for LineOrPoint<T> {
     fn from(c: Coordinate<T>) -> Self {
         LineOrPoint::Point(c.into()).into()
     }
@@ -112,7 +112,7 @@ impl<T: GeoFloat> LineOrPoint<T> {
 }
 
 /// Equality based on ordering defined for segments as per algorithm.
-impl<T: GeoFloat> PartialEq for LineOrPoint<T> {
+impl<T: GeoNum> PartialEq for LineOrPoint<T> {
     #[inline]
     fn eq(&self, other: &Self) -> bool {
         self.partial_cmp(other) == Some(Ordering::Equal)
@@ -128,7 +128,7 @@ impl<T: GeoFloat> PartialEq for LineOrPoint<T> {
 ///
 /// 2. A point is treated as a infinitesimal small vertical segment
 /// centered at its coordinates.
-impl<T: GeoFloat> PartialOrd for LineOrPoint<T> {
+impl<T: GeoNum> PartialOrd for LineOrPoint<T> {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         match (self, other) {
             (LineOrPoint::Point(p), LineOrPoint::Point(q)) => {

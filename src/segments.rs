@@ -32,6 +32,8 @@ impl<T> ActiveSegment<T> {
     /// 2. all co-existing active-segments are
     /// linearly-orderable as per `T: PartialOrd`, and the
     /// ordering does not change over its lifetime.
+    /// Violating this will not lead to a memory-UB, but may
+    /// cause panics or incorrect output.
     unsafe fn new(key: usize, storage: &Slab<T>) -> Self {
         ActiveSegment {
             key,

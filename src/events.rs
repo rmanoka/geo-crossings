@@ -1,9 +1,9 @@
-use geo::{Coordinate, GeoFloat};
+use geo::{Coordinate, GeoNum};
 use std::cmp::Ordering;
 
 /// A sweep event for sweep-line algorithms.
 #[derive(Debug, Clone)]
-pub(crate) struct Event<T: GeoFloat> {
+pub(crate) struct Event<T: GeoNum> {
     pub point: SweepPoint<T>,
     pub ty: EventType,
     pub segment_key: usize,
@@ -11,26 +11,26 @@ pub(crate) struct Event<T: GeoFloat> {
 
 /// Equality check for usage in ordered sets. Note that it ignores
 /// segment_key.
-impl<T: GeoFloat> PartialEq for Event<T> {
+impl<T: GeoNum> PartialEq for Event<T> {
     fn eq(&self, other: &Self) -> bool {
         self.point == other.point && self.ty == other.ty
     }
 }
 
 /// Assert total equality
-impl<T: GeoFloat> Eq for Event<T> {}
+impl<T: GeoNum> Eq for Event<T> {}
 
 /// Ordering for use with a max-heap (`BinaryHeap`). Note that it
 /// ignores the segment_key. This suffices for heap usage, where
 /// repeated items are allowed.
-impl<T: GeoFloat> PartialOrd for Event<T> {
+impl<T: GeoNum> PartialOrd for Event<T> {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
 
 /// Derive `Ord` from `PartialOrd` and expect to not fail.
-impl<T: GeoFloat> Ord for Event<T> {
+impl<T: GeoNum> Ord for Event<T> {
     fn cmp(&self, other: &Self) -> Ordering {
         // The reverse here is to confirm to max-heap / queue impl.
         self.point
@@ -66,9 +66,9 @@ pub(crate) enum EventType {
 /// `Ord`. We must ensure that any sweep point only contains values
 /// that can be consistently ordered.
 #[derive(PartialEq, Clone, Copy)]
-pub struct SweepPoint<T: GeoFloat>(Coordinate<T>);
+pub struct SweepPoint<T: GeoNum>(Coordinate<T>);
 
-impl<T: GeoFloat> std::fmt::Debug for SweepPoint<T> {
+impl<T: GeoNum> std::fmt::Debug for SweepPoint<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_tuple("Pt")
             .field(&self.0.x)
@@ -79,7 +79,7 @@ impl<T: GeoFloat> std::fmt::Debug for SweepPoint<T> {
 
 /// Implememnt lexicographic ordering by `x` and then by `y`
 /// coordinate.
-impl<T: GeoFloat> PartialOrd for SweepPoint<T> {
+impl<T: GeoNum> PartialOrd for SweepPoint<T> {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         match self.0.x.partial_cmp(&other.0.x) {
             Some(Ordering::Equal) => self.0.y.partial_cmp(&other.0.y),
@@ -89,36 +89,36 @@ impl<T: GeoFloat> PartialOrd for SweepPoint<T> {
 }
 
 /// Derive `Ord` from `PartialOrd` and expect to not fail.
-impl<T: GeoFloat> Ord for SweepPoint<T> {
+impl<T: GeoNum> Ord for SweepPoint<T> {
     fn cmp(&self, other: &Self) -> Ordering {
         self.partial_cmp(other).unwrap()
     }
 }
 
 /// We derive `Eq` manually to not require `T: Eq`.
-impl<T: GeoFloat> Eq for SweepPoint<T> {}
+impl<T: GeoNum> Eq for SweepPoint<T> {}
 
-impl<T: GeoFloat> SweepPoint<T> {
+impl<T: GeoNum> SweepPoint<T> {
     pub fn coord(&self) -> Coordinate<T> {
         self.0
     }
 }
 
-/// Create from `Coordinate` while checking the components are finite.
-impl<T: GeoFloat> From<Coordinate<T>> for SweepPoint<T> {
+/// Create from `Coordinate` assuming the components are finite.
+impl<T: GeoNum> From<Coordinate<T>> for SweepPoint<T> {
     fn from(pt: Coordinate<T>) -> Self {
-        assert!(
-            pt.x.is_finite(),
-            "sweep point requires a finite x-coordinate"
-        );
-        assert!(
-            pt.y.is_finite(),
-            "sweep point requires a finite y-coordinate"
-        );
+        // assert!(
+        //     pt.x.is_finite(),
+        //     "sweep point requires a finite x-coordinate"
+        // );
+        // assert!(
+        //     pt.y.is_finite(),
+        //     "sweep point requires a finite y-coordinate"
+        // );
         SweepPoint(pt)
     }
 }
-impl<T: GeoFloat> From<(T, T)> for SweepPoint<T> {
+impl<T: GeoNum> From<(T, T)> for SweepPoint<T> {
     fn from(coords: (T, T)) -> Self {
         Coordinate::from(coords).into()
     }
