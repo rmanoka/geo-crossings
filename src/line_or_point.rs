@@ -3,7 +3,7 @@ use std::cmp::Ordering;
 use geo::{
     kernels::{HasKernel, Kernel, Orientation},
     line_intersection::LineIntersection,
-    Coordinate, GeoNum, Line, GeoFloat,
+    Coordinate, GeoFloat, GeoNum, Line,
 };
 
 use crate::events::SweepPoint;
@@ -22,14 +22,12 @@ pub enum LineOrPoint<T: GeoNum> {
 /// Convert from a [`Line`] ensuring end point ordering.
 impl<T: GeoNum> From<Line<T>> for LineOrPoint<T> {
     fn from(l: Line<T>) -> Self {
-        let start = l.start.into();
+        let start: SweepPoint<T> = l.start.into();
         let end = l.end.into();
-        if start < end {
-            LineOrPoint::Line(start, end)
-        } else if start > end {
-            LineOrPoint::Line(end, start)
-        } else {
-            LineOrPoint::Point(start)
+        match start.cmp(&end) {
+            Ordering::Less => LineOrPoint::Line(start, end),
+            Ordering::Equal => LineOrPoint::Point(start),
+            Ordering::Greater => LineOrPoint::Line(end, start),
         }
     }
 }
@@ -37,18 +35,15 @@ impl<T: GeoNum> From<Line<T>> for LineOrPoint<T> {
 /// Convert from a [`Coordinate`]
 impl<T: GeoNum> From<Coordinate<T>> for LineOrPoint<T> {
     fn from(c: Coordinate<T>) -> Self {
-        LineOrPoint::Point(c.into()).into()
+        LineOrPoint::Point(c.into())
     }
 }
 
-impl<T: GeoFloat> LineOrPoint<T> {
+impl<T: GeoNum> LineOrPoint<T> {
     /// Checks if the variant is a line.
     #[inline]
     pub fn is_line(&self) -> bool {
-        match self {
-            LineOrPoint::Line(_, _) => true,
-            _ => false,
-        }
+        matches!(self, LineOrPoint::Line(_, _))
     }
 
     /// Return a [`Line`] if it is one, otherwise `None`.
@@ -67,7 +62,8 @@ impl<T: GeoFloat> LineOrPoint<T> {
             LineOrPoint::Line(p, _) => p,
         }
     }
-
+}
+impl<T: GeoFloat> LineOrPoint<T> {
     /// Intersect a line with self and return a point, a overlapping segment or `None`.
     ///
     /// The `other` argument must be a line variant (panics otherwise).

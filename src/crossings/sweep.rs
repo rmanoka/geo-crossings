@@ -4,13 +4,13 @@ use std::{cmp::Ordering, collections::BTreeSet, fmt::Debug};
 use crate::{
     events::{Event, EventType, SweepPoint},
     line_or_point::LineOrPoint::{self, *},
-    Crossable, Crossing, segments::{ActiveSegment, SegmentAccess},
+    segments::{ActiveSegment, SegmentAccess},
+    Crossable, Crossing,
 };
 use std::collections::BinaryHeap;
 
 use log::{debug, trace};
 use slab::Slab;
-
 
 /// A segment of input [`LineOrPoint`] generated during the sweep.
 #[derive(Debug, Clone, Copy)]
@@ -646,7 +646,7 @@ mod tests {
             TestCase {
                 a: 0,
                 b: 0,
-                isec: Some(slab[0].geom.clone()),
+                isec: Some(slab[0].geom),
                 split: Some(SplitSegments::Unchanged { overlap: true }),
             },
             TestCase {

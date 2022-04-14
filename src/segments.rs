@@ -1,8 +1,5 @@
-
 use slab::Slab;
 use std::{cmp::Ordering, collections::BTreeSet, fmt::Debug, ops::Bound};
-
-
 
 /// Internal representation used in ordered sets.
 pub(crate) struct ActiveSegment<T> {
@@ -69,7 +66,7 @@ impl<T: PartialOrd> PartialOrd for ActiveSegment<T> {
         self.get()
             .expect("ActiveSegment::partial_cmp: could not find key in storage")
             .partial_cmp(
-                &other
+                other
                     .get()
                     .expect("ActiveSegment::partial_cmp: could not find key in storage"),
             )

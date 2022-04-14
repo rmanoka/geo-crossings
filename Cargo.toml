@@ -10,6 +10,7 @@ slab = "0.4.3"
 geo = "0.18.0"
 log = "0.4.14"
 rstar = "0.8.3"
+pin-project-lite = "0.2.8"
 
 [dev-dependencies]
 env_logger = "0.8.4"

@@ -16,17 +16,16 @@ impl<R: RTreeObject, T> RTreeObject for GeomWithData<R, T> {
     }
 }
 
-pub fn count_bo(lines: &Vec<Line<f64>>) -> usize {
+pub fn count_bo(lines: &[Line<f64>]) -> usize {
     Intersections::from_iter(lines.iter()).count()
 }
 
-pub fn count_brute(lines: &Vec<Line<f64>>) -> usize {
+pub fn count_brute(lines: &[Line<f64>]) -> usize {
     let mut count = 0;
     let n = lines.len();
     for i in 0..n {
         let l1 = &lines[i];
-        for j in i + 1..n {
-            let l2 = &lines[j];
+        for l2 in lines.iter().take(n).skip(i + 1) {
             if line_intersection(*l1, *l2).is_some() {
                 count += 1;
             }
@@ -35,7 +34,7 @@ pub fn count_brute(lines: &Vec<Line<f64>>) -> usize {
     count
 }
 
-pub fn count_rtree(lines: &Vec<Line<f64>>) -> usize {
+pub fn count_rtree(lines: &[Line<f64>]) -> usize {
     let lines: Vec<_> = lines
         .iter()
         .enumerate()
