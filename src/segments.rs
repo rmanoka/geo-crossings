@@ -255,7 +255,7 @@ impl<C: Crossable> Ord for ActiveSegment<C> {
 }
 
 /// Helper trait to insert, remove and get adjacent segments from ordered set.
-pub(crate) trait AdjacentSegments {
+pub(crate) trait SegmentAccess {
     type SegmentType;
     fn prev_key(
         &self,
@@ -271,7 +271,7 @@ pub(crate) trait AdjacentSegments {
     fn remove_segment(&mut self, key: usize, storage: &Slab<Self::SegmentType>);
 }
 
-impl<C: Crossable> AdjacentSegments for BTreeSet<ActiveSegment<C>> {
+impl<C: Crossable> SegmentAccess for BTreeSet<ActiveSegment<C>> {
     type SegmentType = Segment<C>;
 
     #[inline]
@@ -281,7 +281,7 @@ impl<C: Crossable> AdjacentSegments for BTreeSet<ActiveSegment<C>> {
         storage: &Slab<Self::SegmentType>,
     ) -> Option<usize> {
         // Safety: aseg is only valid till end of function, and we
-        // are holding a immut. reference.
+        // are holding an immut. reference to the storage.
         let aseg = unsafe { ActiveSegment::new(segment.key, storage) };
         self.range((Bound::Unbounded, Bound::Excluded(aseg)))
             .next_back()
@@ -295,7 +295,7 @@ impl<C: Crossable> AdjacentSegments for BTreeSet<ActiveSegment<C>> {
         storage: &Slab<Self::SegmentType>,
     ) -> Option<usize> {
         // Safety: aseg is only valid till end of function, and we
-        // are holding a immut. reference.
+        // are holding a immut. reference to the storage.
         let aseg = unsafe { ActiveSegment::new(segment.key, storage) };
         self.range((Bound::Excluded(aseg), Bound::Unbounded))
             .next()

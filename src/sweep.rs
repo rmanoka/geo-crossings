@@ -6,7 +6,7 @@ use slab::Slab;
 use crate::{
     events::{Event, EventType, SweepPoint},
     line_or_point::LineOrPoint,
-    segments::{ActiveSegment, AdjacentSegments, Segment, SplitSegments},
+    segments::{ActiveSegment, SegmentAccess, Segment, SplitSegments},
     Crossable, Crossing,
 };
 

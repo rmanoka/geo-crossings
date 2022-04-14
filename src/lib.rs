@@ -42,6 +42,8 @@
 //! [`Coordinate`]: geo::Coordinate
 //! [`line_intersection`]: geo::algorithm::line_intersection::line_intersection
 mod events;
+pub use events::SweepPoint;
+
 mod line_or_point;
 mod segments;
 mod sweep;

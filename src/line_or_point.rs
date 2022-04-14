@@ -55,8 +55,8 @@ impl<T: GeoFloat> LineOrPoint<T> {
     #[inline]
     pub fn line(&self) -> Line<T> {
         match self {
-            LineOrPoint::Line(p, q) => Line::new(p.0, q.0),
-            LineOrPoint::Point(p) => Line::new(p.0, p.0),
+            LineOrPoint::Line(p, q) => Line::new(p.coord(), q.coord()),
+            LineOrPoint::Point(p) => Line::new(p.coord(), p.coord()),
         }
     }
 
@@ -77,7 +77,7 @@ impl<T: GeoFloat> LineOrPoint<T> {
         let line = other.line();
         match *self {
             LineOrPoint::Point(p) => {
-                if <T as HasKernel>::Ker::orient2d(line.start, p.0, line.end)
+                if <T as HasKernel>::Ker::orient2d(line.start, p.coord(), line.end)
                     == Orientation::Collinear
                 {
                     let ls = line.start.into();
@@ -93,7 +93,7 @@ impl<T: GeoFloat> LineOrPoint<T> {
             }
             LineOrPoint::Line(p, q) => {
                 use geo::algorithm::line_intersection::line_intersection;
-                line_intersection(Line::new(p.0, q.0), line).map(|l| match l {
+                line_intersection(Line::new(p.coord(), q.coord()), line).map(|l| match l {
                     LineIntersection::SinglePoint { intersection, .. } => intersection.into(),
                     LineIntersection::Collinear { intersection } => intersection.into(),
                 })
@@ -148,7 +148,7 @@ impl<T: GeoFloat> PartialOrd for LineOrPoint<T> {
                     return None;
                 }
                 Some(
-                    orientation_as_ordering(T::Ker::orient2d(p.0, q.0, r.0))
+                    orientation_as_ordering(T::Ker::orient2d(p.coord(), q.coord(), r.coord()))
                         .then(Ordering::Greater),
                 )
             }
@@ -163,8 +163,8 @@ impl<T: GeoFloat> PartialOrd for LineOrPoint<T> {
                 // Assertion: p1 <= p2
                 // Assertion: pi < q_j
                 Some(
-                    orientation_as_ordering(T::Ker::orient2d(p1.0, q1.0, p2.0))
-                        .then_with(|| orientation_as_ordering(T::Ker::orient2d(p1.0, q1.0, q2.0))),
+                    orientation_as_ordering(T::Ker::orient2d(p1.coord(), q1.coord(), p2.coord()))
+                        .then_with(|| orientation_as_ordering(T::Ker::orient2d(p1.coord(), q1.coord(), q2.coord()))),
                 )
             }
         }

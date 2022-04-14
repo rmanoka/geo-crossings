@@ -164,7 +164,7 @@ impl<C: Crossable + Clone> Iterator for CrossingsIter<C> {
         if segments.is_empty() {
             None
         } else {
-            last_point.map(|p| p.0)
+            last_point.map(|p| p.coord())
         }
     }
 }

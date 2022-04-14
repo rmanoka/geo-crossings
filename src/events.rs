@@ -32,6 +32,7 @@ impl<T: GeoFloat> PartialOrd for Event<T> {
 /// Derive `Ord` from `PartialOrd` and expect to not fail.
 impl<T: GeoFloat> Ord for Event<T> {
     fn cmp(&self, other: &Self) -> Ordering {
+        // The reverse here is to confirm to max-heap / queue impl.
         self.point
             .cmp(&other.point)
             .then_with(|| self.ty.cmp(&other.ty))
@@ -65,7 +66,7 @@ pub(crate) enum EventType {
 /// `Ord`. We must ensure that any sweep point only contains values
 /// that can be consistently ordered.
 #[derive(PartialEq, Clone, Copy)]
-pub struct SweepPoint<T: GeoFloat>(pub Coordinate<T>);
+pub struct SweepPoint<T: GeoFloat>(Coordinate<T>);
 
 impl<T: GeoFloat> std::fmt::Debug for SweepPoint<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -96,6 +97,12 @@ impl<T: GeoFloat> Ord for SweepPoint<T> {
 
 /// We derive `Eq` manually to not require `T: Eq`.
 impl<T: GeoFloat> Eq for SweepPoint<T> {}
+
+impl<T: GeoFloat> SweepPoint<T> {
+    pub fn coord(&self) -> Coordinate<T> {
+        self.0
+    }
+}
 
 /// Create from `Coordinate` while checking the components are finite.
 impl<T: GeoFloat> From<Coordinate<T>> for SweepPoint<T> {
