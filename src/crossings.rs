@@ -4,7 +4,8 @@ use geo::{
 };
 use std::{fmt::Debug, iter::FromIterator, rc::Rc, sync::Arc};
 
-use crate::sweep::Sweep;
+mod sweep;
+use sweep::Sweep;
 
 /// Interface for types that can be processed to detect crossings.
 ///

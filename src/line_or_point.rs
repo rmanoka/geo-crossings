@@ -164,7 +164,13 @@ impl<T: GeoFloat> PartialOrd for LineOrPoint<T> {
                 // Assertion: pi < q_j
                 Some(
                     orientation_as_ordering(T::Ker::orient2d(p1.coord(), q1.coord(), p2.coord()))
-                        .then_with(|| orientation_as_ordering(T::Ker::orient2d(p1.coord(), q1.coord(), q2.coord()))),
+                        .then_with(|| {
+                            orientation_as_ordering(T::Ker::orient2d(
+                                p1.coord(),
+                                q1.coord(),
+                                q2.coord(),
+                            ))
+                        }),
                 )
             }
         }

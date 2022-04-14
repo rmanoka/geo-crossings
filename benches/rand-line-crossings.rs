@@ -11,8 +11,8 @@ mod random;
 #[path = "utils/crossings.rs"]
 mod crossings;
 
-use random::*;
 use crossings::*;
+use random::*;
 
 fn bench_algos<T, F, I>(g: &mut BenchmarkGroup<T>, mut gen: F, sample_size: usize, param: I)
 where
@@ -131,7 +131,6 @@ fn mixed<T: Measurement>(c: &mut Criterion<T>) {
         );
     });
 }
-
 
 criterion_group!(random, uniform, short, mixed);
 criterion_main!(random);

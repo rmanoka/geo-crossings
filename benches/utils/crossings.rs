@@ -2,7 +2,7 @@
 
 use std::iter::FromIterator;
 
-use geo::{Line, line_intersection::line_intersection};
+use geo::{line_intersection::line_intersection, Line};
 use geo_crossings::Intersections;
 use rstar::{RTree, RTreeObject};
 

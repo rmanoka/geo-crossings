@@ -46,7 +46,8 @@ pub use events::SweepPoint;
 
 mod line_or_point;
 mod segments;
-mod sweep;
 
 pub mod crossings;
 pub use crossings::{Crossable, Crossing, CrossingsIter, Intersections};
+
+pub mod monotone;

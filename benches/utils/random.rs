@@ -1,8 +1,8 @@
 use std::f64::consts::PI;
 
-use geo::{Coordinate, Line, Rect, map_coords::MapCoords, rotate::RotatePoint};
+use geo::{map_coords::MapCoords, rotate::RotatePoint, Coordinate, Line, Rect};
 
-use rand::{Rng, thread_rng};
+use rand::{thread_rng, Rng};
 use rand_distr::Standard;
 
 #[inline]
