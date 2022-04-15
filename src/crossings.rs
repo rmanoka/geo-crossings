@@ -294,13 +294,17 @@ impl<C: Crossable + Clone> Iterator for Intersections<C> {
 }
 
 #[cfg(test)]
-mod tests {
+pub(crate) mod tests {
     use geo::Line;
+    use std::io::Write;
 
     use super::*;
 
-    fn init_log() {
-        let _ = env_logger::builder().is_test(true).try_init();
+    pub(crate) fn init_log() {
+        let _ = env_logger::builder()
+            .is_test(true)
+            .format(|buf, record| writeln!(buf, "{} - {}", record.level(), record.args()))
+            .try_init();
     }
 
     #[test]

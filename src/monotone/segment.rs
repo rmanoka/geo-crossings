@@ -1,4 +1,4 @@
-use geo::{winding_order::WindingOrder, Coordinate, GeoNum, Line};
+use geo::{winding_order::WindingOrder, Coordinate, GeoNum, Line, kernels::Orientation};
 use log::debug;
 use std::cmp::Ordering;
 
@@ -138,4 +138,79 @@ impl<T: GeoNum> Segment<T> {
     pub fn helper_mut(&mut self) -> Option<&mut Helper<T>> {
         self.helper.as_mut()
     }
+}
+
+// #[derive(Clone)]
+// pub struct Link<T: GeoNum> {
+//     pub start: SweepPoint<T>,
+//     pub end: SweepPoint<T>,
+//     pub ty: LinkType,
+//     pub interior_orientation: Orientation,
+// }
+
+// impl<T: GeoNum> std::fmt::Debug for Link<T> {
+//     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+//         f.debug_struct("MonotoneSegment")
+//             .field("ty", &self.ty)
+//             .field("segment", &format!("{:?} -> {:?}", self.start, self.end))
+//             .field("interior", &self.interior_orientation)
+//             .finish()
+//     }
+// }
+
+// #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+// pub enum LinkType {
+//     Start,
+//     Continue,
+//     Merge,
+//     Split,
+//     End,
+// }
+
+#[derive(Debug, Clone)]
+pub enum Link<T: GeoNum> {
+    Start {
+        root: SweepPoint<T>,
+        top: SweepPoint<T>,
+        bot: SweepPoint<T>,
+    },
+    Continue {
+        prev: SweepPoint<T>,
+        curr: SweepPoint<T>,
+        next: SweepPoint<T>,
+        interior: WindingOrder,
+    },
+    Merge {
+        prev: SweepPoint<T>,
+        next: SweepPoint<T>,
+    },
+    Split {
+        prev: SweepPoint<T>,
+        next: SweepPoint<T>,
+    },
+    End {
+        top: SweepPoint<T>,
+        bot: SweepPoint<T>,
+        sink: SweepPoint<T>,
+    },
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum VertexType {
+    Start,
+    Split,
+    End,
+    Merge,
+    Continue,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub(crate) struct Intersection<T: GeoNum> {
+    pub(crate) ty: VertexType,
+    pub(crate) event_1: Event<T>,
+    pub(crate) event_2: Event<T>,
+    pub(crate) other_1: SweepPoint<T>,
+    pub(crate) other_2: SweepPoint<T>,
+    pub(crate) orientation: Orientation,
+    pub(crate) interior: WindingOrder,
 }

@@ -1,36 +1,25 @@
 mod segment;
 mod sweep;
+mod chains;
 
-pub(crate) use segment::Segment;
+use segment::{Segment, Link};
 pub use sweep::Sweep;
 
-use crate::events::Event;
-
-use geo::{kernels::Orientation, winding_order::WindingOrder, GeoNum};
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-enum VertexType {
-    Start,
-    Split,
-    End,
-    Merge,
-    Continue,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-struct Intersection<T: GeoNum> {
-    ty: VertexType,
-    event_1: Event<T>,
-    event_2: Event<T>,
-    orientation: Orientation,
-    interior: WindingOrder,
-}
+use geo::{kernels::Orientation, winding_order::WindingOrder};
 
 fn winding_order_from_orientation(ori: Orientation) -> Option<WindingOrder> {
     match ori {
         Orientation::CounterClockwise => Some(WindingOrder::CounterClockwise),
         Orientation::Clockwise => Some(WindingOrder::Clockwise),
         _ => None,
+    }
+}
+
+#[allow(dead_code)]
+fn winding_order_as_orientation(winding: &WindingOrder) -> Orientation {
+    match winding {
+        WindingOrder::Clockwise => Orientation::Clockwise,
+        WindingOrder::CounterClockwise => Orientation::CounterClockwise,
     }
 }
 
