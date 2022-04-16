@@ -19,6 +19,7 @@ criterion = "0.3.4"
 rand = "0.8.4"
 rand_distr = "0.4.1"
 geo-types = { version = "0.7.2", features = [ "rstar" ] }
+approx = "0.5.1"
 
 [[bench]]
 name = "rand-line-crossings"

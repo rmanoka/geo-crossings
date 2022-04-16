@@ -1,9 +1,11 @@
 mod segment;
 mod sweep;
-mod chains;
 
-use segment::{Segment, Link};
+use segment::{Link, Segment, Chain};
 pub use sweep::Sweep;
+
+mod chains;
+pub use chains::monotone_chains;
 
 use geo::{kernels::Orientation, winding_order::WindingOrder};
 

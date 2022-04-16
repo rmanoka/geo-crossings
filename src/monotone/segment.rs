@@ -1,6 +1,7 @@
-use geo::{winding_order::WindingOrder, Coordinate, GeoNum, Line, kernels::Orientation};
+use geo::{kernels::Orientation, winding_order::WindingOrder, Coordinate, GeoNum, Line, LineString};
 use log::debug;
-use std::cmp::Ordering;
+use smallvec::SmallVec;
+use std::{cmp::Ordering, iter::FromIterator};
 
 use crate::{
     events::{Event, EventType},
@@ -187,6 +188,8 @@ pub enum Link<T: GeoNum> {
     Split {
         prev: SweepPoint<T>,
         next: SweepPoint<T>,
+        top: SweepPoint<T>,
+        bot: SweepPoint<T>,
     },
     End {
         top: SweepPoint<T>,
@@ -196,7 +199,7 @@ pub enum Link<T: GeoNum> {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum VertexType {
+pub enum VertexType {
     Start,
     Split,
     End,
@@ -213,4 +216,67 @@ pub(crate) struct Intersection<T: GeoNum> {
     pub(crate) other_2: SweepPoint<T>,
     pub(crate) orientation: Orientation,
     pub(crate) interior: WindingOrder,
+}
+
+const CHAIN_STACK_SIZE: usize = 16;
+type Coords<T> = SmallVec<[SweepPoint<T>; CHAIN_STACK_SIZE]>;
+
+pub(crate) struct Chain<T: GeoNum> {
+    interior: WindingOrder,
+    other: usize,
+    coords: Coords<T>,
+    done: bool,
+}
+
+impl<T: GeoNum> From<Chain<T>> for LineString<T> {
+    fn from(chain: Chain<T>) -> Self {
+        LineString::from_iter(chain.coords.iter().map(|pt| pt.coord()))
+    }
+}
+
+impl<T: GeoNum> Chain<T> {
+    pub(crate) fn new(interior: WindingOrder, other: usize, coords: Coords<T>) -> Self {
+        assert!(coords.len() > 1);
+        Self {
+            done: false,
+            interior,
+            other,
+            coords,
+        }
+    }
+    pub(crate) fn next(&self) -> SweepPoint<T> {
+        *self.coords.last().unwrap()
+    }
+    pub(crate) fn curr(&self) -> SweepPoint<T> {
+        self.coords[self.coords.len() - 2]
+    }
+
+    pub(crate) fn pop(&mut self) -> SweepPoint<T> {
+        self.coords.pop().unwrap()
+    }
+
+    pub(crate) fn advance(&mut self, next: SweepPoint<T>) {
+        self.coords.push(next);
+    }
+    pub(crate) fn finish(&mut self) {
+        debug_assert!(!self.done);
+        self.done = true;
+    }
+    /// Get the chain's done.
+    #[must_use]
+    pub(crate) fn done(&self) -> bool {
+        self.done
+    }
+
+    /// Get a reference to the chain's interior.
+    #[must_use]
+    pub(crate) fn interior(&self) -> &WindingOrder {
+        &self.interior
+    }
+
+    /// Get the chain's other.
+    #[must_use]
+    pub(crate) fn other(&self) -> usize {
+        self.other
+    }
 }

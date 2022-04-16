@@ -10,7 +10,10 @@ use slab::Slab;
 use smallvec::SmallVec;
 use std::{collections::BTreeSet, marker::PhantomPinned, pin::Pin};
 
-use super::{segment::Link, winding_order_from_orientation, segment::Intersection, Segment, segment::VertexType};
+use super::{
+    segment::Intersection, segment::Link, segment::VertexType, winding_order_from_orientation,
+    Segment,
+};
 
 use crate::{
     events::{Event, EventType},
@@ -28,7 +31,15 @@ pin_project! {
         _pin: PhantomPinned,
     }
 }
-type Links<T> = SmallVec::<[Link<T>; 4]>;
+type Links<T> = SmallVec<[Link<T>; 4]>;
+
+#[derive(Debug, Clone)]
+pub struct SweepEvent<T: GeoNum> {
+    pub pt: SweepPoint<T>,
+    pub ty: VertexType,
+    pub links: Links<T>,
+}
+
 impl<T: GeoNum + Unpin> Sweep<T> {
     pub fn from_closed_ring(mut ring: LineString<T>) -> Self {
         ring.close();
@@ -67,8 +78,8 @@ impl<T: GeoNum + Unpin> Sweep<T> {
         }
     }
 
-    pub fn process_event(mut self: Pin<&mut Self>) -> Option<(SweepPoint<T>, Links<T>)> {
-        let mut events = Links::new();
+    pub fn process_event(mut self: Pin<&mut Self>) -> Option<SweepEvent<T>> {
+        let mut links = Links::new();
         let (pt, segs) = match self.get_next_segments() {
             Some(e) => e,
             None => return None,
@@ -95,7 +106,7 @@ impl<T: GeoNum + Unpin> Sweep<T> {
                     let pt2 = helper.point();
                     // info!("R merging: {pt1:?} -> {pt2:?}", pt1 = pt,);
                     segment.helper_mut().unwrap().reset_merge();
-                    events.push(Link::Merge {
+                    links.push(Link::Merge {
                         prev: pt2,
                         next: pt,
                     });
@@ -125,11 +136,10 @@ impl<T: GeoNum + Unpin> Sweep<T> {
         let mut fix_up = |force: bool, is_merge: bool| {
             let next = {
                 let this = self.as_mut().project();
-                let next = this
-                    .active_segments
+
+                this.active_segments
                     .next_key(*this.pt_key, &this.segments)
-                    .expect("fix-up: next_key should be available");
-                next
+                    .expect("fix-up: next_key should be available")
             };
             let mut segment = self.as_mut().storage_index_mut(next);
             let helper = segment
@@ -138,21 +148,27 @@ impl<T: GeoNum + Unpin> Sweep<T> {
             if helper.is_merge() || force {
                 let pt2 = helper.point();
                 // info!("F merging[split={force}]: {pt1:?} -> {pt2:?}", pt1 = pt,);
-                let helper_was_merge = helper.is_merge();
-                if !is_merge {
-                    segment.helper_mut().unwrap().reset_merge();
-                }
-                events.push(if helper_was_merge {
+                links.push(if helper.is_merge() {
                     Link::Merge {
                         prev: pt2,
                         next: pt,
                     }
                 } else {
+                    let (top, bot) = if ixn.interior != WindingOrder::Clockwise {
+                        (ixn.other_1, ixn.other_2)
+                    } else {
+                        (ixn.other_2, ixn.other_1)
+                    };
                     Link::Split {
                         prev: pt2,
                         next: pt,
+                        top,
+                        bot,
                     }
                 });
+                if !is_merge {
+                    segment.helper_mut().unwrap().reset_merge();
+                }
             }
             let mut segment = self.as_mut().storage_index_mut(next);
             let helper = segment.helper_mut().unwrap();
@@ -176,21 +192,12 @@ impl<T: GeoNum + Unpin> Sweep<T> {
                         unreachable!("continue segment: others must be orderable!");
                     }
                 };
-                // info!("continue: {pt1:?} -> {pt2:?}", pt2 = pt, pt1 = pt1);
-                events.push(Link::Continue {
+                links.push(Link::Continue {
                     prev: pt1,
                     curr: pt,
                     next: pt2,
                     interior: ixn.interior,
                 });
-                // info!("continue: {pt1:?} -> {pt2:?}", pt1 = pt, pt2 = pt2);
-                // self.as_mut().events.push(
-                //     MonotoneSegment {
-                //         start: pt,
-                //         end: pt2,
-                //         ty: SegmentType::Continue,
-                //     }
-                // );
             }
             VertexType::Split => fix_up(true, false),
             VertexType::Merge => fix_up(false, true),
@@ -200,7 +207,7 @@ impl<T: GeoNum + Unpin> Sweep<T> {
                 } else {
                     (ixn.other_2, ixn.other_1)
                 };
-                events.push(Link::End { top, bot, sink: pt });
+                links.push(Link::End { top, bot, sink: pt });
             }
             VertexType::Start => {
                 let (top, bot) = if ixn.interior == WindingOrder::Clockwise {
@@ -208,7 +215,7 @@ impl<T: GeoNum + Unpin> Sweep<T> {
                 } else {
                     (ixn.other_2, ixn.other_1)
                 };
-                events.push(Link::Start { root: pt, top, bot });
+                links.push(Link::Start { root: pt, top, bot });
             }
         }
 
@@ -226,12 +233,16 @@ impl<T: GeoNum + Unpin> Sweep<T> {
         };
         handle_insert(&ixn.event_1);
         handle_insert(&ixn.event_2);
-        Some((pt, events))
+        Some(SweepEvent {
+            pt,
+            links,
+            ty: ixn.ty,
+        })
     }
 }
 
 impl<T: GeoNum + Unpin> Iterator for Pin<Box<Sweep<T>>> {
-    type Item = (SweepPoint<T>, Links<T>);
+    type Item = SweepEvent<T>;
 
     fn next(&mut self) -> Option<Self::Item> {
         self.as_mut().process_event()
