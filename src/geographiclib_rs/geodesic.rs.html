@@ -1,4 +1,6 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;rajsekar&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;geographiclib-rs-0.2.0&#x2F;src&#x2F;geodesic.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>geodesic.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../geographiclib_rs/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input"name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;rajsekar&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;geographiclib-rs-0.2.0&#x2F;src&#x2F;geodesic.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>geodesic.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a class="sidebar-logo" href="../../geographiclib_rs/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.png" alt="logo"></div>
+        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../geographiclib_rs/index.html"><img class="rust-logo" src="../../rust-logo.png" alt="logo"></a><nav class="sub"><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">   1</span>
 <span id="2">   2</span>
 <span id="3">   3</span>
 <span id="4">   4</span>
@@ -2060,12 +2062,11 @@
 <span id="2060">2060</span>
 <span id="2061">2061</span>
 <span id="2062">2062</span>
-</pre><pre class="rust">
-<span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
+</pre><pre class="rust"><code><span class="attribute">#![<span class="ident">allow</span>(<span class="ident">non_snake_case</span>)]</span>
 
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::geodesiccapability</span> <span class="kw">as</span> <span class="ident">caps</span>;
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::geodesicline</span>;
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::geomath</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::geodesiccapability</span> <span class="kw">as</span> <span class="ident">caps</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::geodesicline</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::geomath</span>;
 
 <span class="kw">use</span> <span class="ident">std::f64::consts::PI</span>;
 
@@ -2106,15 +2107,15 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Geodesic</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wgs84</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">wgs84</span>() -&gt; <span class="self">Self</span> {
         <span class="ident">WGS84_GEOD</span>.<span class="ident">clone</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">equatorial_radius</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">equatorial_radius</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">f64</span> {
         <span class="self">self</span>.<span class="ident">a</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flattening</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">flattening</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">f64</span> {
         <span class="self">self</span>.<span class="ident">f</span>
     }
 }
@@ -2147,7 +2148,7 @@
 <span class="kw">const</span> <span class="ident">nC4x_</span>: <span class="ident">i64</span> <span class="op">=</span> <span class="number">21</span>;
 
 <span class="kw">impl</span> <span class="ident">Geodesic</span> {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">a</span>: <span class="ident">f64</span>, <span class="ident">f</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">a</span>: <span class="ident">f64</span>, <span class="ident">f</span>: <span class="ident">f64</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">maxit1_</span> <span class="op">=</span> <span class="number">20</span>;
         <span class="kw">let</span> <span class="ident">maxit2_</span> <span class="op">=</span> <span class="ident">maxit1_</span> <span class="op">+</span> <span class="ident">geomath::DIGITS</span> <span class="op">+</span> <span class="number">10</span>;
         <span class="kw">let</span> <span class="ident">tiny_</span> <span class="op">=</span> <span class="ident">geomath::get_min_val</span>().<span class="ident">sqrt</span>();
@@ -2164,7 +2165,7 @@
         <span class="kw">let</span> <span class="ident">_b</span> <span class="op">=</span> <span class="ident">a</span> <span class="op">*</span> <span class="ident">_f1</span>;
         <span class="kw">let</span> <span class="ident">_c2</span> <span class="op">=</span> (<span class="ident">geomath::sq</span>(<span class="ident">a</span>)
             <span class="op">+</span> <span class="ident">geomath::sq</span>(<span class="ident">_b</span>)
-                <span class="op">*</span> (<span class="kw">if</span> <span class="ident">_e2</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span> {
+                <span class="op">*</span> (<span class="kw">if</span> <span class="ident">_e2</span> <span class="op">==</span> <span class="number">0.0</span> {
                     <span class="number">1.0</span>
                 } <span class="kw">else</span> {
                     <span class="kw">if</span> <span class="ident">_e2</span> <span class="op">&gt;</span> <span class="number">0.0</span> {
@@ -2248,11 +2249,11 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">_A3f</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">eps</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">_A3f</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">eps</span>: <span class="ident">f64</span>) -&gt; <span class="ident">f64</span> {
         <span class="ident">geomath::polyval</span>(<span class="self">self</span>.<span class="ident">GEODESIC_ORDER</span> <span class="op">-</span> <span class="number">1</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">_A3x</span>, <span class="number">0</span>, <span class="ident">eps</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">_C3f</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">eps</span>: <span class="ident">f64</span>, <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">f64</span>]) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">_C3f</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">eps</span>: <span class="ident">f64</span>, <span class="ident">c</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">f64</span>]) {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mult</span> <span class="op">=</span> <span class="number">1.0</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">o</span> <span class="op">=</span> <span class="number">0.0</span>;
         <span class="kw">for</span> <span class="ident">l</span> <span class="kw">in</span> <span class="number">1</span>..<span class="self">self</span>.<span class="ident">GEODESIC_ORDER</span> {
@@ -2263,7 +2264,7 @@
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">_C4f</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">eps</span>: <span class="ident">f64</span>, <span class="ident">c</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">f64</span>]) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">_C4f</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">eps</span>: <span class="ident">f64</span>, <span class="ident">c</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">f64</span>]) {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">mult</span> <span class="op">=</span> <span class="number">1.0</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">o</span> <span class="op">=</span> <span class="number">0.0</span>;
         <span class="kw">for</span> <span class="ident">l</span> <span class="kw">in</span> <span class="number">0</span>..<span class="self">self</span>.<span class="ident">GEODESIC_ORDER</span> {
@@ -2287,9 +2288,9 @@
         <span class="ident">cbet1</span>: <span class="ident">f64</span>,
         <span class="ident">cbet2</span>: <span class="ident">f64</span>,
         <span class="ident">outmask</span>: <span class="ident">u64</span>,
-        <span class="ident">C1a</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">f64</span>],
-        <span class="ident">C2a</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">f64</span>],
-    ) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) {
+        <span class="ident">C1a</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">f64</span>],
+        <span class="ident">C2a</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">f64</span>],
+    ) -&gt; (<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) {
         <span class="kw">let</span> <span class="ident">outmask</span> <span class="op">=</span> <span class="ident">outmask</span> <span class="op">&amp;</span> <span class="ident">caps::OUT_MASK</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s12b</span> <span class="op">=</span> <span class="ident">std::f64::NAN</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">m12b</span> <span class="op">=</span> <span class="ident">std::f64::NAN</span>;
@@ -2355,9 +2356,9 @@
         <span class="ident">lam12</span>: <span class="ident">f64</span>,
         <span class="ident">slam12</span>: <span class="ident">f64</span>,
         <span class="ident">clam12</span>: <span class="ident">f64</span>,
-        <span class="ident">C1a</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">f64</span>],
-        <span class="ident">C2a</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">f64</span>],
-    ) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) {
+        <span class="ident">C1a</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">f64</span>],
+        <span class="ident">C2a</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">f64</span>],
+    ) -&gt; (<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sig12</span> <span class="op">=</span> <span class="op">-</span><span class="number">1.0</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">salp2</span> <span class="op">=</span> <span class="ident">std::f64::NAN</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">calp2</span> <span class="op">=</span> <span class="ident">std::f64::NAN</span>;
@@ -2497,15 +2498,15 @@
         <span class="ident">cbet2</span>: <span class="ident">f64</span>,
         <span class="ident">dn2</span>: <span class="ident">f64</span>,
         <span class="ident">salp1</span>: <span class="ident">f64</span>,
-        <span class="ident">calp1</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">f64</span>,
+        <span class="ident">calp1</span>: <span class="kw-2">&amp;mut</span> <span class="ident">f64</span>,
         <span class="ident">slam120</span>: <span class="ident">f64</span>,
         <span class="ident">clam120</span>: <span class="ident">f64</span>,
         <span class="ident">diffp</span>: <span class="ident">bool</span>,
-        <span class="ident">C1a</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">f64</span>],
-        <span class="ident">C2a</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">f64</span>],
-        <span class="ident">C3a</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">f64</span>],
-    ) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) {
-        <span class="kw">if</span> <span class="ident">sbet1</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span> <span class="op">&amp;&amp;</span> <span class="kw-2">*</span><span class="ident">calp1</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span> {
+        <span class="ident">C1a</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">f64</span>],
+        <span class="ident">C2a</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">f64</span>],
+        <span class="ident">C3a</span>: <span class="kw-2">&amp;mut</span> [<span class="ident">f64</span>],
+    ) -&gt; (<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) {
+        <span class="kw">if</span> <span class="ident">sbet1</span> <span class="op">==</span> <span class="number">0.0</span> <span class="op">&amp;&amp;</span> <span class="kw-2">*</span><span class="ident">calp1</span> <span class="op">==</span> <span class="number">0.0</span> {
             <span class="kw-2">*</span><span class="ident">calp1</span> <span class="op">=</span> <span class="op">-</span><span class="self">self</span>.<span class="ident">tiny_</span>;
         }
         <span class="kw">let</span> <span class="ident">salp0</span> <span class="op">=</span> <span class="ident">salp1</span> <span class="op">*</span> <span class="ident">cbet1</span>;
@@ -2555,7 +2556,7 @@
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">dlam12</span>: <span class="ident">f64</span>;
         <span class="kw">if</span> <span class="ident">diffp</span> {
-            <span class="kw">if</span> <span class="ident">calp2</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span> {
+            <span class="kw">if</span> <span class="ident">calp2</span> <span class="op">==</span> <span class="number">0.0</span> {
                 <span class="ident">dlam12</span> <span class="op">=</span> <span class="op">-</span><span class="number">2.0</span> <span class="op">*</span> <span class="self">self</span>.<span class="ident">_f1</span> <span class="op">*</span> <span class="ident">dn1</span> <span class="op">/</span> <span class="ident">sbet1</span>;
             } <span class="kw">else</span> {
                 <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">_Lengths</span>(
@@ -2592,7 +2593,7 @@
         <span class="ident">lat2</span>: <span class="ident">f64</span>,
         <span class="ident">lon2</span>: <span class="ident">f64</span>,
         <span class="ident">outmask</span>: <span class="ident">u64</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) {
+    ) -&gt; (<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">azi1</span> <span class="op">=</span> <span class="ident">std::f64::NAN</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">azi2</span> <span class="op">=</span> <span class="ident">std::f64::NAN</span>;
         <span class="kw">let</span> <span class="ident">outmask</span> <span class="op">=</span> <span class="ident">outmask</span> <span class="op">&amp;</span> <span class="ident">caps::OUT_MASK</span>;
@@ -2614,7 +2615,7 @@
         <span class="ident">lat2</span>: <span class="ident">f64</span>,
         <span class="ident">lon2</span>: <span class="ident">f64</span>,
         <span class="ident">outmask</span>: <span class="ident">u64</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) {
+    ) -&gt; (<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lat1</span> <span class="op">=</span> <span class="ident">lat1</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lat2</span> <span class="op">=</span> <span class="ident">lat2</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">a12</span> <span class="op">=</span> <span class="ident">std::f64::NAN</span>;
@@ -2670,11 +2671,11 @@
         <span class="ident">cbet2</span> <span class="op">=</span> <span class="ident">cbet2</span>.<span class="ident">max</span>(<span class="self">self</span>.<span class="ident">tiny_</span>);
 
         <span class="kw">if</span> <span class="ident">cbet1</span> <span class="op">&lt;</span> <span class="op">-</span><span class="ident">sbet1</span> {
-            <span class="kw">if</span> <span class="ident">cbet2</span> <span class="op">=</span><span class="op">=</span> <span class="ident">cbet1</span> {
+            <span class="kw">if</span> <span class="ident">cbet2</span> <span class="op">==</span> <span class="ident">cbet1</span> {
                 <span class="ident">sbet2</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">sbet2</span> <span class="op">&lt;</span> <span class="number">0.0</span> { <span class="ident">sbet1</span> } <span class="kw">else</span> { <span class="op">-</span><span class="ident">sbet1</span> };
             }
         } <span class="kw">else</span> {
-            <span class="kw">if</span> <span class="ident">sbet2</span>.<span class="ident">abs</span>() <span class="op">=</span><span class="op">=</span> <span class="op">-</span><span class="ident">sbet1</span> {
+            <span class="kw">if</span> <span class="ident">sbet2</span>.<span class="ident">abs</span>() <span class="op">==</span> <span class="op">-</span><span class="ident">sbet1</span> {
                 <span class="ident">cbet2</span> <span class="op">=</span> <span class="ident">cbet1</span>;
             }
         }
@@ -2687,7 +2688,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">C2a</span>: [<span class="ident">f64</span>; <span class="ident">CARR_SIZE</span>] <span class="op">=</span> [<span class="number">0.0</span>; <span class="ident">CARR_SIZE</span>];
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">C3a</span>: [<span class="ident">f64</span>; <span class="ident">CARR_SIZE</span>] <span class="op">=</span> [<span class="number">0.0</span>; <span class="ident">CARR_SIZE</span>];
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">meridian</span> <span class="op">=</span> <span class="ident">lat1</span> <span class="op">=</span><span class="op">=</span> <span class="op">-</span><span class="number">90.0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">slam12</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">meridian</span> <span class="op">=</span> <span class="ident">lat1</span> <span class="op">==</span> <span class="op">-</span><span class="number">90.0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">slam12</span> <span class="op">==</span> <span class="number">0.0</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">calp1</span> <span class="op">=</span> <span class="number">0.0</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">salp1</span> <span class="op">=</span> <span class="number">0.0</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">calp2</span> <span class="op">=</span> <span class="number">0.0</span>;
@@ -2724,8 +2725,8 @@
                 <span class="ident">cbet1</span>,
                 <span class="ident">cbet2</span>,
                 <span class="ident">outmask</span> <span class="op">|</span> <span class="ident">caps::DISTANCE</span> <span class="op">|</span> <span class="ident">caps::REDUCEDLENGTH</span>,
-                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">C1a</span>,
-                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">C2a</span>,
+                <span class="kw-2">&amp;mut</span> <span class="ident">C1a</span>,
+                <span class="kw-2">&amp;mut</span> <span class="ident">C2a</span>,
             );
             <span class="ident">s12x</span> <span class="op">=</span> <span class="ident">res</span>.<span class="number">0</span>;
             <span class="ident">m12x</span> <span class="op">=</span> <span class="ident">res</span>.<span class="number">1</span>;
@@ -2751,7 +2752,7 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">omg12</span> <span class="op">=</span> <span class="number">0.0</span>;
         <span class="kw">let</span> <span class="ident">dnm</span>: <span class="ident">f64</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">eps</span> <span class="op">=</span> <span class="number">0.0</span>;
-        <span class="kw">if</span> <span class="op">!</span><span class="ident">meridian</span> <span class="op">&amp;&amp;</span> <span class="ident">sbet1</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span> <span class="op">&amp;&amp;</span> (<span class="self">self</span>.<span class="ident">f</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">0.0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">lon12s</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">f</span> <span class="op">*</span> <span class="number">180.0</span>) {
+        <span class="kw">if</span> <span class="op">!</span><span class="ident">meridian</span> <span class="op">&amp;&amp;</span> <span class="ident">sbet1</span> <span class="op">==</span> <span class="number">0.0</span> <span class="op">&amp;&amp;</span> (<span class="self">self</span>.<span class="ident">f</span> <span class="op">&lt;</span><span class="op">=</span> <span class="number">0.0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">lon12s</span> <span class="op">&gt;</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">f</span> <span class="op">*</span> <span class="number">180.0</span>) {
             <span class="ident">calp1</span> <span class="op">=</span> <span class="number">0.0</span>;
             <span class="ident">calp2</span> <span class="op">=</span> <span class="number">0.0</span>;
             <span class="ident">salp1</span> <span class="op">=</span> <span class="number">1.0</span>;
@@ -2768,7 +2769,7 @@
             <span class="ident">a12</span> <span class="op">=</span> <span class="ident">lon12</span> <span class="op">/</span> <span class="self">self</span>.<span class="ident">_f1</span>;
         } <span class="kw">else</span> <span class="kw">if</span> <span class="op">!</span><span class="ident">meridian</span> {
             <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">_InverseStart</span>(
-                <span class="ident">sbet1</span>, <span class="ident">cbet1</span>, <span class="ident">dn1</span>, <span class="ident">sbet2</span>, <span class="ident">cbet2</span>, <span class="ident">dn2</span>, <span class="ident">lam12</span>, <span class="ident">slam12</span>, <span class="ident">clam12</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">C1a</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">C2a</span>,
+                <span class="ident">sbet1</span>, <span class="ident">cbet1</span>, <span class="ident">dn1</span>, <span class="ident">sbet2</span>, <span class="ident">cbet2</span>, <span class="ident">dn2</span>, <span class="ident">lam12</span>, <span class="ident">slam12</span>, <span class="ident">clam12</span>, <span class="kw-2">&amp;mut</span> <span class="ident">C1a</span>, <span class="kw-2">&amp;mut</span> <span class="ident">C2a</span>,
             );
             <span class="ident">sig12</span> <span class="op">=</span> <span class="ident">res</span>.<span class="number">0</span>;
             <span class="ident">salp1</span> <span class="op">=</span> <span class="ident">res</span>.<span class="number">1</span>;
@@ -2804,13 +2805,13 @@
                         <span class="ident">cbet2</span>,
                         <span class="ident">dn2</span>,
                         <span class="ident">salp1</span>,
-                        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">calp1</span>,
+                        <span class="kw-2">&amp;mut</span> <span class="ident">calp1</span>,
                         <span class="ident">slam12</span>,
                         <span class="ident">clam12</span>,
                         <span class="ident">numit</span> <span class="op">&lt;</span> <span class="self">self</span>.<span class="ident">maxit1_</span>,
-                        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">C1a</span>,
-                        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">C2a</span>,
-                        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">C3a</span>,
+                        <span class="kw-2">&amp;mut</span> <span class="ident">C1a</span>,
+                        <span class="kw-2">&amp;mut</span> <span class="ident">C2a</span>,
+                        <span class="kw-2">&amp;mut</span> <span class="ident">C3a</span>,
                     );
                     <span class="kw">let</span> <span class="ident">v</span> <span class="op">=</span> <span class="ident">res</span>.<span class="number">0</span>;
                     <span class="ident">salp2</span> <span class="op">=</span> <span class="ident">res</span>.<span class="number">1</span>;
@@ -2868,7 +2869,7 @@
                     };
                 <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">_Lengths</span>(
                     <span class="ident">eps</span>, <span class="ident">sig12</span>, <span class="ident">ssig1</span>, <span class="ident">csig1</span>, <span class="ident">dn1</span>, <span class="ident">ssig2</span>, <span class="ident">csig2</span>, <span class="ident">dn2</span>, <span class="ident">cbet1</span>, <span class="ident">cbet2</span>, <span class="ident">lengthmask</span>,
-                    <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">C1a</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">C2a</span>,
+                    <span class="kw-2">&amp;mut</span> <span class="ident">C1a</span>, <span class="kw-2">&amp;mut</span> <span class="ident">C2a</span>,
                 );
                 <span class="ident">s12x</span> <span class="op">=</span> <span class="ident">res</span>.<span class="number">0</span>;
                 <span class="ident">m12x</span> <span class="op">=</span> <span class="ident">res</span>.<span class="number">1</span>;
@@ -2910,7 +2911,7 @@
                 <span class="ident">ssig2</span> <span class="op">=</span> <span class="ident">res</span>.<span class="number">0</span>;
                 <span class="ident">csig2</span> <span class="op">=</span> <span class="ident">res</span>.<span class="number">1</span>;
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">C4a</span>: [<span class="ident">f64</span>; <span class="ident">CARR_SIZE</span>] <span class="op">=</span> [<span class="number">0.0</span>; <span class="ident">CARR_SIZE</span>];
-                <span class="self">self</span>.<span class="ident">_C4f</span>(<span class="ident">eps</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">C4a</span>);
+                <span class="self">self</span>.<span class="ident">_C4f</span>(<span class="ident">eps</span>, <span class="kw-2">&amp;mut</span> <span class="ident">C4a</span>);
                 <span class="kw">let</span> <span class="ident">B41</span> <span class="op">=</span> <span class="ident">geomath::sin_cos_series</span>(<span class="bool-val">false</span>, <span class="ident">ssig1</span>, <span class="ident">csig1</span>, <span class="kw-2">&amp;</span><span class="ident">C4a</span>);
                 <span class="kw">let</span> <span class="ident">B42</span> <span class="op">=</span> <span class="ident">geomath::sin_cos_series</span>(<span class="bool-val">false</span>, <span class="ident">ssig2</span>, <span class="ident">csig2</span>, <span class="kw-2">&amp;</span><span class="ident">C4a</span>);
                 <span class="ident">S12</span> <span class="op">=</span> <span class="ident">A4</span> <span class="op">*</span> (<span class="ident">B42</span> <span class="op">-</span> <span class="ident">B41</span>);
@@ -2935,7 +2936,7 @@
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">salp12</span> <span class="op">=</span> <span class="ident">salp2</span> <span class="op">*</span> <span class="ident">calp1</span> <span class="op">-</span> <span class="ident">calp2</span> <span class="op">*</span> <span class="ident">salp1</span>;
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">calp12</span> <span class="op">=</span> <span class="ident">calp2</span> <span class="op">*</span> <span class="ident">calp1</span> <span class="op">+</span> <span class="ident">salp2</span> <span class="op">*</span> <span class="ident">salp1</span>;
 
-                <span class="kw">if</span> <span class="ident">salp12</span> <span class="op">=</span><span class="op">=</span> <span class="number">0.0</span> <span class="op">&amp;&amp;</span> <span class="ident">calp12</span> <span class="op">&lt;</span> <span class="number">0.0</span> {
+                <span class="kw">if</span> <span class="ident">salp12</span> <span class="op">==</span> <span class="number">0.0</span> <span class="op">&amp;&amp;</span> <span class="ident">calp12</span> <span class="op">&lt;</span> <span class="number">0.0</span> {
                     <span class="ident">salp12</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">tiny_</span> <span class="op">*</span> <span class="ident">calp1</span>;
                     <span class="ident">calp12</span> <span class="op">=</span> <span class="op">-</span><span class="number">1.0</span>;
                 }
@@ -2975,7 +2976,7 @@
         <span class="ident">arcmode</span>: <span class="ident">bool</span>,
         <span class="ident">s12_a12</span>: <span class="ident">f64</span>,
         <span class="kw-2">mut</span> <span class="ident">outmask</span>: <span class="ident">u64</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) {
+    ) -&gt; (<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) {
         <span class="kw">if</span> <span class="op">!</span><span class="ident">arcmode</span> {
             <span class="ident">outmask</span> <span class="op">=</span> <span class="ident">outmask</span> <span class="op">|</span> <span class="ident">caps::DISTANCE_IN</span>;
         };
@@ -3033,7 +3034,7 @@
 <span class="doccomment">/// assert_approx_eq!(az,  140.4059858768007);</span>
 <span class="doccomment">/// ```</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">DirectGeodesic</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">direct</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">lat1</span>: <span class="ident">f64</span>, <span class="ident">lon1</span>: <span class="ident">f64</span>, <span class="ident">azi1</span>: <span class="ident">f64</span>, <span class="ident">s12</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span>;
+    <span class="kw">fn</span> <span class="ident">direct</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">lat1</span>: <span class="ident">f64</span>, <span class="ident">lon1</span>: <span class="ident">f64</span>, <span class="ident">azi1</span>: <span class="ident">f64</span>, <span class="ident">s12</span>: <span class="ident">f64</span>) -&gt; <span class="ident">T</span>;
 }
 
 <span class="kw">impl</span> <span class="ident">DirectGeodesic</span><span class="op">&lt;</span>(<span class="ident">f64</span>, <span class="ident">f64</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Geodesic</span> {
@@ -3042,7 +3043,7 @@
     <span class="doccomment">/// # Returns</span>
     <span class="doccomment">///  - lat2 latitude of point 2 (degrees).</span>
     <span class="doccomment">///  - lon2 longitude of point 2 (degrees).</span>
-    <span class="kw">fn</span> <span class="ident">direct</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">lat1</span>: <span class="ident">f64</span>, <span class="ident">lon1</span>: <span class="ident">f64</span>, <span class="ident">azi1</span>: <span class="ident">f64</span>, <span class="ident">s12</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">f64</span>, <span class="ident">f64</span>) {
+    <span class="kw">fn</span> <span class="ident">direct</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">lat1</span>: <span class="ident">f64</span>, <span class="ident">lon1</span>: <span class="ident">f64</span>, <span class="ident">azi1</span>: <span class="ident">f64</span>, <span class="ident">s12</span>: <span class="ident">f64</span>) -&gt; (<span class="ident">f64</span>, <span class="ident">f64</span>) {
         <span class="kw">let</span> <span class="ident">capabilities</span> <span class="op">=</span> <span class="ident">caps::LATITUDE</span> <span class="op">|</span> <span class="ident">caps::LONGITUDE</span>;
         <span class="kw">let</span> (<span class="ident">_a12</span>, <span class="ident">lat2</span>, <span class="ident">lon2</span>, <span class="ident">_azi2</span>, <span class="ident">_s12</span>, <span class="ident">_m12</span>, <span class="ident">_M12</span>, <span class="ident">_M21</span>, <span class="ident">_S12</span>) <span class="op">=</span>
             <span class="self">self</span>.<span class="ident">_gen_direct</span>(<span class="ident">lat1</span>, <span class="ident">lon1</span>, <span class="ident">azi1</span>, <span class="bool-val">false</span>, <span class="ident">s12</span>, <span class="ident">capabilities</span>);
@@ -3058,7 +3059,7 @@
     <span class="doccomment">///  - lat2 latitude of point 2 (degrees).</span>
     <span class="doccomment">///  - lon2 longitude of point 2 (degrees).</span>
     <span class="doccomment">///  - azi2 (forward) azimuth at point 2 (degrees).</span>
-    <span class="kw">fn</span> <span class="ident">direct</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">lat1</span>: <span class="ident">f64</span>, <span class="ident">lon1</span>: <span class="ident">f64</span>, <span class="ident">azi1</span>: <span class="ident">f64</span>, <span class="ident">s12</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) {
+    <span class="kw">fn</span> <span class="ident">direct</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">lat1</span>: <span class="ident">f64</span>, <span class="ident">lon1</span>: <span class="ident">f64</span>, <span class="ident">azi1</span>: <span class="ident">f64</span>, <span class="ident">s12</span>: <span class="ident">f64</span>) -&gt; (<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) {
         <span class="kw">let</span> <span class="ident">capabilities</span> <span class="op">=</span> <span class="ident">caps::LATITUDE</span> <span class="op">|</span> <span class="ident">caps::LONGITUDE</span> <span class="op">|</span> <span class="ident">caps::AZIMUTH</span>;
         <span class="kw">let</span> (<span class="ident">_a12</span>, <span class="ident">lat2</span>, <span class="ident">lon2</span>, <span class="ident">azi2</span>, <span class="ident">_s12</span>, <span class="ident">_m12</span>, <span class="ident">_M12</span>, <span class="ident">_M21</span>, <span class="ident">_S12</span>) <span class="op">=</span>
             <span class="self">self</span>.<span class="ident">_gen_direct</span>(<span class="ident">lat1</span>, <span class="ident">lon1</span>, <span class="ident">azi1</span>, <span class="bool-val">false</span>, <span class="ident">s12</span>, <span class="ident">capabilities</span>);
@@ -3075,7 +3076,7 @@
     <span class="doccomment">///  - lon2 longitude of point 2 (degrees).</span>
     <span class="doccomment">///  - azi2 (forward) azimuth at point 2 (degrees).</span>
     <span class="doccomment">///  - m12 reduced length of geodesic (meters).</span>
-    <span class="kw">fn</span> <span class="ident">direct</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">lat1</span>: <span class="ident">f64</span>, <span class="ident">lon1</span>: <span class="ident">f64</span>, <span class="ident">azi1</span>: <span class="ident">f64</span>, <span class="ident">s12</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) {
+    <span class="kw">fn</span> <span class="ident">direct</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">lat1</span>: <span class="ident">f64</span>, <span class="ident">lon1</span>: <span class="ident">f64</span>, <span class="ident">azi1</span>: <span class="ident">f64</span>, <span class="ident">s12</span>: <span class="ident">f64</span>) -&gt; (<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) {
         <span class="kw">let</span> <span class="ident">capabilities</span> <span class="op">=</span> <span class="ident">caps::LATITUDE</span> <span class="op">|</span> <span class="ident">caps::LONGITUDE</span> <span class="op">|</span> <span class="ident">caps::AZIMUTH</span> <span class="op">|</span> <span class="ident">caps::REDUCEDLENGTH</span>;
         <span class="kw">let</span> (<span class="ident">_a12</span>, <span class="ident">lat2</span>, <span class="ident">lon2</span>, <span class="ident">azi2</span>, <span class="ident">_s12</span>, <span class="ident">m12</span>, <span class="ident">_M12</span>, <span class="ident">_M21</span>, <span class="ident">_S12</span>) <span class="op">=</span>
             <span class="self">self</span>.<span class="ident">_gen_direct</span>(<span class="ident">lat1</span>, <span class="ident">lon1</span>, <span class="ident">azi1</span>, <span class="bool-val">false</span>, <span class="ident">s12</span>, <span class="ident">capabilities</span>);
@@ -3093,7 +3094,7 @@
     <span class="doccomment">///  - azi2 (forward) azimuth at point 2 (degrees).</span>
     <span class="doccomment">///  - M12 geodesic scale of point 2 relative to point 1 (dimensionless).</span>
     <span class="doccomment">///  - M21 geodesic scale of point 1 relative to point 2 (dimensionless).</span>
-    <span class="kw">fn</span> <span class="ident">direct</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">lat1</span>: <span class="ident">f64</span>, <span class="ident">lon1</span>: <span class="ident">f64</span>, <span class="ident">azi1</span>: <span class="ident">f64</span>, <span class="ident">s12</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) {
+    <span class="kw">fn</span> <span class="ident">direct</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">lat1</span>: <span class="ident">f64</span>, <span class="ident">lon1</span>: <span class="ident">f64</span>, <span class="ident">azi1</span>: <span class="ident">f64</span>, <span class="ident">s12</span>: <span class="ident">f64</span>) -&gt; (<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) {
         <span class="kw">let</span> <span class="ident">capabilities</span> <span class="op">=</span> <span class="ident">caps::LATITUDE</span> <span class="op">|</span> <span class="ident">caps::LONGITUDE</span> <span class="op">|</span> <span class="ident">caps::AZIMUTH</span> <span class="op">|</span> <span class="ident">caps::GEODESICSCALE</span>;
         <span class="kw">let</span> (<span class="ident">_a12</span>, <span class="ident">lat2</span>, <span class="ident">lon2</span>, <span class="ident">azi2</span>, <span class="ident">_s12</span>, <span class="ident">_m12</span>, <span class="ident">M12</span>, <span class="ident">M21</span>, <span class="ident">_S12</span>) <span class="op">=</span>
             <span class="self">self</span>.<span class="ident">_gen_direct</span>(<span class="ident">lat1</span>, <span class="ident">lon1</span>, <span class="ident">azi1</span>, <span class="bool-val">false</span>, <span class="ident">s12</span>, <span class="ident">capabilities</span>);
@@ -3112,7 +3113,7 @@
     <span class="doccomment">///  - m12 reduced length of geodesic (meters).</span>
     <span class="doccomment">///  - M12 geodesic scale of point 2 relative to point 1 (dimensionless).</span>
     <span class="doccomment">///  - M21 geodesic scale of point 1 relative to point 2 (dimensionless).</span>
-    <span class="kw">fn</span> <span class="ident">direct</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">lat1</span>: <span class="ident">f64</span>, <span class="ident">lon1</span>: <span class="ident">f64</span>, <span class="ident">azi1</span>: <span class="ident">f64</span>, <span class="ident">s12</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) {
+    <span class="kw">fn</span> <span class="ident">direct</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">lat1</span>: <span class="ident">f64</span>, <span class="ident">lon1</span>: <span class="ident">f64</span>, <span class="ident">azi1</span>: <span class="ident">f64</span>, <span class="ident">s12</span>: <span class="ident">f64</span>) -&gt; (<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) {
         <span class="kw">let</span> <span class="ident">capabilities</span> <span class="op">=</span> <span class="ident">caps::LATITUDE</span>
             <span class="op">|</span> <span class="ident">caps::LONGITUDE</span>
             <span class="op">|</span> <span class="ident">caps::AZIMUTH</span>
@@ -3143,7 +3144,7 @@
         <span class="ident">lon1</span>: <span class="ident">f64</span>,
         <span class="ident">azi1</span>: <span class="ident">f64</span>,
         <span class="ident">s12</span>: <span class="ident">f64</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) {
+    ) -&gt; (<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) {
         <span class="kw">let</span> <span class="ident">capabilities</span> <span class="op">=</span> <span class="ident">caps::LATITUDE</span>
             <span class="op">|</span> <span class="ident">caps::LONGITUDE</span>
             <span class="op">|</span> <span class="ident">caps::AZIMUTH</span>
@@ -3206,7 +3207,7 @@
 <span class="doccomment">/// assert_approx_eq!(s12, 9094718.72751138);</span>
 <span class="doccomment">/// ```</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">InverseGeodesic</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">inverse</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">lat1</span>: <span class="ident">f64</span>, <span class="ident">lon1</span>: <span class="ident">f64</span>, <span class="ident">lat2</span>: <span class="ident">f64</span>, <span class="ident">lon2</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span>;
+    <span class="kw">fn</span> <span class="ident">inverse</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">lat1</span>: <span class="ident">f64</span>, <span class="ident">lon1</span>: <span class="ident">f64</span>, <span class="ident">lat2</span>: <span class="ident">f64</span>, <span class="ident">lon2</span>: <span class="ident">f64</span>) -&gt; <span class="ident">T</span>;
 }
 
 <span class="kw">impl</span> <span class="ident">InverseGeodesic</span><span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Geodesic</span> {
@@ -3214,7 +3215,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Returns</span>
     <span class="doccomment">/// - s12 distance between point 1 and point 2 (meters).</span>
-    <span class="kw">fn</span> <span class="ident">inverse</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">lat1</span>: <span class="ident">f64</span>, <span class="ident">lon1</span>: <span class="ident">f64</span>, <span class="ident">lat2</span>: <span class="ident">f64</span>, <span class="ident">lon2</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">f64</span> {
+    <span class="kw">fn</span> <span class="ident">inverse</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">lat1</span>: <span class="ident">f64</span>, <span class="ident">lon1</span>: <span class="ident">f64</span>, <span class="ident">lat2</span>: <span class="ident">f64</span>, <span class="ident">lon2</span>: <span class="ident">f64</span>) -&gt; <span class="ident">f64</span> {
         <span class="kw">let</span> <span class="ident">capabilities</span> <span class="op">=</span> <span class="ident">caps::DISTANCE</span>;
         <span class="kw">let</span> (<span class="ident">_a12</span>, <span class="ident">s12</span>, <span class="ident">_azi1</span>, <span class="ident">_azi2</span>, <span class="ident">_m12</span>, <span class="ident">_M12</span>, <span class="ident">_M21</span>, <span class="ident">_S12</span>) <span class="op">=</span>
             <span class="self">self</span>.<span class="ident">_gen_inverse_azi</span>(<span class="ident">lat1</span>, <span class="ident">lon1</span>, <span class="ident">lat2</span>, <span class="ident">lon2</span>, <span class="ident">capabilities</span>);
@@ -3229,7 +3230,7 @@
     <span class="doccomment">/// # Returns</span>
     <span class="doccomment">/// - s12 distance between point 1 and point 2 (meters).</span>
     <span class="doccomment">/// - a12 arc length of between point 1 and point 2 (degrees).</span>
-    <span class="kw">fn</span> <span class="ident">inverse</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">lat1</span>: <span class="ident">f64</span>, <span class="ident">lon1</span>: <span class="ident">f64</span>, <span class="ident">lat2</span>: <span class="ident">f64</span>, <span class="ident">lon2</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">f64</span>, <span class="ident">f64</span>) {
+    <span class="kw">fn</span> <span class="ident">inverse</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">lat1</span>: <span class="ident">f64</span>, <span class="ident">lon1</span>: <span class="ident">f64</span>, <span class="ident">lat2</span>: <span class="ident">f64</span>, <span class="ident">lon2</span>: <span class="ident">f64</span>) -&gt; (<span class="ident">f64</span>, <span class="ident">f64</span>) {
         <span class="kw">let</span> <span class="ident">capabilities</span> <span class="op">=</span> <span class="ident">caps::DISTANCE</span>;
         <span class="kw">let</span> (<span class="ident">a12</span>, <span class="ident">s12</span>, <span class="ident">_azi1</span>, <span class="ident">_azi2</span>, <span class="ident">_m12</span>, <span class="ident">_M12</span>, <span class="ident">_M21</span>, <span class="ident">_S12</span>) <span class="op">=</span>
             <span class="self">self</span>.<span class="ident">_gen_inverse_azi</span>(<span class="ident">lat1</span>, <span class="ident">lon1</span>, <span class="ident">lat2</span>, <span class="ident">lon2</span>, <span class="ident">capabilities</span>);
@@ -3245,7 +3246,7 @@
     <span class="doccomment">/// - azi1 azimuth at point 1 (degrees).</span>
     <span class="doccomment">/// - azi2 (forward) azimuth at point 2 (degrees).</span>
     <span class="doccomment">/// - a12 arc length of between point 1 and point 2 (degrees).</span>
-    <span class="kw">fn</span> <span class="ident">inverse</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">lat1</span>: <span class="ident">f64</span>, <span class="ident">lon1</span>: <span class="ident">f64</span>, <span class="ident">lat2</span>: <span class="ident">f64</span>, <span class="ident">lon2</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) {
+    <span class="kw">fn</span> <span class="ident">inverse</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">lat1</span>: <span class="ident">f64</span>, <span class="ident">lon1</span>: <span class="ident">f64</span>, <span class="ident">lat2</span>: <span class="ident">f64</span>, <span class="ident">lon2</span>: <span class="ident">f64</span>) -&gt; (<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) {
         <span class="kw">let</span> <span class="ident">capabilities</span> <span class="op">=</span> <span class="ident">caps::AZIMUTH</span>;
         <span class="kw">let</span> (<span class="ident">a12</span>, <span class="ident">_s12</span>, <span class="ident">azi1</span>, <span class="ident">azi2</span>, <span class="ident">_m12</span>, <span class="ident">_M12</span>, <span class="ident">_M21</span>, <span class="ident">_S12</span>) <span class="op">=</span>
             <span class="self">self</span>.<span class="ident">_gen_inverse_azi</span>(<span class="ident">lat1</span>, <span class="ident">lon1</span>, <span class="ident">lat2</span>, <span class="ident">lon2</span>, <span class="ident">capabilities</span>);
@@ -3262,7 +3263,7 @@
     <span class="doccomment">/// - azi1 azimuth at point 1 (degrees).</span>
     <span class="doccomment">/// - azi2 (forward) azimuth at point 2 (degrees).</span>
     <span class="doccomment">/// - a12 arc length of between point 1 and point 2 (degrees).</span>
-    <span class="kw">fn</span> <span class="ident">inverse</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">lat1</span>: <span class="ident">f64</span>, <span class="ident">lon1</span>: <span class="ident">f64</span>, <span class="ident">lat2</span>: <span class="ident">f64</span>, <span class="ident">lon2</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) {
+    <span class="kw">fn</span> <span class="ident">inverse</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">lat1</span>: <span class="ident">f64</span>, <span class="ident">lon1</span>: <span class="ident">f64</span>, <span class="ident">lat2</span>: <span class="ident">f64</span>, <span class="ident">lon2</span>: <span class="ident">f64</span>) -&gt; (<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) {
         <span class="kw">let</span> <span class="ident">capabilities</span> <span class="op">=</span> <span class="ident">caps::DISTANCE</span> <span class="op">|</span> <span class="ident">caps::AZIMUTH</span>;
         <span class="kw">let</span> (<span class="ident">a12</span>, <span class="ident">s12</span>, <span class="ident">azi1</span>, <span class="ident">azi2</span>, <span class="ident">_m12</span>, <span class="ident">_M12</span>, <span class="ident">_M21</span>, <span class="ident">_S12</span>) <span class="op">=</span>
             <span class="self">self</span>.<span class="ident">_gen_inverse_azi</span>(<span class="ident">lat1</span>, <span class="ident">lon1</span>, <span class="ident">lat2</span>, <span class="ident">lon2</span>, <span class="ident">capabilities</span>);
@@ -3280,7 +3281,7 @@
     <span class="doccomment">/// - azi2 (forward) azimuth at point 2 (degrees).</span>
     <span class="doccomment">/// - m12 reduced length of geodesic (meters).</span>
     <span class="doccomment">/// - a12 arc length of between point 1 and point 2 (degrees).</span>
-    <span class="kw">fn</span> <span class="ident">inverse</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">lat1</span>: <span class="ident">f64</span>, <span class="ident">lon1</span>: <span class="ident">f64</span>, <span class="ident">lat2</span>: <span class="ident">f64</span>, <span class="ident">lon2</span>: <span class="ident">f64</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) {
+    <span class="kw">fn</span> <span class="ident">inverse</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">lat1</span>: <span class="ident">f64</span>, <span class="ident">lon1</span>: <span class="ident">f64</span>, <span class="ident">lat2</span>: <span class="ident">f64</span>, <span class="ident">lon2</span>: <span class="ident">f64</span>) -&gt; (<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) {
         <span class="kw">let</span> <span class="ident">capabilities</span> <span class="op">=</span> <span class="ident">caps::DISTANCE</span> <span class="op">|</span> <span class="ident">caps::AZIMUTH</span> <span class="op">|</span> <span class="ident">caps::REDUCEDLENGTH</span>;
         <span class="kw">let</span> (<span class="ident">a12</span>, <span class="ident">s12</span>, <span class="ident">azi1</span>, <span class="ident">azi2</span>, <span class="ident">m12</span>, <span class="ident">_M12</span>, <span class="ident">_M21</span>, <span class="ident">_S12</span>) <span class="op">=</span>
             <span class="self">self</span>.<span class="ident">_gen_inverse_azi</span>(<span class="ident">lat1</span>, <span class="ident">lon1</span>, <span class="ident">lat2</span>, <span class="ident">lon2</span>, <span class="ident">capabilities</span>);
@@ -3305,7 +3306,7 @@
         <span class="ident">lon1</span>: <span class="ident">f64</span>,
         <span class="ident">lat2</span>: <span class="ident">f64</span>,
         <span class="ident">lon2</span>: <span class="ident">f64</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) {
+    ) -&gt; (<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) {
         <span class="kw">let</span> <span class="ident">capabilities</span> <span class="op">=</span> <span class="ident">caps::DISTANCE</span> <span class="op">|</span> <span class="ident">caps::AZIMUTH</span> <span class="op">|</span> <span class="ident">caps::GEODESICSCALE</span>;
         <span class="kw">let</span> (<span class="ident">a12</span>, <span class="ident">s12</span>, <span class="ident">azi1</span>, <span class="ident">azi2</span>, <span class="ident">_m12</span>, <span class="ident">M12</span>, <span class="ident">M21</span>, <span class="ident">_S12</span>) <span class="op">=</span>
             <span class="self">self</span>.<span class="ident">_gen_inverse_azi</span>(<span class="ident">lat1</span>, <span class="ident">lon1</span>, <span class="ident">lat2</span>, <span class="ident">lon2</span>, <span class="ident">capabilities</span>);
@@ -3331,7 +3332,7 @@
         <span class="ident">lon1</span>: <span class="ident">f64</span>,
         <span class="ident">lat2</span>: <span class="ident">f64</span>,
         <span class="ident">lon2</span>: <span class="ident">f64</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) {
+    ) -&gt; (<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) {
         <span class="kw">let</span> <span class="ident">capabilities</span> <span class="op">=</span>
             <span class="ident">caps::DISTANCE</span> <span class="op">|</span> <span class="ident">caps::AZIMUTH</span> <span class="op">|</span> <span class="ident">caps::REDUCEDLENGTH</span> <span class="op">|</span> <span class="ident">caps::GEODESICSCALE</span>;
         <span class="kw">let</span> (<span class="ident">a12</span>, <span class="ident">s12</span>, <span class="ident">azi1</span>, <span class="ident">azi2</span>, <span class="ident">m12</span>, <span class="ident">M12</span>, <span class="ident">M21</span>, <span class="ident">_S12</span>) <span class="op">=</span>
@@ -3359,7 +3360,7 @@
         <span class="ident">lon1</span>: <span class="ident">f64</span>,
         <span class="ident">lat2</span>: <span class="ident">f64</span>,
         <span class="ident">lon2</span>: <span class="ident">f64</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) {
+    ) -&gt; (<span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>, <span class="ident">f64</span>) {
         <span class="kw">let</span> <span class="ident">capabilities</span> <span class="op">=</span>
             <span class="ident">caps::DISTANCE</span> <span class="op">|</span> <span class="ident">caps::AZIMUTH</span> <span class="op">|</span> <span class="ident">caps::REDUCEDLENGTH</span> <span class="op">|</span> <span class="ident">caps::GEODESICSCALE</span> <span class="op">|</span> <span class="ident">caps::AREA</span>;
         <span class="kw">let</span> (<span class="ident">a12</span>, <span class="ident">s12</span>, <span class="ident">azi1</span>, <span class="ident">azi2</span>, <span class="ident">m12</span>, <span class="ident">M12</span>, <span class="ident">M21</span>, <span class="ident">S12</span>) <span class="op">=</span>
@@ -3375,7 +3376,7 @@
     <span class="kw">use</span> <span class="ident">assert_approx_eq::assert_approx_eq</span>;
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
-    <span class="kw">fn</span> <span class="ident">test_inverse_and_direct</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">test_inverse_and_direct</span>() -&gt; <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">String</span><span class="op">&gt;</span> {
         <span class="comment">// See python/test_geodesic.py</span>
         <span class="kw">let</span> <span class="ident">geod</span> <span class="op">=</span> <span class="ident">Geodesic::wgs84</span>();
         <span class="kw">let</span> (<span class="ident">_a12</span>, <span class="ident">s12</span>, <span class="ident">_azi1</span>, <span class="ident">_azi2</span>, <span class="ident">_m12</span>, <span class="ident">_M12</span>, <span class="ident">_M21</span>, <span class="ident">_S12</span>) <span class="op">=</span>
@@ -3748,8 +3749,8 @@
             <span class="number">0.017453292519943295</span>,
             <span class="number">0.01745240643728351</span>,
             <span class="number">0.9998476951563913</span>,
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">1.0</span>, <span class="number">2.0</span>, <span class="number">3.0</span>, <span class="number">4.0</span>, <span class="number">5.0</span>, <span class="number">6.0</span>],
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">1.0</span>, <span class="number">2.0</span>, <span class="number">3.0</span>, <span class="number">4.0</span>, <span class="number">5.0</span>, <span class="number">6.0</span>],
+            <span class="kw-2">&amp;mut</span> <span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">1.0</span>, <span class="number">2.0</span>, <span class="number">3.0</span>, <span class="number">4.0</span>, <span class="number">5.0</span>, <span class="number">6.0</span>],
+            <span class="kw-2">&amp;mut</span> <span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">1.0</span>, <span class="number">2.0</span>, <span class="number">3.0</span>, <span class="number">4.0</span>, <span class="number">5.0</span>, <span class="number">6.0</span>],
         );
         <span class="macro">assert_eq!</span>(<span class="ident">res</span>.<span class="number">0</span>, <span class="op">-</span><span class="number">1.0</span>);
         <span class="macro">assert_approx_eq!</span>(<span class="ident">res</span>.<span class="number">1</span>, <span class="number">0.7095310092765433</span>, <span class="number">1e-13</span>);
@@ -3768,8 +3769,8 @@
             <span class="number">0.017453292519943295</span>,
             <span class="number">0.01745240643728351</span>,
             <span class="number">0.9998476951563913</span>,
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">1.0</span>, <span class="number">2.0</span>, <span class="number">3.0</span>, <span class="number">4.0</span>, <span class="number">5.0</span>, <span class="number">6.0</span>],
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">1.0</span>, <span class="number">2.0</span>, <span class="number">3.0</span>, <span class="number">4.0</span>, <span class="number">5.0</span>, <span class="number">6.0</span>],
+            <span class="kw-2">&amp;mut</span> <span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">1.0</span>, <span class="number">2.0</span>, <span class="number">3.0</span>, <span class="number">4.0</span>, <span class="number">5.0</span>, <span class="number">6.0</span>],
+            <span class="kw-2">&amp;mut</span> <span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">1.0</span>, <span class="number">2.0</span>, <span class="number">3.0</span>, <span class="number">4.0</span>, <span class="number">5.0</span>, <span class="number">6.0</span>],
         );
         <span class="macro">assert_eq!</span>(<span class="ident">res</span>.<span class="number">0</span>, <span class="op">-</span><span class="number">1.0</span>);
         <span class="macro">assert_approx_eq!</span>(<span class="ident">res</span>.<span class="number">1</span>, <span class="number">0.7095310092765433</span>, <span class="number">1e-13</span>);
@@ -3790,13 +3791,13 @@
             <span class="number">1.0</span>,
             <span class="number">1.0</span>,
             <span class="number">0.7095310092765433</span>,
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="number">0.7046742132893822</span>,
+            <span class="kw-2">&amp;mut</span> <span class="number">0.7046742132893822</span>,
             <span class="number">0.01745240643728351</span>,
             <span class="number">0.9998476951563913</span>,
             <span class="bool-val">true</span>,
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">1.0</span>, <span class="number">2.0</span>, <span class="number">3.0</span>, <span class="number">4.0</span>, <span class="number">5.0</span>, <span class="number">6.0</span>],
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">1.0</span>, <span class="number">2.0</span>, <span class="number">3.0</span>, <span class="number">4.0</span>, <span class="number">5.0</span>, <span class="number">6.0</span>],
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">1.0</span>, <span class="number">2.0</span>, <span class="number">3.0</span>, <span class="number">4.0</span>, <span class="number">5.0</span>],
+            <span class="kw-2">&amp;mut</span> <span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">1.0</span>, <span class="number">2.0</span>, <span class="number">3.0</span>, <span class="number">4.0</span>, <span class="number">5.0</span>, <span class="number">6.0</span>],
+            <span class="kw-2">&amp;mut</span> <span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">1.0</span>, <span class="number">2.0</span>, <span class="number">3.0</span>, <span class="number">4.0</span>, <span class="number">5.0</span>, <span class="number">6.0</span>],
+            <span class="kw-2">&amp;mut</span> <span class="macro">vec!</span>[<span class="number">0.0</span>, <span class="number">1.0</span>, <span class="number">2.0</span>, <span class="number">3.0</span>, <span class="number">4.0</span>, <span class="number">5.0</span>],
         );
         <span class="macro">assert_eq!</span>(<span class="ident">res1</span>.<span class="number">0</span>, <span class="number">1.4834408705897495e-09</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">res1</span>.<span class="number">1</span>, <span class="number">0.7094236675312185</span>);
@@ -3818,11 +3819,11 @@
             <span class="number">1.0</span>,
             <span class="number">1.0</span>,
             <span class="number">0.7095309793242709</span>,
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="number">0.7046742434480923</span>,
+            <span class="kw-2">&amp;mut</span> <span class="number">0.7046742434480923</span>,
             <span class="number">0.01745240643728351</span>,
             <span class="number">0.9998476951563913</span>,
             <span class="bool-val">true</span>,
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="macro">vec!</span>[
+            <span class="kw-2">&amp;mut</span> <span class="macro">vec!</span>[
                 <span class="number">0.0</span>,
                 <span class="op">-</span><span class="number">0.00041775465696698233</span>,
                 <span class="op">-</span><span class="number">4.362974596862037e-08</span>,
@@ -3831,7 +3832,7 @@
                 <span class="op">-</span><span class="number">2.226614930167366e-18</span>,
                 <span class="op">-</span><span class="number">1.1627237498131586e-21</span>,
             ],
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="macro">vec!</span>[
+            <span class="kw-2">&amp;mut</span> <span class="macro">vec!</span>[
                 <span class="number">0.0</span>,
                 <span class="op">-</span><span class="number">0.0008355098973052918</span>,
                 <span class="op">-</span><span class="number">1.7444619952659748e-07</span>,
@@ -3840,7 +3841,7 @@
                 <span class="op">-</span><span class="number">2.2251271876594078e-17</span>,
                 <span class="number">1.2789961247944744e-20</span>,
             ],
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="macro">vec!</span>[
+            <span class="kw-2">&amp;mut</span> <span class="macro">vec!</span>[
                 <span class="number">0.0</span>,
                 <span class="number">0.00020861391868413911</span>,
                 <span class="number">4.3547247296823945e-08</span>,
@@ -3880,8 +3881,8 @@
             <span class="number">0.9998487145115275</span>,
             <span class="number">1.0</span>,
             <span class="number">4101</span>,
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">c1a</span>,
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">c2a</span>,
+            <span class="kw-2">&amp;mut</span> <span class="ident">c1a</span>,
+            <span class="kw-2">&amp;mut</span> <span class="ident">c2a</span>,
         );
         <span class="macro">assert_eq!</span>(<span class="ident">res1</span>.<span class="number">0</span>.<span class="ident">is_nan</span>(), <span class="bool-val">true</span>);
         <span class="macro">assert_eq!</span>(<span class="ident">res1</span>.<span class="number">1</span>, <span class="number">0.024679842274314294</span>);
@@ -3901,7 +3902,7 @@
             <span class="number">0.9998487145115275</span>,
             <span class="number">1.0</span>,
             <span class="number">4101</span>,
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="macro">vec!</span>[
+            <span class="kw-2">&amp;mut</span> <span class="macro">vec!</span>[
                 <span class="number">0.0</span>,
                 <span class="op">-</span><span class="number">0.00041775465696698233</span>,
                 <span class="op">-</span><span class="number">4.362974596862037e-08</span>,
@@ -3910,7 +3911,7 @@
                 <span class="op">-</span><span class="number">2.226614930167366e-18</span>,
                 <span class="op">-</span><span class="number">1.1627237498131586e-21</span>,
             ],
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="macro">vec!</span>[
+            <span class="kw-2">&amp;mut</span> <span class="macro">vec!</span>[
                 <span class="number">0.0</span>,
                 <span class="op">-</span><span class="number">0.0008355098973052918</span>,
                 <span class="op">-</span><span class="number">1.7444619952659748e-07</span>,
@@ -3938,7 +3939,7 @@
             <span class="number">0.9998487145115275</span>,
             <span class="number">1.0</span>,
             <span class="number">1920</span>,
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="macro">vec!</span>[
+            <span class="kw-2">&amp;mut</span> <span class="macro">vec!</span>[
                 <span class="number">0.0</span>,
                 <span class="op">-</span><span class="number">0.00041775469264372037</span>,
                 <span class="op">-</span><span class="number">4.362975342068502e-08</span>,
@@ -3947,7 +3948,7 @@
                 <span class="op">-</span><span class="number">2.2266158809456692e-18</span>,
                 <span class="op">-</span><span class="number">1.1627243456014359e-21</span>,
             ],
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="macro">vec!</span>[
+            <span class="kw-2">&amp;mut</span> <span class="macro">vec!</span>[
                 <span class="number">0.0</span>,
                 <span class="op">-</span><span class="number">0.0008355099686589174</span>,
                 <span class="op">-</span><span class="number">1.744462293162189e-07</span>,
@@ -3975,7 +3976,7 @@
             <span class="number">0.8139459053827204</span>,
             <span class="number">0.9811634781422108</span>,
             <span class="number">1920</span>,
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [
+            <span class="kw-2">&amp;mut</span> [
                 <span class="number">0.0</span>,
                 <span class="op">-</span><span class="number">0.0003561309485314716</span>,
                 <span class="op">-</span><span class="number">3.170731714689771e-08</span>,
@@ -3984,7 +3985,7 @@
                 <span class="op">-</span><span class="number">1.0025061462383107e-18</span>,
                 <span class="op">-</span><span class="number">4.462794158625518e-22</span>,
             ],
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> [
+            <span class="kw-2">&amp;mut</span> [
                 <span class="number">0.0</span>,
                 <span class="op">-</span><span class="number">0.0007122622584701569</span>,
                 <span class="op">-</span><span class="number">1.2678416507678478e-07</span>,
@@ -4005,7 +4006,7 @@
     <span class="kw">fn</span> <span class="ident">test_goed__C4f</span>() {
         <span class="kw">let</span> <span class="ident">geod</span> <span class="op">=</span> <span class="ident">Geodesic::wgs84</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">2.0</span>, <span class="number">3.0</span>, <span class="number">4.0</span>, <span class="number">5.0</span>, <span class="number">6.0</span>, <span class="number">7.0</span>];
-        <span class="ident">geod</span>.<span class="ident">_C4f</span>(<span class="number">0.12</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">c</span>);
+        <span class="ident">geod</span>.<span class="ident">_C4f</span>(<span class="number">0.12</span>, <span class="kw-2">&amp;mut</span> <span class="ident">c</span>);
         <span class="macro">assert_eq!</span>(
             <span class="ident">c</span>,
             [
@@ -4024,7 +4025,7 @@
     <span class="kw">fn</span> <span class="ident">test_goed__C3f</span>() {
         <span class="kw">let</span> <span class="ident">geod</span> <span class="op">=</span> <span class="ident">Geodesic::wgs84</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c</span> <span class="op">=</span> <span class="macro">vec!</span>[<span class="number">1.0</span>, <span class="number">2.0</span>, <span class="number">3.0</span>, <span class="number">4.0</span>, <span class="number">5.0</span>, <span class="number">6.0</span>, <span class="number">7.0</span>];
-        <span class="ident">geod</span>.<span class="ident">_C3f</span>(<span class="number">0.12</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">c</span>);
+        <span class="ident">geod</span>.<span class="ident">_C3f</span>(<span class="number">0.12</span>, <span class="kw-2">&amp;mut</span> <span class="ident">c</span>);
 
         <span class="macro">assert_eq!</span>(
             <span class="ident">c</span>,
@@ -4123,7 +4124,6 @@
         );
     }
 }
-</pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="geographiclib_rs" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
-    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script>
+</code></pre></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="geographiclib_rs" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0 (9d1b2106e 2022-02-23)" ></div>
 </body></html>

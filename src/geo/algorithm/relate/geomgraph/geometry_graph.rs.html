@@ -1,4 +1,6 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;rajsekar&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;geo-0.18.0&#x2F;src&#x2F;algorithm&#x2F;relate&#x2F;geomgraph&#x2F;geometry_graph.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>geometry_graph.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script src="../../../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../../geo/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;georust&#x2F;meta&#x2F;master&#x2F;logo&#x2F;logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input"name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;rajsekar&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;geo-0.18.0&#x2F;src&#x2F;algorithm&#x2F;relate&#x2F;geomgraph&#x2F;geometry_graph.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>geometry_graph.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script src="../../../../../crates.js"></script><script defer src="../../../../../main.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a class="sidebar-logo" href="../../../../../geo/index.html"><div class="logo-container"><img src="https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;georust&#x2F;meta&#x2F;master&#x2F;logo&#x2F;logo.png" alt="logo"></div>
+        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../geo/index.html"><img src="https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;georust&#x2F;meta&#x2F;master&#x2F;logo&#x2F;logo.png" alt="logo"></a><nav class="sub"><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -385,13 +387,12 @@
 <span id="385">385</span>
 <span id="386">386</span>
 <span id="387">387</span>
-</pre><pre class="rust">
-<span class="kw">use</span> <span class="kw">super</span>::{
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{
     <span class="ident">index</span>::{<span class="ident">EdgeSetIntersector</span>, <span class="ident">SegmentIntersector</span>, <span class="ident">SimpleEdgeSetIntersector</span>},
     <span class="ident">CoordNode</span>, <span class="ident">CoordPos</span>, <span class="ident">Direction</span>, <span class="ident">Edge</span>, <span class="ident">Label</span>, <span class="ident">LineIntersector</span>, <span class="ident">PlanarGraph</span>, <span class="ident">TopologyPosition</span>,
 };
 
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::algorithm::dimensions::HasDimensions</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::algorithm::dimensions::HasDimensions</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Coordinate</span>, <span class="ident">GeoFloat</span>, <span class="ident">GeometryCow</span>, <span class="ident">Line</span>, <span class="ident">LineString</span>, <span class="ident">Point</span>, <span class="ident">Polygon</span>};
 
 <span class="kw">use</span> <span class="ident">std::cell::RefCell</span>;
@@ -430,23 +431,23 @@
 <span class="kw">where</span>
     <span class="ident">F</span>: <span class="ident">GeoFloat</span>,
 {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">edges</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">Rc</span><span class="op">&lt;</span><span class="ident">RefCell</span><span class="op">&lt;</span><span class="ident">Edge</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">edges</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">Rc</span><span class="op">&lt;</span><span class="ident">RefCell</span><span class="op">&lt;</span><span class="ident">Edge</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>] {
         <span class="self">self</span>.<span class="ident">planar_graph</span>.<span class="ident">edges</span>()
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert_edge</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">edge</span>: <span class="ident">Edge</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">insert_edge</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">edge</span>: <span class="ident">Edge</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">planar_graph</span>.<span class="ident">insert_edge</span>(<span class="ident">edge</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_boundary_node</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">coord</span>: <span class="ident">Coordinate</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_boundary_node</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">coord</span>: <span class="ident">Coordinate</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>) -&gt; <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">planar_graph</span>.<span class="ident">is_boundary_node</span>(<span class="self">self</span>.<span class="ident">arg_index</span>, <span class="ident">coord</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_node_with_coordinate</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">coord</span>: <span class="ident">Coordinate</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CoordNode</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_node_with_coordinate</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">coord</span>: <span class="ident">Coordinate</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">CoordNode</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">planar_graph</span>.<span class="ident">add_node_with_coordinate</span>(<span class="ident">coord</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">nodes_iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">CoordNode</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">nodes_iter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">CoordNode</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">planar_graph</span>.<span class="ident">nodes</span>.<span class="ident">iter</span>()
     }
 }
@@ -455,7 +456,7 @@
 <span class="kw">where</span>
     <span class="ident">F</span>: <span class="ident">GeoFloat</span>,
 {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">arg_index</span>: <span class="ident">usize</span>, <span class="ident">parent_geometry</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">GeometryCow</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">arg_index</span>: <span class="ident">usize</span>, <span class="ident">parent_geometry</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">GeometryCow</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>) -&gt; <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">graph</span> <span class="op">=</span> <span class="ident">GeometryGraph</span> {
             <span class="ident">arg_index</span>,
             <span class="ident">parent_geometry</span>,
@@ -466,57 +467,57 @@
         <span class="ident">graph</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">geometry</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">GeometryCow</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">geometry</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">GeometryCow</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">parent_geometry</span>
     }
 
     <span class="doccomment">/// Determine whether a component (node or edge) that appears multiple times in elements</span>
     <span class="doccomment">/// of a Multi-Geometry is in the boundary or the interior of the Geometry</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">determine_boundary</span>(<span class="ident">boundary_count</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CoordPos</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">determine_boundary</span>(<span class="ident">boundary_count</span>: <span class="ident">usize</span>) -&gt; <span class="ident">CoordPos</span> {
         <span class="comment">// For now, we only support the SFS &quot;Mod-2 Rule&quot;</span>
         <span class="comment">// We could make this configurable if we wanted to support alternative boundary rules.</span>
-        <span class="kw">if</span> <span class="ident">boundary_count</span> <span class="op">%</span> <span class="number">2</span> <span class="op">=</span><span class="op">=</span> <span class="number">1</span> {
+        <span class="kw">if</span> <span class="ident">boundary_count</span> <span class="op">%</span> <span class="number">2</span> <span class="op">==</span> <span class="number">1</span> {
             <span class="ident">CoordPos::OnBoundary</span>
         } <span class="kw">else</span> {
             <span class="ident">CoordPos::Inside</span>
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">create_edge_set_intersector</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">EdgeSetIntersector</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">create_edge_set_intersector</span>() -&gt; <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">EdgeSetIntersector</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="comment">// PERF: faster algorithms exist. This one was chosen for simplicity of implementation and</span>
         <span class="comment">//       debugging</span>
         <span class="ident">Box::new</span>(<span class="ident">SimpleEdgeSetIntersector::new</span>())
     }
 
-    <span class="kw">fn</span> <span class="ident">boundary_nodes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">CoordNode</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">boundary_nodes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw">impl</span> <span class="ident">Iterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">CoordNode</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">planar_graph</span>.<span class="ident">boundary_nodes</span>(<span class="self">self</span>.<span class="ident">arg_index</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_geometry</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">geometry</span>: <span class="kw-2">&amp;</span><span class="ident">GeometryCow</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_geometry</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">geometry</span>: <span class="kw-2">&amp;</span><span class="ident">GeometryCow</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>) {
         <span class="kw">if</span> <span class="ident">geometry</span>.<span class="ident">is_empty</span>() {
             <span class="kw">return</span>;
         }
         <span class="kw">match</span> <span class="ident">geometry</span> {
-            <span class="ident">GeometryCow::Line</span>(<span class="ident">line</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">add_line</span>(<span class="ident">line</span>),
-            <span class="ident">GeometryCow::Rect</span>(<span class="ident">rect</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">GeometryCow::Line</span>(<span class="ident">line</span>) =&gt; <span class="self">self</span>.<span class="ident">add_line</span>(<span class="ident">line</span>),
+            <span class="ident">GeometryCow::Rect</span>(<span class="ident">rect</span>) =&gt; {
                 <span class="comment">// PERF: avoid this conversion/clone?</span>
                 <span class="self">self</span>.<span class="ident">add_polygon</span>(<span class="kw-2">&amp;</span><span class="ident">rect</span>.<span class="ident">to_polygon</span>());
             }
-            <span class="ident">GeometryCow::Point</span>(<span class="ident">point</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">GeometryCow::Point</span>(<span class="ident">point</span>) =&gt; {
                 <span class="self">self</span>.<span class="ident">add_point</span>(<span class="ident">point</span>);
             }
-            <span class="ident">GeometryCow::Polygon</span>(<span class="ident">polygon</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">add_polygon</span>(<span class="ident">polygon</span>),
-            <span class="ident">GeometryCow::Triangle</span>(<span class="ident">triangle</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">GeometryCow::Polygon</span>(<span class="ident">polygon</span>) =&gt; <span class="self">self</span>.<span class="ident">add_polygon</span>(<span class="ident">polygon</span>),
+            <span class="ident">GeometryCow::Triangle</span>(<span class="ident">triangle</span>) =&gt; {
                 <span class="comment">// PERF: avoid this conversion/clone?</span>
                 <span class="self">self</span>.<span class="ident">add_polygon</span>(<span class="kw-2">&amp;</span><span class="ident">triangle</span>.<span class="ident">to_polygon</span>());
             }
-            <span class="ident">GeometryCow::LineString</span>(<span class="ident">line_string</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">add_line_string</span>(<span class="ident">line_string</span>),
-            <span class="ident">GeometryCow::MultiPoint</span>(<span class="ident">multi_point</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">GeometryCow::LineString</span>(<span class="ident">line_string</span>) =&gt; <span class="self">self</span>.<span class="ident">add_line_string</span>(<span class="ident">line_string</span>),
+            <span class="ident">GeometryCow::MultiPoint</span>(<span class="ident">multi_point</span>) =&gt; {
                 <span class="kw">for</span> <span class="ident">point</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">multi_point</span>.<span class="number">0</span> {
                     <span class="self">self</span>.<span class="ident">add_point</span>(<span class="ident">point</span>);
                 }
             }
-            <span class="ident">GeometryCow::MultiPolygon</span>(<span class="ident">multi_polygon</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">GeometryCow::MultiPolygon</span>(<span class="ident">multi_polygon</span>) =&gt; {
                 <span class="comment">// check if this Geometry should obey the Boundary Determination Rule</span>
                 <span class="comment">// all collections except MultiPolygons obey the rule</span>
                 <span class="self">self</span>.<span class="ident">use_boundary_determination_rule</span> <span class="op">=</span> <span class="bool-val">false</span>;
@@ -524,12 +525,12 @@
                     <span class="self">self</span>.<span class="ident">add_polygon</span>(<span class="ident">polygon</span>);
                 }
             }
-            <span class="ident">GeometryCow::MultiLineString</span>(<span class="ident">multi_line_string</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">GeometryCow::MultiLineString</span>(<span class="ident">multi_line_string</span>) =&gt; {
                 <span class="kw">for</span> <span class="ident">line_string</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">multi_line_string</span>.<span class="number">0</span> {
                     <span class="self">self</span>.<span class="ident">add_line_string</span>(<span class="ident">line_string</span>);
                 }
             }
-            <span class="ident">GeometryCow::GeometryCollection</span>(<span class="ident">geometry_collection</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">GeometryCow::GeometryCollection</span>(<span class="ident">geometry_collection</span>) =&gt; {
                 <span class="kw">for</span> <span class="ident">geometry</span> <span class="kw">in</span> <span class="ident">geometry_collection</span>.<span class="ident">iter</span>() {
                     <span class="self">self</span>.<span class="ident">add_geometry</span>(<span class="kw-2">&amp;</span><span class="ident">GeometryCow::from</span>(<span class="ident">geometry</span>));
                 }
@@ -538,7 +539,7 @@
     }
 
     <span class="kw">fn</span> <span class="ident">add_polygon_ring</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">linear_ring</span>: <span class="kw-2">&amp;</span><span class="ident">LineString</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>,
         <span class="ident">cw_left</span>: <span class="ident">CoordPos</span>,
         <span class="ident">cw_right</span>: <span class="ident">CoordPos</span>,
@@ -564,11 +565,11 @@
         }
         <span class="kw">let</span> <span class="ident">first_point</span> <span class="op">=</span> <span class="ident">coords</span>[<span class="number">0</span>];
 
-        <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::algorithm::winding_order</span>::{<span class="ident">Winding</span>, <span class="ident">WindingOrder</span>};
+        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::algorithm::winding_order</span>::{<span class="ident">Winding</span>, <span class="ident">WindingOrder</span>};
         <span class="kw">let</span> (<span class="ident">left</span>, <span class="ident">right</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">linear_ring</span>.<span class="ident">winding_order</span>() {
-            <span class="prelude-val">Some</span>(<span class="ident">WindingOrder::Clockwise</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">cw_left</span>, <span class="ident">cw_right</span>),
-            <span class="prelude-val">Some</span>(<span class="ident">WindingOrder::CounterClockwise</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">cw_right</span>, <span class="ident">cw_left</span>),
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">WindingOrder::Clockwise</span>) =&gt; (<span class="ident">cw_left</span>, <span class="ident">cw_right</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">WindingOrder::CounterClockwise</span>) =&gt; (<span class="ident">cw_right</span>, <span class="ident">cw_left</span>),
+            <span class="prelude-val">None</span> =&gt; {
                 <span class="macro">warn!</span>(<span class="string">&quot;polygon had no winding order. Results are undefined.&quot;</span>);
                 (<span class="ident">cw_left</span>, <span class="ident">cw_right</span>)
             }
@@ -587,7 +588,7 @@
         <span class="self">self</span>.<span class="ident">insert_point</span>(<span class="self">self</span>.<span class="ident">arg_index</span>, <span class="ident">first_point</span>, <span class="ident">CoordPos::OnBoundary</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">add_polygon</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">polygon</span>: <span class="kw-2">&amp;</span><span class="ident">Polygon</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">add_polygon</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">polygon</span>: <span class="kw-2">&amp;</span><span class="ident">Polygon</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">add_polygon_ring</span>(<span class="ident">polygon</span>.<span class="ident">exterior</span>(), <span class="ident">CoordPos::Outside</span>, <span class="ident">CoordPos::Inside</span>);
         <span class="comment">// Holes are topologically labeled opposite to the shell, since</span>
         <span class="comment">// the interior of the polygon lies on their opposite side</span>
@@ -597,7 +598,7 @@
         }
     }
 
-    <span class="kw">fn</span> <span class="ident">add_line_string</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">line_string</span>: <span class="kw-2">&amp;</span><span class="ident">LineString</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">add_line_string</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">line_string</span>: <span class="kw-2">&amp;</span><span class="ident">LineString</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>) {
         <span class="kw">if</span> <span class="ident">line_string</span>.<span class="ident">is_empty</span>() {
             <span class="kw">return</span>;
         }
@@ -628,7 +629,7 @@
         <span class="self">self</span>.<span class="ident">insert_edge</span>(<span class="ident">edge</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">add_line</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">line</span>: <span class="kw-2">&amp;</span><span class="ident">Line</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">add_line</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">line</span>: <span class="kw-2">&amp;</span><span class="ident">Line</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">insert_boundary_point</span>(<span class="ident">line</span>.<span class="ident">start</span>);
         <span class="self">self</span>.<span class="ident">insert_boundary_point</span>(<span class="ident">line</span>.<span class="ident">end</span>);
 
@@ -645,7 +646,7 @@
 
     <span class="doccomment">/// Add a point computed externally.  The point is assumed to be a</span>
     <span class="doccomment">/// Point Geometry part, which has a location of INTERIOR.</span>
-    <span class="kw">fn</span> <span class="ident">add_point</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">point</span>: <span class="kw-2">&amp;</span><span class="ident">Point</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">add_point</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">point</span>: <span class="kw-2">&amp;</span><span class="ident">Point</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>) {
         <span class="self">self</span>.<span class="ident">insert_point</span>(<span class="self">self</span>.<span class="ident">arg_index</span>, <span class="ident">point</span>.<span class="ident">clone</span>().<span class="ident">into</span>(), <span class="ident">CoordPos::Inside</span>);
     }
 
@@ -655,26 +656,26 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// `line_intersector` the [`LineIntersector`] to use to determine intersection</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">compute_self_nodes</span>(
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>,
         <span class="ident">line_intersector</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">LineIntersector</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SegmentIntersector</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">SegmentIntersector</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">segment_intersector</span> <span class="op">=</span> <span class="ident">SegmentIntersector::new</span>(<span class="ident">line_intersector</span>, <span class="bool-val">true</span>);
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">edge_set_intersector</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::create_edge_set_intersector</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">edge_set_intersector</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::create_edge_set_intersector</span>();
 
         <span class="comment">// optimize intersection search for valid Polygons and LinearRings</span>
         <span class="kw">let</span> <span class="ident">is_rings</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">geometry</span>() {
-            <span class="ident">GeometryCow::LineString</span>(<span class="ident">ls</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ls</span>.<span class="ident">is_closed</span>(),
-            <span class="ident">GeometryCow::MultiLineString</span>(<span class="ident">ls</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ls</span>.<span class="ident">is_closed</span>(),
-            <span class="ident">GeometryCow::Polygon</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">GeometryCow::MultiPolygon</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
+            <span class="ident">GeometryCow::LineString</span>(<span class="ident">ls</span>) =&gt; <span class="ident">ls</span>.<span class="ident">is_closed</span>(),
+            <span class="ident">GeometryCow::MultiLineString</span>(<span class="ident">ls</span>) =&gt; <span class="ident">ls</span>.<span class="ident">is_closed</span>(),
+            <span class="ident">GeometryCow::Polygon</span>(<span class="kw">_</span>) <span class="op">|</span> <span class="ident">GeometryCow::MultiPolygon</span>(<span class="kw">_</span>) =&gt; <span class="bool-val">true</span>,
+            <span class="kw">_</span> =&gt; <span class="bool-val">false</span>,
         };
         <span class="kw">let</span> <span class="ident">check_for_self_intersecting_edges</span> <span class="op">=</span> <span class="op">!</span><span class="ident">is_rings</span>;
 
         <span class="ident">edge_set_intersector</span>.<span class="ident">compute_intersections_within_set</span>(
             <span class="self">self</span>.<span class="ident">edges</span>(),
             <span class="ident">check_for_self_intersecting_edges</span>,
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">segment_intersector</span>,
+            <span class="kw-2">&amp;mut</span> <span class="ident">segment_intersector</span>,
         );
 
         <span class="self">self</span>.<span class="ident">add_self_intersection_nodes</span>();
@@ -686,39 +687,39 @@
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="ident">GeometryGraph</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>,
         <span class="ident">line_intersector</span>: <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">LineIntersector</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">SegmentIntersector</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
+    ) -&gt; <span class="ident">SegmentIntersector</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">segment_intersector</span> <span class="op">=</span> <span class="ident">SegmentIntersector::new</span>(<span class="ident">line_intersector</span>, <span class="bool-val">false</span>);
         <span class="ident">segment_intersector</span>.<span class="ident">set_boundary_nodes</span>(
             <span class="self">self</span>.<span class="ident">boundary_nodes</span>().<span class="ident">into_iter</span>().<span class="ident">cloned</span>().<span class="ident">collect</span>(),
             <span class="ident">other</span>.<span class="ident">boundary_nodes</span>().<span class="ident">into_iter</span>().<span class="ident">cloned</span>().<span class="ident">collect</span>(),
         );
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">edge_set_intersector</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::create_edge_set_intersector</span>();
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">edge_set_intersector</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::create_edge_set_intersector</span>();
         <span class="ident">edge_set_intersector</span>.<span class="ident">compute_intersections_between_sets</span>(
             <span class="self">self</span>.<span class="ident">edges</span>(),
             <span class="ident">other</span>.<span class="ident">edges</span>(),
-            <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">segment_intersector</span>,
+            <span class="kw-2">&amp;mut</span> <span class="ident">segment_intersector</span>,
         );
 
         <span class="ident">segment_intersector</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">insert_point</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">arg_index</span>: <span class="ident">usize</span>, <span class="ident">coord</span>: <span class="ident">Coordinate</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>, <span class="ident">position</span>: <span class="ident">CoordPos</span>) {
-        <span class="kw">let</span> <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CoordNode</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">add_node_with_coordinate</span>(<span class="ident">coord</span>);
+    <span class="kw">fn</span> <span class="ident">insert_point</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">arg_index</span>: <span class="ident">usize</span>, <span class="ident">coord</span>: <span class="ident">Coordinate</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>, <span class="ident">position</span>: <span class="ident">CoordPos</span>) {
+        <span class="kw">let</span> <span class="ident">node</span>: <span class="kw-2">&amp;mut</span> <span class="ident">CoordNode</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">add_node_with_coordinate</span>(<span class="ident">coord</span>);
         <span class="ident">node</span>.<span class="ident">label_mut</span>().<span class="ident">set_on_position</span>(<span class="ident">arg_index</span>, <span class="ident">position</span>);
     }
 
     <span class="doccomment">/// Add the boundary points of 1-dim (line) geometries.</span>
-    <span class="kw">fn</span> <span class="ident">insert_boundary_point</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">coord</span>: <span class="ident">Coordinate</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>) {
+    <span class="kw">fn</span> <span class="ident">insert_boundary_point</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">coord</span>: <span class="ident">Coordinate</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>) {
         <span class="kw">let</span> <span class="ident">arg_index</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">arg_index</span>;
-        <span class="kw">let</span> <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CoordNode</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">add_node_with_coordinate</span>(<span class="ident">coord</span>);
+        <span class="kw">let</span> <span class="ident">node</span>: <span class="kw-2">&amp;mut</span> <span class="ident">CoordNode</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">add_node_with_coordinate</span>(<span class="ident">coord</span>);
 
-        <span class="kw">let</span> <span class="ident">label</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Label</span> <span class="op">=</span> <span class="ident">node</span>.<span class="ident">label_mut</span>();
+        <span class="kw">let</span> <span class="ident">label</span>: <span class="kw-2">&amp;mut</span> <span class="ident">Label</span> <span class="op">=</span> <span class="ident">node</span>.<span class="ident">label_mut</span>();
 
         <span class="comment">// determine the current location for the point (if any)</span>
         <span class="kw">let</span> <span class="ident">boundary_count</span> <span class="op">=</span> {
             <span class="kw">let</span> <span class="ident">prev_boundary_count</span> <span class="op">=</span>
-                <span class="kw">if</span> <span class="prelude-val">Some</span>(<span class="ident">CoordPos::OnBoundary</span>) <span class="op">=</span><span class="op">=</span> <span class="ident">label</span>.<span class="ident">position</span>(<span class="ident">arg_index</span>, <span class="ident">Direction::On</span>) {
+                <span class="kw">if</span> <span class="prelude-val">Some</span>(<span class="ident">CoordPos::OnBoundary</span>) <span class="op">==</span> <span class="ident">label</span>.<span class="ident">position</span>(<span class="ident">arg_index</span>, <span class="ident">Direction::On</span>) {
                     <span class="number">1</span>
                 } <span class="kw">else</span> {
                     <span class="number">0</span>
@@ -726,11 +727,11 @@
             <span class="ident">prev_boundary_count</span> <span class="op">+</span> <span class="number">1</span>
         };
 
-        <span class="kw">let</span> <span class="ident">new_position</span> <span class="op">=</span> <span class="self">Self</span><span class="ident">::determine_boundary</span>(<span class="ident">boundary_count</span>);
+        <span class="kw">let</span> <span class="ident">new_position</span> <span class="op">=</span> <span class="ident"><span class="self">Self</span>::determine_boundary</span>(<span class="ident">boundary_count</span>);
         <span class="ident">label</span>.<span class="ident">set_on_position</span>(<span class="ident">arg_index</span>, <span class="ident">new_position</span>);
     }
 
-    <span class="kw">fn</span> <span class="ident">add_self_intersection_nodes</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
+    <span class="kw">fn</span> <span class="ident">add_self_intersection_nodes</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) {
         <span class="kw">let</span> <span class="ident">positions_and_intersections</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="ident">CoordPos</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Coordinate</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span><span class="op">&gt;</span>)<span class="op">&gt;</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">edges</span>()
             .<span class="ident">iter</span>()
@@ -760,20 +761,19 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// If the node is a potential boundary node (e.g. came from an edge which is a boundary), then</span>
     <span class="doccomment">/// insert it as a potential boundary node.  Otherwise, just add it as a regular node.</span>
-    <span class="kw">fn</span> <span class="ident">add_self_intersection_node</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">coord</span>: <span class="ident">Coordinate</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>, <span class="ident">position</span>: <span class="ident">CoordPos</span>) {
+    <span class="kw">fn</span> <span class="ident">add_self_intersection_node</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">coord</span>: <span class="ident">Coordinate</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>, <span class="ident">position</span>: <span class="ident">CoordPos</span>) {
         <span class="comment">// if this node is already a boundary node, don&#39;t change it</span>
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_boundary_node</span>(<span class="ident">coord</span>) {
             <span class="kw">return</span>;
         }
 
-        <span class="kw">if</span> <span class="ident">position</span> <span class="op">=</span><span class="op">=</span> <span class="ident">CoordPos::OnBoundary</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">use_boundary_determination_rule</span> {
+        <span class="kw">if</span> <span class="ident">position</span> <span class="op">==</span> <span class="ident">CoordPos::OnBoundary</span> <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">use_boundary_determination_rule</span> {
             <span class="self">self</span>.<span class="ident">insert_boundary_point</span>(<span class="ident">coord</span>)
         } <span class="kw">else</span> {
             <span class="self">self</span>.<span class="ident">insert_point</span>(<span class="self">self</span>.<span class="ident">arg_index</span>, <span class="ident">coord</span>, <span class="ident">position</span>)
         }
     }
 }
-</pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="geo" data-search-index-js="../../../../../search-index.js" data-search-js="../../../../../search.js"></div>
-    <script src="../../../../../main.js"></script><script src="../../../../../source-script.js"></script><script src="../../../../../source-files.js"></script>
+</code></pre></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="geo" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0 (9d1b2106e 2022-02-23)" ></div>
 </body></html>

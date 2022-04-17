@@ -1,0 +1,1 @@
+initSidebarItems({"fn":[["monotone_chains","Partition a valid polygon into monotone pieces."]],"struct":[["MonoPoly",""],["Sweep","Monotone decomposition sweep implementation."]]});

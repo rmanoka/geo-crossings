@@ -1,4 +1,6 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;rajsekar&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;rstar-0.8.3&#x2F;src&#x2F;point.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>point.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../rstar/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input"name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;rajsekar&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;rstar-0.8.3&#x2F;src&#x2F;point.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>point.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a class="sidebar-logo" href="../../rstar/index.html"><div class="logo-container"><img class="rust-logo" src="../../rust-logo.png" alt="logo"></div>
+        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../rstar/index.html"><img class="rust-logo" src="../../rust-logo.png" alt="logo"></a><nav class="sub"><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -343,8 +345,7 @@
 <span id="343">343</span>
 <span id="344">344</span>
 <span id="345">345</span>
-</pre><pre class="rust">
-<span class="kw">use</span> <span class="ident">num_traits</span>::{<span class="ident">Bounded</span>, <span class="ident">Num</span>, <span class="ident">Signed</span>, <span class="ident">Zero</span>};
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident">num_traits</span>::{<span class="ident">Bounded</span>, <span class="ident">Num</span>, <span class="ident">Signed</span>, <span class="ident">Zero</span>};
 <span class="kw">use</span> <span class="ident">std::fmt::Debug</span>;
 
 <span class="doccomment">/// Defines a number type that is compatible with rstar.</span>
@@ -511,15 +512,15 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// The value that each dimension should be initialized with is given by the parameter `generator`.</span>
     <span class="doccomment">/// Calling `generator(n)` returns the value of dimension `n`, `n` will be in the range `0 .. Self::DIMENSIONS`.</span>
-    <span class="kw">fn</span> <span class="ident">generate</span>(<span class="ident">generator</span>: <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::Scalar</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>;
+    <span class="kw">fn</span> <span class="ident">generate</span>(<span class="ident">generator</span>: <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="ident">usize</span>) -&gt; <span class="ident"><span class="self">Self</span>::Scalar</span>) -&gt; <span class="self">Self</span>;
 
     <span class="doccomment">/// Returns a single coordinate of this point.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns the coordinate indicated by `index`. `index` is always smaller than `Self::DIMENSIONS`.</span>
-    <span class="kw">fn</span> <span class="ident">nth</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::Scalar</span>;
+    <span class="kw">fn</span> <span class="ident">nth</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="ident"><span class="self">Self</span>::Scalar</span>;
 
     <span class="doccomment">/// Mutable variant of [nth](#methods.nth).</span>
-    <span class="kw">fn</span> <span class="ident">nth_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="ident">::Scalar</span>;
+    <span class="kw">fn</span> <span class="ident">nth_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Scalar</span>;
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">PointExt</span> <span class="kw">for</span> <span class="ident">T</span> <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">Point</span> {}
@@ -527,27 +528,27 @@
 <span class="doccomment">/// Utility functions for Point</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">PointExt</span>: <span class="ident">Point</span> {
     <span class="doccomment">/// Returns a new Point with all components set to zero.</span>
-    <span class="kw">fn</span> <span class="ident">new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span><span class="ident">::from_value</span>(<span class="ident">Zero::zero</span>())
+    <span class="kw">fn</span> <span class="ident">new</span>() -&gt; <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::from_value</span>(<span class="ident">Zero::zero</span>())
     }
 
     <span class="doccomment">/// Applies `f` on each pair of components of `self` and `other`.</span>
     <span class="kw">fn</span> <span class="ident">component_wise</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>,
-        <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="self">Self</span><span class="ident">::Scalar</span>, <span class="self">Self</span><span class="ident">::Scalar</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::Scalar</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span><span class="ident">::generate</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">f</span>(<span class="self">self</span>.<span class="ident">nth</span>(<span class="ident">i</span>), <span class="ident">other</span>.<span class="ident">nth</span>(<span class="ident">i</span>)))
+        <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="ident"><span class="self">Self</span>::Scalar</span>, <span class="ident"><span class="self">Self</span>::Scalar</span>) -&gt; <span class="ident"><span class="self">Self</span>::Scalar</span>,
+    ) -&gt; <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::generate</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">f</span>(<span class="self">self</span>.<span class="ident">nth</span>(<span class="ident">i</span>), <span class="ident">other</span>.<span class="ident">nth</span>(<span class="ident">i</span>)))
     }
 
     <span class="doccomment">/// Returns whether all pairs of components of `self` and `other` pass test closure `f`. Short circuits if any result is false.</span>
     <span class="kw">fn</span> <span class="ident">all_component_wise</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>,
-        <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="self">Self</span><span class="ident">::Scalar</span>, <span class="self">Self</span><span class="ident">::Scalar</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="ident"><span class="self">Self</span>::Scalar</span>, <span class="ident"><span class="self">Self</span>::Scalar</span>) -&gt; <span class="ident">bool</span>,
+    ) -&gt; <span class="ident">bool</span> {
         <span class="comment">// TODO: Maybe do this by proper iteration</span>
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="self">Self</span><span class="ident">::DIMENSIONS</span> {
+        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident"><span class="self">Self</span>::DIMENSIONS</span> {
             <span class="kw">if</span> <span class="op">!</span><span class="ident">f</span>(<span class="self">self</span>.<span class="ident">nth</span>(<span class="ident">i</span>), <span class="ident">other</span>.<span class="ident">nth</span>(<span class="ident">i</span>)) {
                 <span class="kw">return</span> <span class="bool-val">false</span>;
             }
@@ -556,7 +557,7 @@
     }
 
     <span class="doccomment">/// Returns the dot product of `self` and `rhs`.</span>
-    <span class="kw">fn</span> <span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rhs</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::Scalar</span> {
+    <span class="kw">fn</span> <span class="ident">dot</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">rhs</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Scalar</span> {
         <span class="self">self</span>.<span class="ident">component_wise</span>(<span class="ident">rhs</span>, <span class="op">|</span><span class="ident">l</span>, <span class="ident">r</span><span class="op">|</span> <span class="ident">l</span> <span class="op">*</span> <span class="ident">r</span>)
             .<span class="ident">fold</span>(<span class="ident">Zero::zero</span>(), <span class="op">|</span><span class="ident">acc</span>, <span class="ident">val</span><span class="op">|</span> <span class="ident">acc</span> <span class="op">+</span> <span class="ident">val</span>)
     }
@@ -568,63 +569,63 @@
     <span class="doccomment">/// The `start_value` is the value the accumulator will have on the first call of the closure.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// After applying the closure to every component of the Point, fold() returns the accumulator.</span>
-    <span class="kw">fn</span> <span class="ident">fold</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">start_value</span>: <span class="ident">T</span>, <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="ident">T</span>, <span class="self">Self</span><span class="ident">::Scalar</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">T</span> {
+    <span class="kw">fn</span> <span class="ident">fold</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">start_value</span>: <span class="ident">T</span>, <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="ident">T</span>, <span class="ident"><span class="self">Self</span>::Scalar</span>) -&gt; <span class="ident">T</span>) -&gt; <span class="ident">T</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">accumulated</span> <span class="op">=</span> <span class="ident">start_value</span>;
         <span class="comment">// TODO: Maybe do this by proper iteration</span>
-        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="self">Self</span><span class="ident">::DIMENSIONS</span> {
+        <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident"><span class="self">Self</span>::DIMENSIONS</span> {
             <span class="ident">accumulated</span> <span class="op">=</span> <span class="ident">f</span>(<span class="ident">accumulated</span>, <span class="self">self</span>.<span class="ident">nth</span>(<span class="ident">i</span>));
         }
         <span class="ident">accumulated</span>
     }
 
     <span class="doccomment">/// Returns a Point with every component set to `value`.</span>
-    <span class="kw">fn</span> <span class="ident">from_value</span>(<span class="ident">value</span>: <span class="self">Self</span><span class="ident">::Scalar</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span><span class="ident">::generate</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">value</span>)
+    <span class="kw">fn</span> <span class="ident">from_value</span>(<span class="ident">value</span>: <span class="ident"><span class="self">Self</span>::Scalar</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::generate</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">value</span>)
     }
 
     <span class="doccomment">/// Returns a Point with each component set to the smallest of each component pair of `self` and `other`.</span>
-    <span class="kw">fn</span> <span class="ident">min_point</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">min_point</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">component_wise</span>(<span class="ident">other</span>, <span class="ident">min_inline</span>)
     }
 
     <span class="doccomment">/// Returns a Point with each component set to the biggest of each component pair of `self` and `other`.</span>
-    <span class="kw">fn</span> <span class="ident">max_point</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">max_point</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">component_wise</span>(<span class="ident">other</span>, <span class="ident">max_inline</span>)
     }
 
     <span class="doccomment">/// Returns the squared length of this Point as if it was a vector.</span>
-    <span class="kw">fn</span> <span class="ident">length_2</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::Scalar</span> {
+    <span class="kw">fn</span> <span class="ident">length_2</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Scalar</span> {
         <span class="self">self</span>.<span class="ident">fold</span>(<span class="ident">Zero::zero</span>(), <span class="op">|</span><span class="ident">acc</span>, <span class="ident">cur</span><span class="op">|</span> <span class="ident">cur</span> <span class="op">*</span> <span class="ident">cur</span> <span class="op">+</span> <span class="ident">acc</span>)
     }
 
     <span class="doccomment">/// Substracts `other` from `self` component wise.</span>
-    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">sub</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">component_wise</span>(<span class="ident">other</span>, <span class="op">|</span><span class="ident">l</span>, <span class="ident">r</span><span class="op">|</span> <span class="ident">l</span> <span class="op">-</span> <span class="ident">r</span>)
     }
 
     <span class="doccomment">/// Adds `other` to `self` component wise.</span>
-    <span class="kw">fn</span> <span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">add</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">component_wise</span>(<span class="ident">other</span>, <span class="op">|</span><span class="ident">l</span>, <span class="ident">r</span><span class="op">|</span> <span class="ident">l</span> <span class="op">+</span> <span class="ident">r</span>)
     }
 
     <span class="doccomment">/// Multiplies `self` with `scalar` component wise.</span>
-    <span class="kw">fn</span> <span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">scalar</span>: <span class="self">Self</span><span class="ident">::Scalar</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">mul</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">scalar</span>: <span class="ident"><span class="self">Self</span>::Scalar</span>) -&gt; <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">coordinate</span><span class="op">|</span> <span class="ident">coordinate</span> <span class="op">*</span> <span class="ident">scalar</span>)
     }
 
     <span class="doccomment">/// Applies `f` to `self` component wise.</span>
-    <span class="kw">fn</span> <span class="ident">map</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="self">Self</span><span class="ident">::Scalar</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::Scalar</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">Self</span><span class="ident">::generate</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">f</span>(<span class="self">self</span>.<span class="ident">nth</span>(<span class="ident">i</span>)))
+    <span class="kw">fn</span> <span class="ident">map</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="ident"><span class="self">Self</span>::Scalar</span>) -&gt; <span class="ident"><span class="self">Self</span>::Scalar</span>) -&gt; <span class="self">Self</span> {
+        <span class="ident"><span class="self">Self</span>::generate</span>(<span class="op">|</span><span class="ident">i</span><span class="op">|</span> <span class="ident">f</span>(<span class="self">self</span>.<span class="ident">nth</span>(<span class="ident">i</span>)))
     }
 
     <span class="doccomment">/// Returns the squared distance between `self` and `other`.</span>
-    <span class="kw">fn</span> <span class="ident">distance_2</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::Scalar</span> {
+    <span class="kw">fn</span> <span class="ident">distance_2</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Scalar</span> {
         <span class="self">self</span>.<span class="ident">sub</span>(<span class="ident">other</span>).<span class="ident">length_2</span>()
     }
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">min_inline</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">a</span>: <span class="ident">S</span>, <span class="ident">b</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">S</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">min_inline</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">a</span>: <span class="ident">S</span>, <span class="ident">b</span>: <span class="ident">S</span>) -&gt; <span class="ident">S</span>
 <span class="kw">where</span>
     <span class="ident">S</span>: <span class="ident">RTreeNum</span>,
 {
@@ -636,7 +637,7 @@
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_inline</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">a</span>: <span class="ident">S</span>, <span class="ident">b</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">S</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">max_inline</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="ident">a</span>: <span class="ident">S</span>, <span class="ident">b</span>: <span class="ident">S</span>) -&gt; <span class="ident">S</span>
 <span class="kw">where</span>
     <span class="ident">S</span>: <span class="ident">RTreeNum</span>,
 {
@@ -648,13 +649,13 @@
 }
 
 <span class="macro">macro_rules!</span> <span class="ident">count_exprs</span> {
-    () <span class="op">=</span><span class="op">&gt;</span> (<span class="number">0</span>);
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">head</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="number">1</span>);
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">head</span>:<span class="ident">expr</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">expr</span>),<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="number">1</span> <span class="op">+</span> <span class="macro">count_exprs!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>),<span class="kw-2">*</span>));
+    () =&gt; (<span class="number">0</span>);
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">head</span>:<span class="ident">expr</span>) =&gt; (<span class="number">1</span>);
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">head</span>:<span class="ident">expr</span>, $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>:<span class="ident">expr</span>),<span class="kw-2">*</span>) =&gt; (<span class="number">1</span> <span class="op">+</span> <span class="macro">count_exprs!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">tail</span>),<span class="kw-2">*</span>));
 }
 
 <span class="macro">macro_rules!</span> <span class="ident">implement_point_for_array</span> {
-    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">index</span>:<span class="ident">expr</span>),<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
+    ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">index</span>:<span class="ident">expr</span>),<span class="kw-2">*</span>) =&gt; {
         <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span> <span class="ident">Point</span> <span class="kw">for</span> [<span class="ident">S</span>; <span class="macro">count_exprs!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">index</span>),<span class="kw-2">*</span>)]
         <span class="kw">where</span>
             <span class="ident">S</span>: <span class="ident">RTreeNum</span>,
@@ -663,19 +664,19 @@
 
             <span class="kw">const</span> <span class="ident">DIMENSIONS</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="macro">count_exprs!</span>($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">index</span>),<span class="kw-2">*</span>);
 
-            <span class="kw">fn</span> <span class="ident">generate</span>(<span class="ident">generator</span>: <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+            <span class="kw">fn</span> <span class="ident">generate</span>(<span class="ident">generator</span>: <span class="kw">impl</span> <span class="ident">Fn</span>(<span class="ident">usize</span>) -&gt; <span class="ident">S</span>) -&gt; <span class="self">Self</span>
             {
                 [$(<span class="ident">generator</span>(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">index</span>)),<span class="kw-2">*</span>]
             }
 
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">nth</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::Scalar</span> {
+            <span class="kw">fn</span> <span class="ident">nth</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="ident"><span class="self">Self</span>::Scalar</span> {
                 <span class="self">self</span>[<span class="ident">index</span>]
             }
 
             <span class="attribute">#[<span class="ident">inline</span>]</span>
-            <span class="kw">fn</span> <span class="ident">nth_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="ident">::Scalar</span> {
-                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>[<span class="ident">index</span>]
+            <span class="kw">fn</span> <span class="ident">nth_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">index</span>: <span class="ident">usize</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident"><span class="self">Self</span>::Scalar</span> {
+                <span class="kw-2">&amp;mut</span> <span class="self">self</span>[<span class="ident">index</span>]
             }
         }
     };
@@ -689,7 +690,6 @@
 <span class="macro">implement_point_for_array!</span>(<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>);
 <span class="macro">implement_point_for_array!</span>(<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>);
 <span class="macro">implement_point_for_array!</span>(<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>);
-</pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rstar" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
-    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script>
+</code></pre></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="rstar" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0 (9d1b2106e 2022-02-23)" ></div>
 </body></html>

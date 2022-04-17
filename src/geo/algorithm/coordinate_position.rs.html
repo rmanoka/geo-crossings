@@ -1,4 +1,6 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;rajsekar&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;geo-0.18.0&#x2F;src&#x2F;algorithm&#x2F;coordinate_position.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>coordinate_position.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../geo/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;georust&#x2F;meta&#x2F;master&#x2F;logo&#x2F;logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input"name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;rajsekar&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;geo-0.18.0&#x2F;src&#x2F;algorithm&#x2F;coordinate_position.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>coordinate_position.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a class="sidebar-logo" href="../../../geo/index.html"><div class="logo-container"><img src="https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;georust&#x2F;meta&#x2F;master&#x2F;logo&#x2F;logo.png" alt="logo"></div>
+        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../geo/index.html"><img src="https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;georust&#x2F;meta&#x2F;master&#x2F;logo&#x2F;logo.png" alt="logo"></a><nav class="sub"><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -737,8 +739,7 @@
 <span id="737">737</span>
 <span id="738">738</span>
 <span id="739">739</span>
-</pre><pre class="rust">
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::algorithm</span>::{
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::algorithm</span>::{
     <span class="ident">bounding_rect::BoundingRect</span>, <span class="ident">dimensions::HasDimensions</span>, <span class="ident">intersects::Intersects</span>,
 };
 <span class="kw">use</span> <span class="kw">crate</span>::{
@@ -775,18 +776,18 @@
 <span class="doccomment">/// ```</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">CoordinatePosition</span> {
     <span class="kw">type</span> <span class="ident">Scalar</span>: <span class="ident">GeoNum</span>;
-    <span class="kw">fn</span> <span class="ident">coordinate_position</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">coord</span>: <span class="kw-2">&amp;</span><span class="ident">Coordinate</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Scalar</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CoordPos</span> {
+    <span class="kw">fn</span> <span class="ident">coordinate_position</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">coord</span>: <span class="kw-2">&amp;</span><span class="ident">Coordinate</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Scalar</span><span class="op">&gt;</span>) -&gt; <span class="ident">CoordPos</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">is_inside</span> <span class="op">=</span> <span class="bool-val">false</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">boundary_count</span> <span class="op">=</span> <span class="number">0</span>;
 
-        <span class="self">self</span>.<span class="ident">calculate_coordinate_position</span>(<span class="ident">coord</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">is_inside</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">boundary_count</span>);
+        <span class="self">self</span>.<span class="ident">calculate_coordinate_position</span>(<span class="ident">coord</span>, <span class="kw-2">&amp;mut</span> <span class="ident">is_inside</span>, <span class="kw-2">&amp;mut</span> <span class="ident">boundary_count</span>);
 
         <span class="comment">// “The boundary of an arbitrary collection of geometries whose interiors are disjoint</span>
         <span class="comment">// consists of geometries drawn from the boundaries of the element geometries by</span>
         <span class="comment">// application of the ‘mod 2’ union rule”</span>
         <span class="comment">//</span>
         <span class="comment">// ― OpenGIS Simple Feature Access § 6.1.15.1</span>
-        <span class="kw">if</span> <span class="ident">boundary_count</span> <span class="op">%</span> <span class="number">2</span> <span class="op">=</span><span class="op">=</span> <span class="number">1</span> {
+        <span class="kw">if</span> <span class="ident">boundary_count</span> <span class="op">%</span> <span class="number">2</span> <span class="op">==</span> <span class="number">1</span> {
             <span class="ident">CoordPos::OnBoundary</span>
         } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">is_inside</span> {
             <span class="ident">CoordPos::Inside</span>
@@ -800,9 +801,9 @@
     <span class="comment">//  2. increment `boundary_count` for each component whose Boundary contains `coord`.</span>
     <span class="kw">fn</span> <span class="ident">calculate_coordinate_position</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
-        <span class="ident">coord</span>: <span class="kw-2">&amp;</span><span class="ident">Coordinate</span><span class="op">&lt;</span><span class="self">Self</span><span class="ident">::Scalar</span><span class="op">&gt;</span>,
-        <span class="ident">is_inside</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">bool</span>,
-        <span class="ident">boundary_count</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">usize</span>,
+        <span class="ident">coord</span>: <span class="kw-2">&amp;</span><span class="ident">Coordinate</span><span class="op">&lt;</span><span class="ident"><span class="self">Self</span>::Scalar</span><span class="op">&gt;</span>,
+        <span class="ident">is_inside</span>: <span class="kw-2">&amp;mut</span> <span class="ident">bool</span>,
+        <span class="ident">boundary_count</span>: <span class="kw-2">&amp;mut</span> <span class="ident">usize</span>,
     );
 }
 
@@ -814,10 +815,10 @@
     <span class="kw">fn</span> <span class="ident">calculate_coordinate_position</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">coord</span>: <span class="kw-2">&amp;</span><span class="ident">Coordinate</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-        <span class="ident">is_inside</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">bool</span>,
-        <span class="ident">_boundary_count</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">usize</span>,
+        <span class="ident">is_inside</span>: <span class="kw-2">&amp;mut</span> <span class="ident">bool</span>,
+        <span class="ident">_boundary_count</span>: <span class="kw-2">&amp;mut</span> <span class="ident">usize</span>,
     ) {
-        <span class="kw">if</span> <span class="self">self</span> <span class="op">=</span><span class="op">=</span> <span class="ident">coord</span> {
+        <span class="kw">if</span> <span class="self">self</span> <span class="op">==</span> <span class="ident">coord</span> {
             <span class="kw-2">*</span><span class="ident">is_inside</span> <span class="op">=</span> <span class="bool-val">true</span>;
         }
     }
@@ -831,10 +832,10 @@
     <span class="kw">fn</span> <span class="ident">calculate_coordinate_position</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">coord</span>: <span class="kw-2">&amp;</span><span class="ident">Coordinate</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-        <span class="ident">is_inside</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">bool</span>,
-        <span class="ident">_boundary_count</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">usize</span>,
+        <span class="ident">is_inside</span>: <span class="kw-2">&amp;mut</span> <span class="ident">bool</span>,
+        <span class="ident">_boundary_count</span>: <span class="kw-2">&amp;mut</span> <span class="ident">usize</span>,
     ) {
-        <span class="kw">if</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span> <span class="op">=</span><span class="op">=</span> <span class="ident">coord</span> {
+        <span class="kw">if</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span> <span class="op">==</span> <span class="ident">coord</span> {
             <span class="kw-2">*</span><span class="ident">is_inside</span> <span class="op">=</span> <span class="bool-val">true</span>;
         }
     }
@@ -848,17 +849,17 @@
     <span class="kw">fn</span> <span class="ident">calculate_coordinate_position</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">coord</span>: <span class="kw-2">&amp;</span><span class="ident">Coordinate</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-        <span class="ident">is_inside</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">bool</span>,
-        <span class="ident">boundary_count</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">usize</span>,
+        <span class="ident">is_inside</span>: <span class="kw-2">&amp;mut</span> <span class="ident">bool</span>,
+        <span class="ident">boundary_count</span>: <span class="kw-2">&amp;mut</span> <span class="ident">usize</span>,
     ) {
         <span class="comment">// degenerate line is a point</span>
-        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">start</span> <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">end</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="ident">start</span> <span class="op">==</span> <span class="self">self</span>.<span class="ident">end</span> {
             <span class="self">self</span>.<span class="ident">start</span>
                 .<span class="ident">calculate_coordinate_position</span>(<span class="ident">coord</span>, <span class="ident">is_inside</span>, <span class="ident">boundary_count</span>);
             <span class="kw">return</span>;
         }
 
-        <span class="kw">if</span> <span class="ident">coord</span> <span class="op">=</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">start</span> <span class="op">|</span><span class="op">|</span> <span class="ident">coord</span> <span class="op">=</span><span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">end</span> {
+        <span class="kw">if</span> <span class="ident">coord</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">start</span> <span class="op">|</span><span class="op">|</span> <span class="ident">coord</span> <span class="op">==</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">end</span> {
             <span class="kw-2">*</span><span class="ident">boundary_count</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
         } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">intersects</span>(<span class="ident">coord</span>) {
             <span class="kw-2">*</span><span class="ident">is_inside</span> <span class="op">=</span> <span class="bool-val">true</span>;
@@ -874,15 +875,15 @@
     <span class="kw">fn</span> <span class="ident">calculate_coordinate_position</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">coord</span>: <span class="kw-2">&amp;</span><span class="ident">Coordinate</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-        <span class="ident">is_inside</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">bool</span>,
-        <span class="ident">boundary_count</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">usize</span>,
+        <span class="ident">is_inside</span>: <span class="kw-2">&amp;mut</span> <span class="ident">bool</span>,
+        <span class="ident">boundary_count</span>: <span class="kw-2">&amp;mut</span> <span class="ident">usize</span>,
     ) {
         <span class="kw">if</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="number">2</span> {
             <span class="macro">debug_assert!</span>(<span class="bool-val">false</span>, <span class="string">&quot;invalid line string with less than 2 coords&quot;</span>);
             <span class="kw">return</span>;
         }
 
-        <span class="kw">if</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">2</span> {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">2</span> {
             <span class="comment">// line string with two coords is just a line</span>
             <span class="ident">Line::new</span>(<span class="self">self</span>.<span class="number">0</span>[<span class="number">0</span>], <span class="self">self</span>.<span class="number">0</span>[<span class="number">1</span>]).<span class="ident">calculate_coordinate_position</span>(
                 <span class="ident">coord</span>,
@@ -901,7 +902,7 @@
         <span class="comment">// A closed linestring has no boundary, per SFS</span>
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">is_closed</span>() {
             <span class="comment">// since self.0 is non-empty, safe to `unwrap`</span>
-            <span class="kw">if</span> <span class="ident">coord</span> <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">first</span>().<span class="ident">unwrap</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">coord</span> <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">last</span>().<span class="ident">unwrap</span>() {
+            <span class="kw">if</span> <span class="ident">coord</span> <span class="op">==</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">first</span>().<span class="ident">unwrap</span>() <span class="op">|</span><span class="op">|</span> <span class="ident">coord</span> <span class="op">==</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">last</span>().<span class="ident">unwrap</span>() {
                 <span class="kw-2">*</span><span class="ident">boundary_count</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
                 <span class="kw">return</span>;
             }
@@ -923,8 +924,8 @@
     <span class="kw">fn</span> <span class="ident">calculate_coordinate_position</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">coord</span>: <span class="kw-2">&amp;</span><span class="ident">Coordinate</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-        <span class="ident">is_inside</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">bool</span>,
-        <span class="ident">boundary_count</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">usize</span>,
+        <span class="ident">is_inside</span>: <span class="kw-2">&amp;mut</span> <span class="ident">bool</span>,
+        <span class="ident">boundary_count</span>: <span class="kw-2">&amp;mut</span> <span class="ident">usize</span>,
     ) {
         <span class="comment">// PERF TODO: I&#39;m sure there&#39;s a better way to calculate than converting to a polygon</span>
         <span class="self">self</span>.<span class="ident">to_polygon</span>()
@@ -940,8 +941,8 @@
     <span class="kw">fn</span> <span class="ident">calculate_coordinate_position</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">coord</span>: <span class="kw-2">&amp;</span><span class="ident">Coordinate</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-        <span class="ident">is_inside</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">bool</span>,
-        <span class="ident">boundary_count</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">usize</span>,
+        <span class="ident">is_inside</span>: <span class="kw-2">&amp;mut</span> <span class="ident">bool</span>,
+        <span class="ident">boundary_count</span>: <span class="kw-2">&amp;mut</span> <span class="ident">usize</span>,
     ) {
         <span class="comment">// PERF TODO: I&#39;m sure there&#39;s a better way to calculate than converting to a polygon</span>
         <span class="self">self</span>.<span class="ident">to_polygon</span>()
@@ -957,10 +958,10 @@
     <span class="kw">fn</span> <span class="ident">calculate_coordinate_position</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">coord</span>: <span class="kw-2">&amp;</span><span class="ident">Coordinate</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-        <span class="ident">is_inside</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">bool</span>,
-        <span class="ident">_boundary_count</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">usize</span>,
+        <span class="ident">is_inside</span>: <span class="kw-2">&amp;mut</span> <span class="ident">bool</span>,
+        <span class="ident">_boundary_count</span>: <span class="kw-2">&amp;mut</span> <span class="ident">usize</span>,
     ) {
-        <span class="kw">if</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">p</span>.<span class="number">0</span> <span class="op">=</span><span class="op">=</span> <span class="ident">coord</span>) {
+        <span class="kw">if</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="kw-2">&amp;</span><span class="ident">p</span>.<span class="number">0</span> <span class="op">==</span> <span class="ident">coord</span>) {
             <span class="kw-2">*</span><span class="ident">is_inside</span> <span class="op">=</span> <span class="bool-val">true</span>;
         }
     }
@@ -974,8 +975,8 @@
     <span class="kw">fn</span> <span class="ident">calculate_coordinate_position</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">coord</span>: <span class="kw-2">&amp;</span><span class="ident">Coordinate</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-        <span class="ident">is_inside</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">bool</span>,
-        <span class="ident">boundary_count</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">usize</span>,
+        <span class="ident">is_inside</span>: <span class="kw-2">&amp;mut</span> <span class="ident">bool</span>,
+        <span class="ident">boundary_count</span>: <span class="kw-2">&amp;mut</span> <span class="ident">usize</span>,
     ) {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_empty</span>() {
             <span class="kw">return</span>;
@@ -987,19 +988,19 @@
         }
 
         <span class="kw">match</span> <span class="ident">coord_pos_relative_to_ring</span>(<span class="kw-2">*</span><span class="ident">coord</span>, <span class="self">self</span>.<span class="ident">exterior</span>()) {
-            <span class="ident">CoordPos::Outside</span> <span class="op">=</span><span class="op">&gt;</span> {}
-            <span class="ident">CoordPos::OnBoundary</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">CoordPos::Outside</span> =&gt; {}
+            <span class="ident">CoordPos::OnBoundary</span> =&gt; {
                 <span class="kw-2">*</span><span class="ident">boundary_count</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
             }
-            <span class="ident">CoordPos::Inside</span> <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">CoordPos::Inside</span> =&gt; {
                 <span class="kw">for</span> <span class="ident">hole</span> <span class="kw">in</span> <span class="self">self</span>.<span class="ident">interiors</span>() {
                     <span class="kw">match</span> <span class="ident">coord_pos_relative_to_ring</span>(<span class="kw-2">*</span><span class="ident">coord</span>, <span class="ident">hole</span>) {
-                        <span class="ident">CoordPos::Outside</span> <span class="op">=</span><span class="op">&gt;</span> {}
-                        <span class="ident">CoordPos::OnBoundary</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">CoordPos::Outside</span> =&gt; {}
+                        <span class="ident">CoordPos::OnBoundary</span> =&gt; {
                             <span class="kw-2">*</span><span class="ident">boundary_count</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
                             <span class="kw">return</span>;
                         }
-                        <span class="ident">CoordPos::Inside</span> <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">CoordPos::Inside</span> =&gt; {
                             <span class="kw">return</span>;
                         }
                     }
@@ -1019,8 +1020,8 @@
     <span class="kw">fn</span> <span class="ident">calculate_coordinate_position</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">coord</span>: <span class="kw-2">&amp;</span><span class="ident">Coordinate</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-        <span class="ident">is_inside</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">bool</span>,
-        <span class="ident">boundary_count</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">usize</span>,
+        <span class="ident">is_inside</span>: <span class="kw-2">&amp;mut</span> <span class="ident">bool</span>,
+        <span class="ident">boundary_count</span>: <span class="kw-2">&amp;mut</span> <span class="ident">usize</span>,
     ) {
         <span class="kw">for</span> <span class="ident">line_string</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span> {
             <span class="ident">line_string</span>.<span class="ident">calculate_coordinate_position</span>(<span class="ident">coord</span>, <span class="ident">is_inside</span>, <span class="ident">boundary_count</span>);
@@ -1036,8 +1037,8 @@
     <span class="kw">fn</span> <span class="ident">calculate_coordinate_position</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">coord</span>: <span class="kw-2">&amp;</span><span class="ident">Coordinate</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-        <span class="ident">is_inside</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">bool</span>,
-        <span class="ident">boundary_count</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">usize</span>,
+        <span class="ident">is_inside</span>: <span class="kw-2">&amp;mut</span> <span class="ident">bool</span>,
+        <span class="ident">boundary_count</span>: <span class="kw-2">&amp;mut</span> <span class="ident">usize</span>,
     ) {
         <span class="kw">for</span> <span class="ident">polygon</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span> {
             <span class="ident">polygon</span>.<span class="ident">calculate_coordinate_position</span>(<span class="ident">coord</span>, <span class="ident">is_inside</span>, <span class="ident">boundary_count</span>);
@@ -1053,8 +1054,8 @@
     <span class="kw">fn</span> <span class="ident">calculate_coordinate_position</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">coord</span>: <span class="kw-2">&amp;</span><span class="ident">Coordinate</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-        <span class="ident">is_inside</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">bool</span>,
-        <span class="ident">boundary_count</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">usize</span>,
+        <span class="ident">is_inside</span>: <span class="kw-2">&amp;mut</span> <span class="ident">bool</span>,
+        <span class="ident">boundary_count</span>: <span class="kw-2">&amp;mut</span> <span class="ident">usize</span>,
     ) {
         <span class="kw">for</span> <span class="ident">geometry</span> <span class="kw">in</span> <span class="self">self</span> {
             <span class="ident">geometry</span>.<span class="ident">calculate_coordinate_position</span>(<span class="ident">coord</span>, <span class="ident">is_inside</span>, <span class="ident">boundary_count</span>);
@@ -1067,29 +1068,29 @@
     <span class="ident">T</span>: <span class="ident">GeoNum</span>,
 {
     <span class="kw">type</span> <span class="ident">Scalar</span> <span class="op">=</span> <span class="ident">T</span>;
-    <span class="kw">crate</span><span class="macro">::geometry_delegate_impl!</span> {
+    <span class="macro">crate::geometry_delegate_impl!</span> {
         <span class="kw">fn</span> <span class="ident">calculate_coordinate_position</span>(
             <span class="kw-2">&amp;</span><span class="self">self</span>,
             <span class="ident">coord</span>: <span class="kw-2">&amp;</span><span class="ident">Coordinate</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-            <span class="ident">is_inside</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">bool</span>,
-            <span class="ident">boundary_count</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> ();
+            <span class="ident">is_inside</span>: <span class="kw-2">&amp;mut</span> <span class="ident">bool</span>,
+            <span class="ident">boundary_count</span>: <span class="kw-2">&amp;mut</span> <span class="ident">usize</span>) -&gt; ();
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>: <span class="ident">GeoNum</span><span class="op">&gt;</span> <span class="ident">CoordinatePosition</span> <span class="kw">for</span> <span class="ident">GeometryCow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Scalar</span> <span class="op">=</span> <span class="ident">T</span>;
-    <span class="kw">crate</span><span class="macro">::geometry_cow_delegate_impl!</span> {
+    <span class="macro">crate::geometry_cow_delegate_impl!</span> {
         <span class="kw">fn</span> <span class="ident">calculate_coordinate_position</span>(
             <span class="kw-2">&amp;</span><span class="self">self</span>,
             <span class="ident">coord</span>: <span class="kw-2">&amp;</span><span class="ident">Coordinate</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
-            <span class="ident">is_inside</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">bool</span>,
-            <span class="ident">boundary_count</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> ();
+            <span class="ident">is_inside</span>: <span class="kw-2">&amp;mut</span> <span class="ident">bool</span>,
+            <span class="ident">boundary_count</span>: <span class="kw-2">&amp;mut</span> <span class="ident">usize</span>) -&gt; ();
     }
 }
 
 <span class="doccomment">/// Calculate the position of a `Coordinate` relative to a</span>
 <span class="doccomment">/// closed `LineString`.</span>
-<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">coord_pos_relative_to_ring</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">coord</span>: <span class="ident">Coordinate</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">linestring</span>: <span class="kw-2">&amp;</span><span class="ident">LineString</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CoordPos</span>
+<span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">coord_pos_relative_to_ring</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">coord</span>: <span class="ident">Coordinate</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">linestring</span>: <span class="kw-2">&amp;</span><span class="ident">LineString</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="ident">CoordPos</span>
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">GeoNum</span>,
 {
@@ -1104,10 +1105,10 @@
     <span class="kw">if</span> <span class="ident">linestring</span>.<span class="number">0</span>.<span class="ident">is_empty</span>() {
         <span class="kw">return</span> <span class="ident">CoordPos::Outside</span>;
     }
-    <span class="kw">if</span> <span class="ident">linestring</span>.<span class="number">0</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">1</span> {
+    <span class="kw">if</span> <span class="ident">linestring</span>.<span class="number">0</span>.<span class="ident">len</span>() <span class="op">==</span> <span class="number">1</span> {
         <span class="comment">// If LineString has one point, it will not generate</span>
         <span class="comment">// any lines.  So, we handle this edge case separately.</span>
-        <span class="kw">return</span> <span class="kw">if</span> <span class="ident">coord</span> <span class="op">=</span><span class="op">=</span> <span class="ident">linestring</span>.<span class="number">0</span>[<span class="number">0</span>] {
+        <span class="kw">return</span> <span class="kw">if</span> <span class="ident">coord</span> <span class="op">==</span> <span class="ident">linestring</span>.<span class="number">0</span>[<span class="number">0</span>] {
             <span class="ident">CoordPos::OnBoundary</span>
         } <span class="kw">else</span> {
             <span class="ident">CoordPos::Outside</span>
@@ -1135,7 +1136,7 @@
         <span class="comment">// edge case where the ray would intersect a</span>
         <span class="comment">// horizontal segment of the ring infinitely many</span>
         <span class="comment">// times, and is irrelevant for the calculation.</span>
-        <span class="kw">if</span> <span class="ident">line</span>.<span class="ident">start</span>.<span class="ident">y</span> <span class="op">=</span><span class="op">=</span> <span class="ident">line</span>.<span class="ident">end</span>.<span class="ident">y</span> {
+        <span class="kw">if</span> <span class="ident">line</span>.<span class="ident">start</span>.<span class="ident">y</span> <span class="op">==</span> <span class="ident">line</span>.<span class="ident">end</span>.<span class="ident">y</span> {
             <span class="kw">continue</span>;
         }
 
@@ -1150,8 +1151,8 @@
         <span class="comment">//      at the point of intersection</span>
         <span class="comment">//   2. if the ray touches a vertex,</span>
         <span class="comment">//      but doesn&#39;t enter/exit at that point</span>
-        <span class="kw">if</span> (<span class="ident">line</span>.<span class="ident">start</span>.<span class="ident">y</span> <span class="op">=</span><span class="op">=</span> <span class="ident">coord</span>.<span class="ident">y</span> <span class="op">&amp;&amp;</span> <span class="ident">line</span>.<span class="ident">end</span>.<span class="ident">y</span> <span class="op">&lt;</span> <span class="ident">coord</span>.<span class="ident">y</span>)
-            <span class="op">|</span><span class="op">|</span> (<span class="ident">line</span>.<span class="ident">end</span>.<span class="ident">y</span> <span class="op">=</span><span class="op">=</span> <span class="ident">coord</span>.<span class="ident">y</span> <span class="op">&amp;&amp;</span> <span class="ident">line</span>.<span class="ident">start</span>.<span class="ident">y</span> <span class="op">&lt;</span> <span class="ident">coord</span>.<span class="ident">y</span>)
+        <span class="kw">if</span> (<span class="ident">line</span>.<span class="ident">start</span>.<span class="ident">y</span> <span class="op">==</span> <span class="ident">coord</span>.<span class="ident">y</span> <span class="op">&amp;&amp;</span> <span class="ident">line</span>.<span class="ident">end</span>.<span class="ident">y</span> <span class="op">&lt;</span> <span class="ident">coord</span>.<span class="ident">y</span>)
+            <span class="op">|</span><span class="op">|</span> (<span class="ident">line</span>.<span class="ident">end</span>.<span class="ident">y</span> <span class="op">==</span> <span class="ident">coord</span>.<span class="ident">y</span> <span class="op">&amp;&amp;</span> <span class="ident">line</span>.<span class="ident">start</span>.<span class="ident">y</span> <span class="op">&lt;</span> <span class="ident">coord</span>.<span class="ident">y</span>)
         {
             <span class="kw">continue</span>;
         }
@@ -1170,7 +1171,7 @@
             <span class="ident">crossings</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
         }
     }
-    <span class="kw">if</span> <span class="ident">crossings</span> <span class="op">%</span> <span class="number">2</span> <span class="op">=</span><span class="op">=</span> <span class="number">1</span> {
+    <span class="kw">if</span> <span class="ident">crossings</span> <span class="op">%</span> <span class="number">2</span> <span class="op">==</span> <span class="number">1</span> {
         <span class="ident">CoordPos::Inside</span>
     } <span class="kw">else</span> {
         <span class="ident">CoordPos::Outside</span>
@@ -1265,7 +1266,7 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_simple_line</span>() {
-        <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::point</span>;
+        <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::point</span>;
         <span class="kw">let</span> <span class="ident">line</span> <span class="op">=</span> <span class="ident">Line::new</span>(<span class="macro">point!</span>[<span class="ident">x</span>: <span class="number">0.0</span>, <span class="ident">y</span>: <span class="number">0.0</span>], <span class="macro">point!</span>[<span class="ident">x</span>: <span class="number">10.0</span>, <span class="ident">y</span>: <span class="number">10.0</span>]);
 
         <span class="kw">let</span> <span class="ident">start</span> <span class="op">=</span> <span class="ident">Coordinate</span> { <span class="ident">x</span>: <span class="number">0.0</span>, <span class="ident">y</span>: <span class="number">0.0</span> };
@@ -1477,7 +1478,6 @@
         );
     }
 }
-</pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="geo" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
-    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script>
+</code></pre></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="geo" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0 (9d1b2106e 2022-02-23)" ></div>
 </body></html>

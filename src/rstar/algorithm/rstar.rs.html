@@ -1,4 +1,6 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;rajsekar&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;rstar-0.8.3&#x2F;src&#x2F;algorithm&#x2F;rstar.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>rstar.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../rstar/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input"name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;rajsekar&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;rstar-0.8.3&#x2F;src&#x2F;algorithm&#x2F;rstar.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>rstar.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a class="sidebar-logo" href="../../../rstar/index.html"><div class="logo-container"><img class="rust-logo" src="../../../rust-logo.png" alt="logo"></div>
+        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../rstar/index.html"><img class="rust-logo" src="../../../rust-logo.png" alt="logo"></a><nav class="sub"><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -353,13 +355,12 @@
 <span id="353">353</span>
 <span id="354">354</span>
 <span id="355">355</span>
-</pre><pre class="rust">
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::envelope::Envelope</span>;
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::node</span>::{<span class="ident">envelope_for_children</span>, <span class="ident">ParentNode</span>, <span class="ident">RTreeNode</span>};
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::object::RTreeObject</span>;
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::params</span>::{<span class="ident">InsertionStrategy</span>, <span class="ident">RTreeParams</span>};
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::point</span>::{<span class="ident">Point</span>, <span class="ident">PointExt</span>};
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::rtree::RTree</span>;
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::envelope::Envelope</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::node</span>::{<span class="ident">envelope_for_children</span>, <span class="ident">ParentNode</span>, <span class="ident">RTreeNode</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::object::RTreeObject</span>;
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::params</span>::{<span class="ident">InsertionStrategy</span>, <span class="ident">RTreeParams</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::point</span>::{<span class="ident">Point</span>, <span class="ident">PointExt</span>};
+<span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::rtree::RTree</span>;
 <span class="kw">use</span> <span class="ident">num_traits</span>::{<span class="ident">Bounded</span>, <span class="ident">Zero</span>};
 
 <span class="doccomment">/// Inserts points according to the r-star heuristic.</span>
@@ -382,7 +383,7 @@
 }
 
 <span class="kw">impl</span> <span class="ident">InsertionStrategy</span> <span class="kw">for</span> <span class="ident">RStarInsertionStrategy</span> {
-    <span class="kw">fn</span> <span class="ident">insert</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Params</span><span class="op">&gt;</span>(<span class="ident">tree</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">RTree</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Params</span><span class="op">&gt;</span>, <span class="ident">t</span>: <span class="ident">T</span>)
+    <span class="kw">fn</span> <span class="ident">insert</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Params</span><span class="op">&gt;</span>(<span class="ident">tree</span>: <span class="kw-2">&amp;mut</span> <span class="ident">RTree</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Params</span><span class="op">&gt;</span>, <span class="ident">t</span>: <span class="ident">T</span>)
     <span class="kw">where</span>
         <span class="ident">Params</span>: <span class="ident">RTreeParams</span>,
         <span class="ident">T</span>: <span class="ident">RTreeObject</span>,
@@ -398,8 +399,8 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">target_height</span> <span class="op">=</span> <span class="number">0</span>;
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">insertion_stack</span> <span class="op">=</span> <span class="ident">Vec::new</span>();
         <span class="kw">match</span> <span class="ident">first</span> {
-            <span class="ident">InsertionResult::Split</span>(<span class="ident">node</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">insertion_stack</span>.<span class="ident">push</span>(<span class="ident">PerformSplit</span>(<span class="ident">node</span>)),
-            <span class="ident">InsertionResult::Reinsert</span>(<span class="ident">nodes_to_reinsert</span>, <span class="ident">real_target_height</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">InsertionResult::Split</span>(<span class="ident">node</span>) =&gt; <span class="ident">insertion_stack</span>.<span class="ident">push</span>(<span class="ident">PerformSplit</span>(<span class="ident">node</span>)),
+            <span class="ident">InsertionResult::Reinsert</span>(<span class="ident">nodes_to_reinsert</span>, <span class="ident">real_target_height</span>) =&gt; {
                 <span class="ident">insertion_stack</span>.<span class="ident">extend</span>(
                     <span class="ident">nodes_to_reinsert</span>
                         .<span class="ident">into_iter</span>()
@@ -407,12 +408,12 @@
                 );
                 <span class="ident">target_height</span> <span class="op">=</span> <span class="ident">real_target_height</span>;
             }
-            <span class="ident">InsertionResult::Complete</span> <span class="op">=</span><span class="op">&gt;</span> {}
+            <span class="ident">InsertionResult::Complete</span> =&gt; {}
         };
 
         <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">next</span>) <span class="op">=</span> <span class="ident">insertion_stack</span>.<span class="ident">pop</span>() {
             <span class="kw">match</span> <span class="ident">next</span> {
-                <span class="ident">PerformSplit</span>(<span class="ident">node</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">PerformSplit</span>(<span class="ident">node</span>) =&gt; {
                     <span class="comment">// The root node was split, create a new root and increase height</span>
                     <span class="kw">let</span> <span class="ident">new_root</span> <span class="op">=</span> <span class="ident">ParentNode::new_root</span>::<span class="op">&lt;</span><span class="ident">Params</span><span class="op">&gt;</span>();
                     <span class="kw">let</span> <span class="ident">old_root</span> <span class="op">=</span> <span class="ident">::std::mem::replace</span>(<span class="ident">tree</span>.<span class="ident">root_mut</span>(), <span class="ident">new_root</span>);
@@ -423,14 +424,14 @@
                     <span class="ident">root</span>.<span class="ident">children</span>.<span class="ident">push</span>(<span class="ident">node</span>);
                     <span class="ident">target_height</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
                 }
-                <span class="ident">PerformReinsert</span>(<span class="ident">node_to_reinsert</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">PerformReinsert</span>(<span class="ident">node_to_reinsert</span>) =&gt; {
                     <span class="kw">let</span> <span class="ident">root</span> <span class="op">=</span> <span class="ident">tree</span>.<span class="ident">root_mut</span>();
                     <span class="kw">match</span> <span class="ident">forced_insertion</span>::<span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Params</span><span class="op">&gt;</span>(<span class="ident">root</span>, <span class="ident">node_to_reinsert</span>, <span class="ident">target_height</span>) {
-                        <span class="ident">InsertionResult::Split</span>(<span class="ident">node</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">insertion_stack</span>.<span class="ident">push</span>(<span class="ident">PerformSplit</span>(<span class="ident">node</span>)),
-                        <span class="ident">InsertionResult::Reinsert</span>(<span class="kw">_</span>, <span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                        <span class="ident">InsertionResult::Split</span>(<span class="ident">node</span>) =&gt; <span class="ident">insertion_stack</span>.<span class="ident">push</span>(<span class="ident">PerformSplit</span>(<span class="ident">node</span>)),
+                        <span class="ident">InsertionResult::Reinsert</span>(<span class="kw">_</span>, <span class="kw">_</span>) =&gt; {
                             <span class="macro">panic!</span>(<span class="string">&quot;Unexpected reinsert. This is a bug in rstar.&quot;</span>)
                         }
-                        <span class="ident">InsertionResult::Complete</span> <span class="op">=</span><span class="op">&gt;</span> {}
+                        <span class="ident">InsertionResult::Complete</span> =&gt; {}
                     }
                 }
             }
@@ -439,10 +440,10 @@
 }
 
 <span class="kw">fn</span> <span class="ident">forced_insertion</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Params</span><span class="op">&gt;</span>(
-    <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ParentNode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+    <span class="ident">node</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ParentNode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
     <span class="ident">t</span>: <span class="ident">RTreeNode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
     <span class="ident">target_height</span>: <span class="ident">usize</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">InsertionResult</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+) -&gt; <span class="ident">InsertionResult</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">RTreeObject</span>,
     <span class="ident">Params</span>: <span class="ident">RTreeParams</span>,
@@ -450,7 +451,7 @@
     <span class="ident">node</span>.<span class="ident">envelope</span>.<span class="ident">merge</span>(<span class="kw-2">&amp;</span><span class="ident">t</span>.<span class="ident">envelope</span>());
     <span class="kw">let</span> <span class="ident">expand_index</span> <span class="op">=</span> <span class="ident">choose_subtree</span>(<span class="ident">node</span>, <span class="kw-2">&amp;</span><span class="ident">t</span>);
 
-    <span class="kw">if</span> <span class="ident">target_height</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">node</span>.<span class="ident">children</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="ident">expand_index</span> {
+    <span class="kw">if</span> <span class="ident">target_height</span> <span class="op">==</span> <span class="number">0</span> <span class="op">|</span><span class="op">|</span> <span class="ident">node</span>.<span class="ident">children</span>.<span class="ident">len</span>() <span class="op">&lt;</span> <span class="ident">expand_index</span> {
         <span class="comment">// Force insertion into this node</span>
         <span class="ident">node</span>.<span class="ident">children</span>.<span class="ident">push</span>(<span class="ident">t</span>);
         <span class="kw">return</span> <span class="ident">resolve_overflow_without_reinsertion</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">Params</span><span class="op">&gt;</span>(<span class="ident">node</span>);
@@ -458,12 +459,12 @@
 
     <span class="kw">if</span> <span class="kw">let</span> <span class="ident">RTreeNode::Parent</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">follow</span>) <span class="op">=</span> <span class="ident">node</span>.<span class="ident">children</span>[<span class="ident">expand_index</span>] {
         <span class="kw">match</span> <span class="ident">forced_insertion</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">Params</span><span class="op">&gt;</span>(<span class="ident">follow</span>, <span class="ident">t</span>, <span class="ident">target_height</span> <span class="op">-</span> <span class="number">1</span>) {
-            <span class="ident">InsertionResult::Split</span>(<span class="ident">child</span>) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="ident">InsertionResult::Split</span>(<span class="ident">child</span>) =&gt; {
                 <span class="ident">node</span>.<span class="ident">envelope</span>.<span class="ident">merge</span>(<span class="kw-2">&amp;</span><span class="ident">child</span>.<span class="ident">envelope</span>());
                 <span class="ident">node</span>.<span class="ident">children</span>.<span class="ident">push</span>(<span class="ident">child</span>);
                 <span class="ident">resolve_overflow_without_reinsertion</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">Params</span><span class="op">&gt;</span>(<span class="ident">node</span>)
             }
-            <span class="ident">other</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">other</span>,
+            <span class="ident">other</span> =&gt; <span class="ident">other</span>,
         }
     } <span class="kw">else</span> {
         <span class="macro">unreachable!</span>(<span class="string">&quot;This is a bug in rstar.&quot;</span>)
@@ -471,10 +472,10 @@
 }
 
 <span class="kw">fn</span> <span class="ident">recursive_insert</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Params</span><span class="op">&gt;</span>(
-    <span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ParentNode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
+    <span class="ident">node</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ParentNode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
     <span class="ident">t</span>: <span class="ident">RTreeNode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>,
     <span class="ident">current_height</span>: <span class="ident">usize</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">InsertionResult</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+) -&gt; <span class="ident">InsertionResult</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">RTreeObject</span>,
     <span class="ident">Params</span>: <span class="ident">RTreeParams</span>,
@@ -495,31 +496,31 @@
     };
 
     <span class="kw">match</span> <span class="ident">expand</span> {
-        <span class="ident">InsertionResult::Split</span>(<span class="ident">child</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">InsertionResult::Split</span>(<span class="ident">child</span>) =&gt; {
             <span class="ident">node</span>.<span class="ident">envelope</span>.<span class="ident">merge</span>(<span class="kw-2">&amp;</span><span class="ident">child</span>.<span class="ident">envelope</span>());
             <span class="ident">node</span>.<span class="ident">children</span>.<span class="ident">push</span>(<span class="ident">child</span>);
             <span class="ident">resolve_overflow</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">Params</span><span class="op">&gt;</span>(<span class="ident">node</span>, <span class="ident">current_height</span>)
         }
-        <span class="ident">InsertionResult::Reinsert</span>(<span class="ident">a</span>, <span class="ident">b</span>) <span class="op">=</span><span class="op">&gt;</span> {
+        <span class="ident">InsertionResult::Reinsert</span>(<span class="ident">a</span>, <span class="ident">b</span>) =&gt; {
             <span class="ident">node</span>.<span class="ident">envelope</span> <span class="op">=</span> <span class="ident">envelope_for_children</span>(<span class="kw-2">&amp;</span><span class="ident">node</span>.<span class="ident">children</span>);
             <span class="ident">InsertionResult::Reinsert</span>(<span class="ident">a</span>, <span class="ident">b</span>)
         }
-        <span class="ident">other</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">other</span>,
+        <span class="ident">other</span> =&gt; <span class="ident">other</span>,
     }
 }
 
-<span class="kw">fn</span> <span class="ident">choose_subtree</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ParentNode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">to_insert</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">RTreeNode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span>
+<span class="kw">fn</span> <span class="ident">choose_subtree</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span>, <span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">node</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ParentNode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">to_insert</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="ident">RTreeNode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="ident">usize</span>
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">RTreeObject</span>,
 {
     <span class="kw">let</span> <span class="ident">all_leaves</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">node</span>.<span class="ident">children</span>.<span class="ident">first</span>() {
-        <span class="prelude-val">Some</span>(<span class="ident">RTreeNode::Leaf</span>(<span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">usize::max_value</span>(),
-        <span class="prelude-val">Some</span>(<span class="ident">RTreeNode::Parent</span>(<span class="kw-2">ref</span> <span class="ident">data</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">data</span>
+        <span class="prelude-val">Some</span>(<span class="ident">RTreeNode::Leaf</span>(<span class="kw">_</span>)) =&gt; <span class="kw">return</span> <span class="ident">usize::max_value</span>(),
+        <span class="prelude-val">Some</span>(<span class="ident">RTreeNode::Parent</span>(<span class="kw-2">ref</span> <span class="ident">data</span>)) =&gt; <span class="ident">data</span>
             .<span class="ident">children</span>
             .<span class="ident">first</span>()
             .<span class="ident">map</span>(<span class="ident">RTreeNode::is_leaf</span>)
             .<span class="ident">unwrap_or</span>(<span class="bool-val">true</span>),
-        <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">usize::max_value</span>(),
+        <span class="kw">_</span> =&gt; <span class="kw">return</span> <span class="ident">usize::max_value</span>(),
     };
 
     <span class="kw">let</span> <span class="ident">zero</span>: <span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">T::Envelope</span> <span class="kw">as</span> <span class="ident">Envelope</span><span class="op">&gt;</span><span class="ident">::Point</span> <span class="kw">as</span> <span class="ident">Point</span><span class="op">&gt;</span><span class="ident">::Scalar</span> <span class="op">=</span> <span class="ident">Zero::zero</span>();
@@ -538,7 +539,7 @@
             }
         }
     }
-    <span class="kw">if</span> <span class="ident">inclusion_count</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+    <span class="kw">if</span> <span class="ident">inclusion_count</span> <span class="op">==</span> <span class="number">0</span> {
         <span class="comment">// No inclusion found, subtree depends on overlap and area increase</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">min</span> <span class="op">=</span> (<span class="ident">zero</span>, <span class="ident">zero</span>, <span class="ident">zero</span>);
 
@@ -551,7 +552,7 @@
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">overlap</span> <span class="op">=</span> <span class="ident">zero</span>;
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_overlap</span> <span class="op">=</span> <span class="ident">zero</span>;
                 <span class="kw">for</span> <span class="ident">child2</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">node</span>.<span class="ident">children</span> {
-                    <span class="kw">if</span> <span class="ident">child1</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span> <span class="op">!</span><span class="op">=</span> <span class="ident">child2</span> <span class="kw">as</span> <span class="kw-2">*</span><span class="kw">const</span> <span class="kw">_</span> {
+                    <span class="kw">if</span> <span class="ident">child1</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> <span class="op">!</span><span class="op">=</span> <span class="ident">child2</span> <span class="kw">as</span> <span class="kw-2">*const</span> <span class="kw">_</span> {
                         <span class="kw">let</span> <span class="ident">child_envelope</span> <span class="op">=</span> <span class="ident">child2</span>.<span class="ident">envelope</span>();
                         <span class="kw">let</span> <span class="ident">temp1</span> <span class="op">=</span> <span class="ident">envelope</span>.<span class="ident">intersection_area</span>(<span class="kw-2">&amp;</span><span class="ident">child_envelope</span>);
                         <span class="ident">overlap</span> <span class="op">=</span> <span class="ident">overlap</span> <span class="op">+</span> <span class="ident">temp1</span>;
@@ -568,7 +569,7 @@
             <span class="kw">let</span> <span class="ident">area</span> <span class="op">=</span> <span class="ident">new_envelope</span>.<span class="ident">area</span>();
             <span class="kw">let</span> <span class="ident">area_increase</span> <span class="op">=</span> <span class="ident">area</span> <span class="op">-</span> <span class="ident">envelope</span>.<span class="ident">area</span>();
             <span class="kw">let</span> <span class="ident">new_min</span> <span class="op">=</span> (<span class="ident">overlap_increase</span>, <span class="ident">area_increase</span>, <span class="ident">area</span>);
-            <span class="kw">if</span> <span class="ident">new_min</span> <span class="op">&lt;</span> <span class="ident">min</span> <span class="op">|</span><span class="op">|</span> <span class="ident">index</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+            <span class="kw">if</span> <span class="ident">new_min</span> <span class="op">&lt;</span> <span class="ident">min</span> <span class="op">|</span><span class="op">|</span> <span class="ident">index</span> <span class="op">==</span> <span class="number">0</span> {
                 <span class="ident">min</span> <span class="op">=</span> <span class="ident">new_min</span>;
                 <span class="ident">min_index</span> <span class="op">=</span> <span class="ident">index</span>;
             }
@@ -578,7 +579,7 @@
 }
 
 <span class="comment">// Does never return a request for reinsertion</span>
-<span class="kw">fn</span> <span class="ident">resolve_overflow_without_reinsertion</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Params</span><span class="op">&gt;</span>(<span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ParentNode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">InsertionResult</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">fn</span> <span class="ident">resolve_overflow_without_reinsertion</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Params</span><span class="op">&gt;</span>(<span class="ident">node</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ParentNode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="ident">InsertionResult</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">RTreeObject</span>,
     <span class="ident">Params</span>: <span class="ident">RTreeParams</span>,
@@ -591,12 +592,12 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">resolve_overflow</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Params</span><span class="op">&gt;</span>(<span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ParentNode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">current_depth</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">InsertionResult</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">fn</span> <span class="ident">resolve_overflow</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Params</span><span class="op">&gt;</span>(<span class="ident">node</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ParentNode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">current_depth</span>: <span class="ident">usize</span>) -&gt; <span class="ident">InsertionResult</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">RTreeObject</span>,
     <span class="ident">Params</span>: <span class="ident">RTreeParams</span>,
 {
-    <span class="kw">if</span> <span class="ident">Params::REINSERTION_COUNT</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
+    <span class="kw">if</span> <span class="ident">Params::REINSERTION_COUNT</span> <span class="op">==</span> <span class="number">0</span> {
         <span class="ident">resolve_overflow_without_reinsertion</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">Params</span><span class="op">&gt;</span>(<span class="ident">node</span>)
     } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">node</span>.<span class="ident">children</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="ident">Params::MAX_SIZE</span> {
         <span class="kw">let</span> <span class="ident">nodes_for_reinsertion</span> <span class="op">=</span> <span class="ident">get_nodes_for_reinsertion</span>::<span class="op">&lt;</span><span class="kw">_</span>, <span class="ident">Params</span><span class="op">&gt;</span>(<span class="ident">node</span>);
@@ -606,7 +607,7 @@
     }
 }
 
-<span class="kw">fn</span> <span class="ident">split</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Params</span><span class="op">&gt;</span>(<span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ParentNode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">RTreeNode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
+<span class="kw">fn</span> <span class="ident">split</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Params</span><span class="op">&gt;</span>(<span class="ident">node</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ParentNode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="ident">RTreeNode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">RTreeObject</span>,
     <span class="ident">Params</span>: <span class="ident">RTreeParams</span>,
@@ -615,7 +616,7 @@
     <span class="kw">let</span> <span class="ident">zero</span> <span class="op">=</span> <span class="op">&lt;</span><span class="op">&lt;</span><span class="ident">T::Envelope</span> <span class="kw">as</span> <span class="ident">Envelope</span><span class="op">&gt;</span><span class="ident">::Point</span> <span class="kw">as</span> <span class="ident">Point</span><span class="op">&gt;</span><span class="ident">::Scalar::zero</span>();
     <span class="macro">debug_assert!</span>(<span class="ident">node</span>.<span class="ident">children</span>.<span class="ident">len</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">2</span>);
     <span class="comment">// Sort along axis</span>
-    <span class="ident">T::Envelope::sort_envelopes</span>(<span class="ident">axis</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">node</span>.<span class="ident">children</span>);
+    <span class="ident">T::Envelope::sort_envelopes</span>(<span class="ident">axis</span>, <span class="kw-2">&amp;mut</span> <span class="ident">node</span>.<span class="ident">children</span>);
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">best</span> <span class="op">=</span> (<span class="ident">zero</span>, <span class="ident">zero</span>);
     <span class="kw">let</span> <span class="ident">min_size</span> <span class="op">=</span> <span class="ident">Params::MIN_SIZE</span>;
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">best_index</span> <span class="op">=</span> <span class="ident">min_size</span>;
@@ -634,7 +635,7 @@
         <span class="kw">let</span> <span class="ident">overlap_value</span> <span class="op">=</span> <span class="ident">first_envelope</span>.<span class="ident">intersection_area</span>(<span class="kw-2">&amp;</span><span class="ident">second_envelope</span>);
         <span class="kw">let</span> <span class="ident">area_value</span> <span class="op">=</span> <span class="ident">first_envelope</span>.<span class="ident">area</span>() <span class="op">+</span> <span class="ident">second_envelope</span>.<span class="ident">area</span>();
         <span class="kw">let</span> <span class="ident">new_best</span> <span class="op">=</span> (<span class="ident">overlap_value</span>, <span class="ident">area_value</span>);
-        <span class="kw">if</span> <span class="ident">new_best</span> <span class="op">&lt;</span> <span class="ident">best</span> <span class="op">|</span><span class="op">|</span> <span class="ident">k</span> <span class="op">=</span><span class="op">=</span> <span class="ident">min_size</span> {
+        <span class="kw">if</span> <span class="ident">new_best</span> <span class="op">&lt;</span> <span class="ident">best</span> <span class="op">|</span><span class="op">|</span> <span class="ident">k</span> <span class="op">==</span> <span class="ident">min_size</span> {
             <span class="ident">best</span> <span class="op">=</span> <span class="ident">new_best</span>;
             <span class="ident">best_index</span> <span class="op">=</span> <span class="ident">k</span>;
         }
@@ -644,7 +645,7 @@
     <span class="ident">RTreeNode::Parent</span>(<span class="ident">ParentNode::new_parent</span>(<span class="ident">off_split</span>))
 }
 
-<span class="kw">fn</span> <span class="ident">get_split_axis</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Params</span><span class="op">&gt;</span>(<span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ParentNode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span>
+<span class="kw">fn</span> <span class="ident">get_split_axis</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Params</span><span class="op">&gt;</span>(<span class="ident">node</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ParentNode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="ident">usize</span>
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">RTreeObject</span>,
     <span class="ident">Params</span>: <span class="ident">RTreeParams</span>,
@@ -655,7 +656,7 @@
     <span class="kw">let</span> <span class="ident">until</span> <span class="op">=</span> <span class="ident">node</span>.<span class="ident">children</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="ident">min_size</span> <span class="op">+</span> <span class="number">1</span>;
     <span class="kw">for</span> <span class="ident">axis</span> <span class="kw">in</span> <span class="number">0</span>..<span class="op">&lt;</span><span class="ident">T::Envelope</span> <span class="kw">as</span> <span class="ident">Envelope</span><span class="op">&gt;</span><span class="ident">::Point::DIMENSIONS</span> {
         <span class="comment">// Sort children along the current axis</span>
-        <span class="ident">T::Envelope::sort_envelopes</span>(<span class="ident">axis</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">node</span>.<span class="ident">children</span>);
+        <span class="ident">T::Envelope::sort_envelopes</span>(<span class="ident">axis</span>, <span class="kw-2">&amp;mut</span> <span class="ident">node</span>.<span class="ident">children</span>);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">first_envelope</span> <span class="op">=</span> <span class="ident">T::Envelope::new_empty</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">second_envelope</span> <span class="op">=</span> <span class="ident">T::Envelope::new_empty</span>();
         <span class="kw">for</span> <span class="ident">child</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">node</span>.<span class="ident">children</span>[..<span class="ident">min_size</span>] {
@@ -686,7 +687,7 @@
     <span class="ident">best_axis</span>
 }
 
-<span class="kw">fn</span> <span class="ident">get_nodes_for_reinsertion</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Params</span><span class="op">&gt;</span>(<span class="ident">node</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ParentNode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RTreeNode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>
+<span class="kw">fn</span> <span class="ident">get_nodes_for_reinsertion</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Params</span><span class="op">&gt;</span>(<span class="ident">node</span>: <span class="kw-2">&amp;mut</span> <span class="ident">ParentNode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RTreeNode</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>
 <span class="kw">where</span>
     <span class="ident">T</span>: <span class="ident">RTreeObject</span>,
     <span class="ident">Params</span>: <span class="ident">RTreeParams</span>,
@@ -709,7 +710,6 @@
     <span class="ident">node</span>.<span class="ident">envelope</span> <span class="op">=</span> <span class="ident">envelope_for_children</span>(<span class="kw-2">&amp;</span><span class="ident">node</span>.<span class="ident">children</span>);
     <span class="ident">result</span>
 }
-</pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rstar" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
-    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script>
+</code></pre></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="rstar" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0 (9d1b2106e 2022-02-23)" ></div>
 </body></html>

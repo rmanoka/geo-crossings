@@ -1,4 +1,6 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;rajsekar&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;geo-types-0.7.2&#x2F;src&#x2F;polygon.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>polygon.rs - source</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg"><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../geo_types/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;georust&#x2F;meta&#x2F;master&#x2F;logo&#x2F;logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input"name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;rajsekar&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;geo-types-0.7.2&#x2F;src&#x2F;polygon.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>polygon.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../storage.js"></script><script src="../../crates.js"></script><script defer src="../../main.js"></script><script defer src="../../source-script.js"></script><script defer src="../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a class="sidebar-logo" href="../../geo_types/index.html"><div class="logo-container"><img src="https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;georust&#x2F;meta&#x2F;master&#x2F;logo&#x2F;logo.png" alt="logo"></div>
+        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../geo_types/index.html"><img src="https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;georust&#x2F;meta&#x2F;master&#x2F;logo&#x2F;logo.png" alt="logo"></a><nav class="sub"><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -549,8 +551,7 @@
 <span id="549">549</span>
 <span id="550">550</span>
 <span id="551">551</span>
-</pre><pre class="rust">
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">CoordFloat</span>, <span class="ident">CoordNum</span>, <span class="ident">LineString</span>, <span class="ident">Point</span>, <span class="ident">Rect</span>, <span class="ident">Triangle</span>};
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">CoordFloat</span>, <span class="ident">CoordNum</span>, <span class="ident">LineString</span>, <span class="ident">Point</span>, <span class="ident">Rect</span>, <span class="ident">Triangle</span>};
 <span class="kw">use</span> <span class="ident">num_traits</span>::{<span class="ident">Float</span>, <span class="ident">Signed</span>};
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;approx&quot;</span>, <span class="ident">test</span>))]</span>
@@ -680,9 +681,9 @@
     <span class="doccomment">///     &amp;LineString::from(vec![(0., 0.), (1., 1.), (1., 0.), (0., 0.),])</span>
     <span class="doccomment">/// );</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="kw-2">mut</span> <span class="ident">exterior</span>: <span class="ident">LineString</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="kw-2">mut</span> <span class="ident">interiors</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">LineString</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Polygon</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="kw-2">mut</span> <span class="ident">exterior</span>: <span class="ident">LineString</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="kw-2">mut</span> <span class="ident">interiors</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">LineString</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>) -&gt; <span class="ident">Polygon</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="ident">exterior</span>.<span class="ident">close</span>();
-        <span class="kw">for</span> <span class="ident">interior</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">interiors</span> {
+        <span class="kw">for</span> <span class="ident">interior</span> <span class="kw">in</span> <span class="kw-2">&amp;mut</span> <span class="ident">interiors</span> {
             <span class="ident">interior</span>.<span class="ident">close</span>();
         }
         <span class="ident">Polygon</span> {
@@ -726,7 +727,7 @@
     <span class="doccomment">///     ])]</span>
     <span class="doccomment">/// );</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">LineString</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">LineString</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">into_inner</span>(<span class="self">self</span>) -&gt; (<span class="ident">LineString</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">LineString</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
         (<span class="self">self</span>.<span class="ident">exterior</span>, <span class="self">self</span>.<span class="ident">interiors</span>)
     }
 
@@ -743,7 +744,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// assert_eq!(polygon.exterior(), &amp;exterior);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">exterior</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">LineString</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">exterior</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">LineString</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">exterior</span>
     }
 
@@ -794,11 +795,11 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [will be closed]: #linestring-closing-operation</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">exterior_mut</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">exterior_mut</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>)
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">LineString</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>),
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> <span class="ident">LineString</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>),
     {
-        <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">exterior</span>);
+        <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">exterior</span>);
         <span class="self">self</span>.<span class="ident">exterior</span>.<span class="ident">close</span>();
     }
 
@@ -823,7 +824,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// assert_eq!(interiors, polygon.interiors());</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">interiors</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span>[<span class="ident">LineString</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>] {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">interiors</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span>[<span class="ident">LineString</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>] {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">interiors</span>
     }
 
@@ -896,12 +897,12 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [will be closed]: #linestring-closing-operation</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">interiors_mut</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>)
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">interiors_mut</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>)
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> [<span class="ident">LineString</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>]),
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;mut</span> [<span class="ident">LineString</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>]),
     {
-        <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">interiors</span>);
-        <span class="kw">for</span> <span class="ident">interior</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">interiors</span> {
+        <span class="ident">f</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">interiors</span>);
+        <span class="kw">for</span> <span class="ident">interior</span> <span class="kw">in</span> <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">interiors</span> {
             <span class="ident">interior</span>.<span class="ident">close</span>();
         }
     }
@@ -936,14 +937,14 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [will be closed]: #linestring-closing-operation</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">interiors_push</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">new_interior</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">LineString</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">interiors_push</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">new_interior</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">LineString</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>) {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">new_interior</span> <span class="op">=</span> <span class="ident">new_interior</span>.<span class="ident">into</span>();
         <span class="ident">new_interior</span>.<span class="ident">close</span>();
         <span class="self">self</span>.<span class="ident">interiors</span>.<span class="ident">push</span>(<span class="ident">new_interior</span>);
     }
 
     <span class="doccomment">/// Wrap-around previous-vertex</span>
-    <span class="kw">fn</span> <span class="ident">previous_vertex</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">current_vertex</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">usize</span>
+    <span class="kw">fn</span> <span class="ident">previous_vertex</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">current_vertex</span>: <span class="ident">usize</span>) -&gt; <span class="ident">usize</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Float</span>,
     {
@@ -976,7 +977,7 @@
         <span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.6.1&quot;</span>,
         <span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;Please use `geo::is_convex` on `poly.exterior()` instead&quot;</span>
     )]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_convex</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_convex</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="ident">convex</span> <span class="op">=</span> <span class="self">self</span>
             .<span class="ident">exterior</span>
             .<span class="number">0</span>
@@ -992,16 +993,16 @@
             <span class="comment">// positive implies ccw convexity, negative implies cw convexity</span>
             <span class="comment">// anything else implies non-convexity</span>
             .<span class="ident">fold</span>(<span class="ident">ListSign::Empty</span>, <span class="op">|</span><span class="ident">acc</span>, <span class="ident">n</span><span class="op">|</span> <span class="kw">match</span> (<span class="ident">acc</span>, <span class="ident">n</span>.<span class="ident">is_positive</span>()) {
-                (<span class="ident">ListSign::Empty</span>, <span class="bool-val">true</span>) <span class="op">|</span> (<span class="ident">ListSign::Positive</span>, <span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ListSign::Positive</span>,
-                (<span class="ident">ListSign::Empty</span>, <span class="bool-val">false</span>) <span class="op">|</span> (<span class="ident">ListSign::Negative</span>, <span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ListSign::Negative</span>,
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">ListSign::Mixed</span>,
+                (<span class="ident">ListSign::Empty</span>, <span class="bool-val">true</span>) <span class="op">|</span> (<span class="ident">ListSign::Positive</span>, <span class="bool-val">true</span>) =&gt; <span class="ident">ListSign::Positive</span>,
+                (<span class="ident">ListSign::Empty</span>, <span class="bool-val">false</span>) <span class="op">|</span> (<span class="ident">ListSign::Negative</span>, <span class="bool-val">false</span>) =&gt; <span class="ident">ListSign::Negative</span>,
+                <span class="kw">_</span> =&gt; <span class="ident">ListSign::Mixed</span>,
             });
         <span class="ident">convex</span> <span class="op">!</span><span class="op">=</span> <span class="ident">ListSign::Mixed</span>
     }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">CoordNum</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Rect</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Polygon</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">r</span>: <span class="ident">Rect</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Polygon</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">r</span>: <span class="ident">Rect</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="ident">Polygon</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="ident">Polygon::new</span>(
             <span class="macro">vec!</span>[
                 (<span class="ident">r</span>.<span class="ident">min</span>().<span class="ident">x</span>, <span class="ident">r</span>.<span class="ident">min</span>().<span class="ident">y</span>),
@@ -1017,7 +1018,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">CoordNum</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Triangle</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Polygon</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">t</span>: <span class="ident">Triangle</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Polygon</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">t</span>: <span class="ident">Triangle</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="ident">Polygon</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="ident">Polygon::new</span>(<span class="macro">vec!</span>[<span class="ident">t</span>.<span class="number">0</span>, <span class="ident">t</span>.<span class="number">1</span>, <span class="ident">t</span>.<span class="number">2</span>, <span class="ident">t</span>.<span class="number">0</span>].<span class="ident">into</span>(), <span class="ident">Vec::new</span>())
     }
 }
@@ -1028,7 +1029,7 @@
     <span class="ident">T</span>: <span class="ident">AbsDiffEq</span><span class="op">&lt;</span><span class="ident">Epsilon</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">CoordNum</span> <span class="op">+</span> <span class="ident">RelativeEq</span>,
 {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">default_max_relative</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::Epsilon</span> {
+    <span class="kw">fn</span> <span class="ident">default_max_relative</span>() -&gt; <span class="ident"><span class="self">Self</span>::Epsilon</span> {
         <span class="ident">T::default_max_relative</span>()
     }
 
@@ -1049,9 +1050,9 @@
     <span class="kw">fn</span> <span class="ident">relative_eq</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>,
-        <span class="ident">epsilon</span>: <span class="self">Self</span><span class="ident">::Epsilon</span>,
-        <span class="ident">max_relative</span>: <span class="self">Self</span><span class="ident">::Epsilon</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="ident">epsilon</span>: <span class="ident"><span class="self">Self</span>::Epsilon</span>,
+        <span class="ident">max_relative</span>: <span class="ident"><span class="self">Self</span>::Epsilon</span>,
+    ) -&gt; <span class="ident">bool</span> {
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>
             .<span class="ident">exterior</span>
             .<span class="ident">relative_eq</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">exterior</span>, <span class="ident">epsilon</span>, <span class="ident">max_relative</span>)
@@ -1072,7 +1073,7 @@
     <span class="kw">type</span> <span class="ident">Epsilon</span> <span class="op">=</span> <span class="ident">T</span>;
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">fn</span> <span class="ident">default_epsilon</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::Epsilon</span> {
+    <span class="kw">fn</span> <span class="ident">default_epsilon</span>() -&gt; <span class="ident"><span class="self">Self</span>::Epsilon</span> {
         <span class="ident">T::default_epsilon</span>()
     }
 
@@ -1089,7 +1090,7 @@
     <span class="doccomment">/// approx::assert_abs_diff_eq!(a, b, epsilon=0.1);</span>
     <span class="doccomment">/// approx::assert_abs_diff_ne!(a, b, epsilon=0.001);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">abs_diff_eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>, <span class="ident">epsilon</span>: <span class="self">Self</span><span class="ident">::Epsilon</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">fn</span> <span class="ident">abs_diff_eq</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">other</span>: <span class="kw-2">&amp;</span><span class="self">Self</span>, <span class="ident">epsilon</span>: <span class="ident"><span class="self">Self</span>::Epsilon</span>) -&gt; <span class="ident">bool</span> {
         <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">exterior</span>.<span class="ident">abs_diff_eq</span>(<span class="kw-2">&amp;</span><span class="ident">other</span>.<span class="ident">exterior</span>, <span class="ident">epsilon</span>) {
             <span class="kw">return</span> <span class="bool-val">false</span>;
         }
@@ -1101,7 +1102,6 @@
         <span class="ident">zipper</span>.<span class="ident">all</span>(<span class="op">|</span>(<span class="ident">lhs</span>, <span class="ident">rhs</span>)<span class="op">|</span> <span class="ident">lhs</span>.<span class="ident">abs_diff_eq</span>(<span class="kw-2">&amp;</span><span class="ident">rhs</span>, <span class="ident">epsilon</span>))
     }
 }
-</pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../" data-current-crate="geo_types" data-search-index-js="../../search-index.js" data-search-js="../../search.js"></div>
-    <script src="../../main.js"></script><script src="../../source-script.js"></script><script src="../../source-files.js"></script>
+</code></pre></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../" data-current-crate="geo_types" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0 (9d1b2106e 2022-02-23)" ></div>
 </body></html>

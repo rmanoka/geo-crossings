@@ -1,4 +1,6 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;rajsekar&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;geo-0.18.0&#x2F;src&#x2F;algorithm&#x2F;relate&#x2F;geomgraph&#x2F;node.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>node.rs - source</title><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script src="../../../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../../../geo/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;georust&#x2F;meta&#x2F;master&#x2F;logo&#x2F;logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input"name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1"> 1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;rajsekar&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;geo-0.18.0&#x2F;src&#x2F;algorithm&#x2F;relate&#x2F;geomgraph&#x2F;node.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>node.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../../../storage.js"></script><script src="../../../../../crates.js"></script><script defer src="../../../../../main.js"></script><script defer src="../../../../../source-script.js"></script><script defer src="../../../../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a class="sidebar-logo" href="../../../../../geo/index.html"><div class="logo-container"><img src="https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;georust&#x2F;meta&#x2F;master&#x2F;logo&#x2F;logo.png" alt="logo"></div>
+        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../../../geo/index.html"><img src="https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;georust&#x2F;meta&#x2F;master&#x2F;logo&#x2F;logo.png" alt="logo"></a><nav class="sub"><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../../../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1"> 1</span>
 <span id="2"> 2</span>
 <span id="3"> 3</span>
 <span id="4"> 4</span>
@@ -69,8 +71,7 @@
 <span id="69">69</span>
 <span id="70">70</span>
 <span id="71">71</span>
-</pre><pre class="rust">
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">CoordPos</span>, <span class="ident">Dimensions</span>, <span class="ident">EdgeEnd</span>, <span class="ident">EdgeEndBundleStar</span>, <span class="ident">IntersectionMatrix</span>, <span class="ident">Label</span>};
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">CoordPos</span>, <span class="ident">Dimensions</span>, <span class="ident">EdgeEnd</span>, <span class="ident">EdgeEndBundleStar</span>, <span class="ident">IntersectionMatrix</span>, <span class="ident">Label</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">Coordinate</span>, <span class="ident">GeoFloat</span>};
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
@@ -83,16 +84,16 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">F</span>: <span class="ident">GeoFloat</span><span class="op">&gt;</span> <span class="ident">CoordNode</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">label</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Label</span> {
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">label</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Label</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">label</span>
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">label_mut</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Label</span> {
-        <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>.<span class="ident">label</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">label_mut</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>) -&gt; <span class="kw-2">&amp;mut</span> <span class="ident">Label</span> {
+        <span class="kw-2">&amp;mut</span> <span class="self">self</span>.<span class="ident">label</span>
     }
 
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_isolated</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="self">self</span>.<span class="ident">label</span>.<span class="ident">geometry_count</span>() <span class="op">=</span><span class="op">=</span> <span class="number">1</span>
+    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">is_isolated</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">label</span>.<span class="ident">geometry_count</span>() <span class="op">==</span> <span class="number">1</span>
     }
 }
 
@@ -100,27 +101,27 @@
 <span class="kw">where</span>
     <span class="ident">F</span>: <span class="ident">GeoFloat</span>,
 {
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">coordinate</span>: <span class="ident">Coordinate</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CoordNode</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">coordinate</span>: <span class="ident">Coordinate</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>) -&gt; <span class="ident">CoordNode</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
         <span class="ident">CoordNode</span> {
             <span class="ident">coordinate</span>,
             <span class="ident">label</span>: <span class="ident">Label::empty_line_or_point</span>(),
         }
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">coordinate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Coordinate</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">coordinate</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="kw-2">&amp;</span><span class="ident">Coordinate</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span> {
         <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">coordinate</span>
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_label_on_position</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">geom_index</span>: <span class="ident">usize</span>, <span class="ident">position</span>: <span class="ident">CoordPos</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_label_on_position</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">geom_index</span>: <span class="ident">usize</span>, <span class="ident">position</span>: <span class="ident">CoordPos</span>) {
         <span class="self">self</span>.<span class="ident">label</span>.<span class="ident">set_on_position</span>(<span class="ident">geom_index</span>, <span class="ident">position</span>)
     }
 
     <span class="doccomment">/// Updates the label of a node to BOUNDARY, obeying the mod-2 rule.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_label_boundary</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">geom_index</span>: <span class="ident">usize</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_label_boundary</span>(<span class="kw-2">&amp;mut</span> <span class="self">self</span>, <span class="ident">geom_index</span>: <span class="ident">usize</span>) {
         <span class="kw">let</span> <span class="ident">new_position</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">label</span>.<span class="ident">on_position</span>(<span class="ident">geom_index</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">CoordPos::OnBoundary</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">CoordPos::Inside</span>,
-            <span class="prelude-val">Some</span>(<span class="ident">CoordPos::Inside</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">CoordPos::OnBoundary</span>,
-            <span class="prelude-val">None</span> <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">CoordPos::Outside</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">CoordPos::OnBoundary</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">CoordPos::OnBoundary</span>) =&gt; <span class="ident">CoordPos::Inside</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">CoordPos::Inside</span>) =&gt; <span class="ident">CoordPos::OnBoundary</span>,
+            <span class="prelude-val">None</span> <span class="op">|</span> <span class="prelude-val">Some</span>(<span class="ident">CoordPos::Outside</span>) =&gt; <span class="ident">CoordPos::OnBoundary</span>,
         };
         <span class="self">self</span>.<span class="ident">label</span>.<span class="ident">set_on_position</span>(<span class="ident">geom_index</span>, <span class="ident">new_position</span>);
     }
@@ -128,7 +129,7 @@
     <span class="comment">// In JTS this method is implemented on a `GraphComponent` superclass, but since it&#39;s only used</span>
     <span class="comment">// by this one &quot;subclass&quot; I&#39;ve implemented it directly on the node, rather than introducing</span>
     <span class="comment">// something like a `GraphComponent` trait</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">update_intersection_matrix</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">intersection_matrix</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">IntersectionMatrix</span>) {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">update_intersection_matrix</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">intersection_matrix</span>: <span class="kw-2">&amp;mut</span> <span class="ident">IntersectionMatrix</span>) {
         <span class="macro">assert!</span>(<span class="self">self</span>.<span class="ident">label</span>.<span class="ident">geometry_count</span>() <span class="op">&gt;</span><span class="op">=</span> <span class="number">2</span>, <span class="string">&quot;found partial label&quot;</span>);
         <span class="ident">intersection_matrix</span>.<span class="ident">set_at_least_if_in_both</span>(
             <span class="self">self</span>.<span class="ident">label</span>.<span class="ident">on_position</span>(<span class="number">0</span>),
@@ -141,7 +142,6 @@
         );
     }
 }
-</pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="geo" data-search-index-js="../../../../../search-index.js" data-search-js="../../../../../search.js"></div>
-    <script src="../../../../../main.js"></script><script src="../../../../../source-script.js"></script><script src="../../../../../source-files.js"></script>
+</code></pre></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../../../" data-current-crate="geo" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0 (9d1b2106e 2022-02-23)" ></div>
 </body></html>

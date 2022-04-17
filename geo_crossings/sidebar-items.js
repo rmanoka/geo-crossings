@@ -1,1 +1,1 @@
-initSidebarItems({"mod":[["crossings",""],["events",""],["line_or_point",""],["segments",""],["sweep",""]]});
+initSidebarItems({"fn":[["monotone_chains","Partition a valid polygon into monotone pieces."]],"mod":[["crossings",""],["monotone",""]],"struct":[["Sweep","Monotone decomposition sweep implementation."],["SweepPoint","Wraps a [`Coordinate`] to support lexicographic ordering."]]});

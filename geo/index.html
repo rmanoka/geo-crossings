@@ -1,5 +1,7 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="The `geo` crate provides geospatial primitive types and algorithms."><meta name="keywords" content="rust, rustlang, rust-lang, geo"><title>geo - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../ayu.css" disabled ><script id="default-settings" ></script><script src="../storage.js"></script><script src="../crates.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../favicon.svg"><link rel="alternate icon" type="image/png" href="../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../geo/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;georust&#x2F;meta&#x2F;master&#x2F;logo&#x2F;logo.png' alt='logo'></div></a><p class="location">Crate geo</p><div class="block version"><p>Version 0.18.0</p></div><div class="sidebar-elems"><a id="all-types" href="all.html"><p>See all geo's items</p></a><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#macros">Macros</a></li><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#traits">Traits</a></li></ul></div><div id="sidebar-vars" data-name="geo" data-ty="mod" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input"name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../wheel.svg"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">geo</a><button id="copy-path" onclick="copy_path(this)" title="copy path"><img src="../clipboard.svg" width="19" height="18" alt="Copy item import" title="Copy item import to clipboard"></button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/geo/lib.rs.html#1-292" title="goto source code">[src]</a></span></h1><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>The <code>geo</code> crate provides geospatial primitive types and algorithms.</p>
-<h1 id="types" class="section-header"><a href="#types">Types</a></h1>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="The `geo` crate provides geospatial primitive types and algorithms."><meta name="keywords" content="rust, rustlang, rust-lang, geo"><title>geo - Rust</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../dark.css" disabled><link rel="stylesheet" type="text/css" href="../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../storage.js"></script><script src="../crates.js"></script><script defer src="../main.js"></script>
+    <noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../favicon.svg"></head><body class="rustdoc mod crate"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a class="sidebar-logo" href="../geo/index.html"><div class="logo-container"><img src="https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;georust&#x2F;meta&#x2F;master&#x2F;logo&#x2F;logo.png" alt="logo"></div>
+        </a><h2 class="location">Crate geo</h2><div class="block version"><div class="narrow-helper"></div><p>Version 0.18.0</p></div><div class="sidebar-elems"><a id="all-types" href="all.html"><p>See all geo's items</p></a><div class="block items"><ul><li><a href="#modules">Modules</a></li><li><a href="#macros">Macros</a></li><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#traits">Traits</a></li></ul></div><div id="sidebar-vars" data-name="geo" data-ty="mod" data-relpath=""></div><script defer src="sidebar-items.js"></script></div></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../geo/index.html"><img src="https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;georust&#x2F;meta&#x2F;master&#x2F;logo&#x2F;logo.png" alt="logo"></a><nav class="sub"><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><h1 class="fqn"><span class="in-band">Crate <a class="mod" href="#">geo</a><button id="copy-path" onclick="copy_path(this)" title="Copy item path to clipboard"><img src="../clipboard.svg" width="19" height="18" alt="Copy item path"></button></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/geo/lib.rs.html#1-292" title="goto source code">[src]</a></span></h1><details class="rustdoc-toggle top-doc" open><summary class="hideme"><span>Expand description</span></summary><div class="docblock"><p>The <code>geo</code> crate provides geospatial primitive types and algorithms.</p>
+<h2 id="types" class="section-header"><a href="#types">Types</a></h2>
 <ul>
 <li><strong><a href="struct.Coordinate.html" title="Coordinate"><code>Coordinate</code></a></strong>: A two-dimensional coordinate. All geometry types are composed of <a href="struct.Coordinate.html" title="Coordinate"><code>Coordinate</code></a>s, though <a href="struct.Coordinate.html" title="Coordinate"><code>Coordinate</code></a> itself is not a <a href="enum.Geometry.html" title="Geometry"><code>Geometry</code></a> type.</li>
 <li><strong><a href="struct.Point.html" title="Point"><code>Point</code></a></strong>: A single point represented by one <a href="struct.Coordinate.html" title="Coordinate"><code>Coordinate</code></a></li>
@@ -19,30 +21,30 @@ more <a href="struct.LineString.html" title="LineString"><code>LineString</code>
 </ul>
 <p>The preceding types are reexported from the <a href="https://crates.io/crates/geo-types"><code>geo-types</code></a> crate. Consider using that crate
 if you only need access to these types and no other <code>geo</code> functionality.</p>
-<h2 id="semantics" class="section-header"><a href="#semantics">Semantics</a></h2>
+<h3 id="semantics" class="section-header"><a href="#semantics">Semantics</a></h3>
 <p>The geospatial types provided here aim to adhere to the <a href="https://www.ogc.org/standards/sfa">OpenGIS Simple feature access</a>
 standards. Thus, the types here are inter-operable with other implementations of the standards:
 <a href="https://github.com/locationtech/jts">JTS</a>, <a href="https://trac.osgeo.org/geos">GEOS</a>, etc.</p>
-<h1 id="algorithms" class="section-header"><a href="#algorithms">Algorithms</a></h1><h2 id="area" class="section-header"><a href="#area">Area</a></h2>
+<h2 id="algorithms" class="section-header"><a href="#algorithms">Algorithms</a></h2><h3 id="area" class="section-header"><a href="#area">Area</a></h3>
 <ul>
 <li><strong><a href="algorithm/area/trait.Area.html"><code>Area</code></a></strong>: Calculate the planar area of a geometry</li>
 <li><strong><a href="algorithm/chamberlain_duquette_area/trait.ChamberlainDuquetteArea.html"><code>ChamberlainDuquetteArea</code></a></strong>: Calculate the geodesic area of a geometry</li>
 </ul>
-<h2 id="distance" class="section-header"><a href="#distance">Distance</a></h2>
+<h3 id="distance" class="section-header"><a href="#distance">Distance</a></h3>
 <ul>
 <li><strong><a href="algorithm/euclidean_distance/trait.EuclideanDistance.html"><code>EuclideanDistance</code></a></strong>: Calculate the minimum euclidean distance between geometries</li>
 <li><strong><a href="algorithm/geodesic_distance/trait.GeodesicDistance.html"><code>GeodesicDistance</code></a></strong>: Calculate the minimum geodesic distance between geometries using the algorithm presented in <em>Algorithms for geodesics</em> by Charles Karney (2013)</li>
 <li><strong><a href="algorithm/haversine_distance/trait.HaversineDistance.html"><code>HaversineDistance</code></a></strong>: Calculate the minimum geodesic distance between geometries using the haversine formula</li>
 <li><strong><a href="algorithm/vincenty_distance/trait.VincentyDistance.html"><code>VincentyDistance</code></a></strong>: Calculate the minimum geodesic distance between geometries using Vincenty’s formula</li>
 </ul>
-<h2 id="length" class="section-header"><a href="#length">Length</a></h2>
+<h3 id="length" class="section-header"><a href="#length">Length</a></h3>
 <ul>
 <li><strong><a href="algorithm/euclidean_length/trait.EuclideanLength.html"><code>EuclideanLength</code></a></strong>: Calculate the euclidean length of a geometry</li>
 <li><strong><a href="algorithm/geodesic_length/trait.GeodesicLength.html"><code>GeodesicLength</code></a></strong>: Calculate the geodesic length of a geometry using the algorithm presented in <em>Algorithms for geodesics</em> by Charles Karney (2013)</li>
 <li><strong><a href="algorithm/haversine_length/trait.HaversineLength.html"><code>HaversineLength</code></a></strong>: Calculate the geodesic length of a geometry using the haversine formula</li>
 <li><strong><a href="algorithm/vincenty_length/trait.VincentyLength.html"><code>VincentyLength</code></a></strong>: Calculate the geodesic length of a geometry using Vincenty’s formula</li>
 </ul>
-<h2 id="simplification" class="section-header"><a href="#simplification">Simplification</a></h2>
+<h3 id="simplification" class="section-header"><a href="#simplification">Simplification</a></h3>
 <ul>
 <li><strong><a href="algorithm/simplify/trait.Simplify.html"><code>Simplify</code></a></strong>: Simplify a geometry using the Ramer–Douglas–Peucker algorithm</li>
 <li><strong><a href="algorithm/simplify/trait.SimplifyIdx.html"><code>SimplifyIdx</code></a></strong>: Calculate a simplified geometry using the Ramer–Douglas–Peucker algorithm, returning coordinate indices</li>
@@ -50,7 +52,7 @@ standards. Thus, the types here are inter-operable with other implementations of
 <li><strong><a href="algorithm/simplifyvw/trait.SimplifyVWPreserve.html"><code>SimplifyVWPreserve</code></a></strong>: Simplify a geometry using a topology-preserving variant of the Visvalingam-Whyatt algorithm</li>
 <li><strong><a href="algorithm/simplifyvw/trait.SimplifyVwIdx.html"><code>SimplifyVwIdx</code></a></strong>: Calculate a simplified geometry using a topology-preserving variant of the Visvalingam-Whyatt algorithm, returning coordinate indices</li>
 </ul>
-<h2 id="query" class="section-header"><a href="#query">Query</a></h2>
+<h3 id="query" class="section-header"><a href="#query">Query</a></h3>
 <ul>
 <li><strong><a href="algorithm/bearing/trait.Bearing.html"><code>Bearing</code></a></strong>: Calculate the bearing between points</li>
 <li><strong><a href="algorithm/closest_point/trait.ClosestPoint.html"><code>ClosestPoint</code></a></strong>: Find the point on a geometry
@@ -63,11 +65,11 @@ Generates a point that lies a given fraction along the line</li>
 fraction of a line’s total length representing the location of the closest point on the
 line to the given point</li>
 </ul>
-<h2 id="similarity" class="section-header"><a href="#similarity">Similarity</a></h2>
+<h3 id="similarity" class="section-header"><a href="#similarity">Similarity</a></h3>
 <ul>
 <li><strong><a href="algorithm/frechet_distance/trait.FrechetDistance.html"><code>FrechetDistance</code></a></strong>: Calculate the similarity between <a href="struct.LineString.html" title="LineString"><code>LineString</code></a>s using the Fréchet distance</li>
 </ul>
-<h2 id="topology" class="section-header"><a href="#topology">Topology</a></h2>
+<h3 id="topology" class="section-header"><a href="#topology">Topology</a></h3>
 <ul>
 <li><strong><a href="algorithm/contains/trait.Contains.html"><code>Contains</code></a></strong>: Calculate if a geometry contains another
 geometry</li>
@@ -81,12 +83,12 @@ intersection, if any, between two lines.</li>
 <li><strong><a href="algorithm/relate/trait.Relate.html"><code>Relate</code></a></strong>: Topologically relate two geometries based on
 <a href="https://en.wikipedia.org/wiki/DE-9IM">DE-9IM</a> semantics.</li>
 </ul>
-<h2 id="winding" class="section-header"><a href="#winding">Winding</a></h2>
+<h3 id="winding" class="section-header"><a href="#winding">Winding</a></h3>
 <ul>
 <li><strong><a href="algorithm/orient/trait.Orient.html"><code>Orient</code></a></strong>: Apply a specified <a href="algorithm/winding_order/trait.Winding.html"><code>Winding</code></a> to a <a href="struct.Polygon.html" title="Polygon"><code>Polygon</code></a>’s interior and exterior rings</li>
 <li><strong><a href="algorithm/winding_order/trait.Winding.html"><code>Winding</code></a></strong>: Calculate and manipulate the winding order of a <a href="struct.LineString.html" title="LineString"><code>LineString</code></a></li>
 </ul>
-<h2 id="iteration" class="section-header"><a href="#iteration">Iteration</a></h2>
+<h3 id="iteration" class="section-header"><a href="#iteration">Iteration</a></h3>
 <ul>
 <li><strong><a href="algorithm/coords_iter/trait.CoordsIter.html"><code>CoordsIter</code></a></strong>: Iterate over the coordinates of a geometry</li>
 <li><strong><a href="algorithm/map_coords/trait.MapCoords.html"><code>MapCoords</code></a></strong>: Map a function over all the coordinates
@@ -96,7 +98,7 @@ coordinates in a geometry in-place</li>
 <li><strong><a href="algorithm/map_coords/trait.TryMapCoords.html"><code>TryMapCoords</code></a></strong>: Map a fallible function over all
 the coordinates in a geometry, returning a new geometry wrapped in a <code>Result</code></li>
 </ul>
-<h2 id="boundary" class="section-header"><a href="#boundary">Boundary</a></h2>
+<h3 id="boundary" class="section-header"><a href="#boundary">Boundary</a></h3>
 <ul>
 <li><strong><a href="algorithm/bounding_rect/trait.BoundingRect.html"><code>BoundingRect</code></a></strong>: Calculate the axis-aligned
 bounding rectangle of a geometry</li>
@@ -107,27 +109,27 @@ geometry</li>
 <li><strong><a href="algorithm/extremes/trait.Extremes.html"><code>Extremes</code></a></strong>: Calculate the extreme coordinates and
 indices of a geometry</li>
 </ul>
-<h2 id="affine-transformations" class="section-header"><a href="#affine-transformations">Affine transformations</a></h2>
+<h3 id="affine-transformations" class="section-header"><a href="#affine-transformations">Affine transformations</a></h3>
 <ul>
 <li><strong><a href="algorithm/rotate/trait.Rotate.html"><code>Rotate</code></a></strong>: Rotate a geometry around its centroid</li>
 <li><strong><a href="algorithm/rotate/trait.RotatePoint.html"><code>RotatePoint</code></a></strong>: Rotate a geometry around a point</li>
 <li><strong><a href="algorithm/translate/trait.Translate.html"><code>Translate</code></a></strong>: Translate a geometry along its axis</li>
 </ul>
-<h2 id="miscellaneous" class="section-header"><a href="#miscellaneous">Miscellaneous</a></h2>
+<h3 id="miscellaneous" class="section-header"><a href="#miscellaneous">Miscellaneous</a></h3>
 <ul>
 <li><strong><a href="algorithm/centroid/trait.Centroid.html"><code>Centroid</code></a></strong>: Calculate the centroid of a geometry</li>
 <li><strong><a href="algorithm/haversine_destination/trait.HaversineDestination.html"><code>HaversineDestination</code></a></strong>:</li>
 <li><strong><a href="algorithm/haversine_intermediate/trait.HaversineIntermediate.html"><code>HaversineIntermediate</code></a></strong>:</li>
 <li><strong><code>Proj</code></strong>: Project geometries with the <code>proj</code> crate</li>
 </ul>
-<h1 id="features" class="section-header"><a href="#features">Features</a></h1>
+<h2 id="features" class="section-header"><a href="#features">Features</a></h2>
 <p>The following optional <a href="https://doc.rust-lang.org/cargo/reference/features.html">Cargo features</a> are available:</p>
 <ul>
 <li><code>proj-network</code>: Enables <a href="https://proj.org/usage/network.html">network grid</a> support for the <a href="https://github.com/georust/proj"><code>proj</code> crate</a>. After enabling this feature, <a href="https://docs.rs/proj/*/proj/#grid-file-download">further configuration</a> is required to use the network grid</li>
 <li><code>use-proj</code>: Enables coordinate conversion and transformation of <code>Point</code> geometries using the <a href="https://github.com/georust/proj"><code>proj</code> crate</a></li>
 <li><code>use-serde</code>: Allows geometry types to be serialized and deserialized with <a href="https://serde.rs/">Serde</a></li>
 </ul>
-<h1 id="ecosystem" class="section-header"><a href="#ecosystem">Ecosystem</a></h1>
+<h2 id="ecosystem" class="section-header"><a href="#ecosystem">Ecosystem</a></h2>
 <p>There’s a wide variety of <code>geo</code>-compatible crates in the ecosystem that offer functionality not
 included in the <code>geo</code> crate, including:</p>
 <ul>
@@ -138,51 +140,50 @@ included in the <code>geo</code> crate, including:</p>
 <li><a href="https://crates.io/crates/geocoding">Geocoding</a></li>
 <li><a href="https://georust.org">and much more…</a></li>
 </ul>
-</div></details><h2 id="reexports" class="section-header"><a href="#reexports">Re-exports</a></h2>
-<table><tr class="import-item"><td><code>pub use crate::<a class="mod" href="algorithm/index.html" title="mod geo::algorithm">algorithm</a>::*;</code></td><td class="docblock-short"></td></tr></table><h2 id="modules" class="section-header"><a href="#modules">Modules</a></h2>
-<table><tr class="module-item"><td><a class="mod" href="algorithm/index.html" title="geo::algorithm mod">algorithm</a></td><td class="docblock-short"><p>This module includes all the functions of geometric calculations</p>
-</td></tr><tr class="module-item"><td><a class="mod" href="prelude/index.html" title="geo::prelude mod">prelude</a></td><td class="docblock-short"><p>A prelude which re-exports the traits for manipulating objects in this
+</div></details><h2 id="reexports" class="small-section-header"><a href="#reexports">Re-exports</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left import-item"><code>pub use crate::<a class="mod" href="algorithm/index.html" title="mod geo::algorithm">algorithm</a>::*;</code></div><div class="item-right docblock-short"></div></div></div><h2 id="modules" class="small-section-header"><a href="#modules">Modules</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="mod" href="algorithm/index.html" title="geo::algorithm mod">algorithm</a></div><div class="item-right docblock-short"><p>This module includes all the functions of geometric calculations</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="mod" href="prelude/index.html" title="geo::prelude mod">prelude</a></div><div class="item-right docblock-short"><p>A prelude which re-exports the traits for manipulating objects in this
 crate. Typically imported with <code>use geo::prelude::*</code>.</p>
-</td></tr></table><h2 id="macros" class="section-header"><a href="#macros">Macros</a></h2>
-<table><tr class="module-item"><td><a class="macro" href="macro.geometry_delegate_impl.html" title="geo::geometry_delegate_impl macro">geometry_delegate_impl</a></td><td class="docblock-short"><p>Implements the common pattern where a Geometry enum simply delegates its trait impl to it’s inner type.</p>
-</td></tr><tr class="module-item"><td><a class="macro" href="macro.line_string.html" title="geo::line_string macro">line_string</a></td><td class="docblock-short"><p>Creates a <a href="./line_string/struct.LineString.html"><code>LineString</code></a> containing the given coordinates.</p>
-</td></tr><tr class="module-item"><td><a class="macro" href="macro.point.html" title="geo::point macro">point</a></td><td class="docblock-short"><p>Creates a <a href="./struct.Point.html"><code>Point</code></a> from the given coordinates.</p>
-</td></tr><tr class="module-item"><td><a class="macro" href="macro.polygon.html" title="geo::polygon macro">polygon</a></td><td class="docblock-short"><p>Creates a <a href="./struct.Polygon.html"><code>Polygon</code></a> containing the given coordinates.</p>
-</td></tr></table><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
-<table><tr class="module-item"><td><a class="struct" href="struct.Coordinate.html" title="geo::Coordinate struct">Coordinate</a></td><td class="docblock-short"><p>A lightweight struct used to store coordinates on the 2-dimensional
+</div></div></div><h2 id="macros" class="small-section-header"><a href="#macros">Macros</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.geometry_delegate_impl.html" title="geo::geometry_delegate_impl macro">geometry_delegate_impl</a></div><div class="item-right docblock-short"><p>Implements the common pattern where a Geometry enum simply delegates its trait impl to it’s inner type.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.line_string.html" title="geo::line_string macro">line_string</a></div><div class="item-right docblock-short"><p>Creates a <a href="./line_string/struct.LineString.html"><code>LineString</code></a> containing the given coordinates.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.point.html" title="geo::point macro">point</a></div><div class="item-right docblock-short"><p>Creates a <a href="./struct.Point.html"><code>Point</code></a> from the given coordinates.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="macro" href="macro.polygon.html" title="geo::polygon macro">polygon</a></div><div class="item-right docblock-short"><p>Creates a <a href="./struct.Polygon.html"><code>Polygon</code></a> containing the given coordinates.</p>
+</div></div></div><h2 id="structs" class="small-section-header"><a href="#structs">Structs</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Coordinate.html" title="geo::Coordinate struct">Coordinate</a></div><div class="item-right docblock-short"><p>A lightweight struct used to store coordinates on the 2-dimensional
 Cartesian plane.</p>
-</td></tr><tr class="module-item"><td><a class="struct" href="struct.GeometryCollection.html" title="geo::GeometryCollection struct">GeometryCollection</a></td><td class="docblock-short"><p>A collection of <a href="enum.Geometry.html"><code>Geometry</code></a> types.</p>
-</td></tr><tr class="module-item"><td><a class="struct" href="struct.Line.html" title="geo::Line struct">Line</a></td><td class="docblock-short"><p>A line segment made up of exactly two
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.GeometryCollection.html" title="geo::GeometryCollection struct">GeometryCollection</a></div><div class="item-right docblock-short"><p>A collection of <a href="enum.Geometry.html"><code>Geometry</code></a> types.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Line.html" title="geo::Line struct">Line</a></div><div class="item-right docblock-short"><p>A line segment made up of exactly two
 <a href="struct.Coordinate.html"><code>Coordinate</code>s</a>.</p>
-</td></tr><tr class="module-item"><td><a class="struct" href="struct.LineString.html" title="geo::LineString struct">LineString</a></td><td class="docblock-short"><p>An ordered collection of two or more <a href="struct.Coordinate.html" title="Coordinate"><code>Coordinate</code></a>s, representing a
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.LineString.html" title="geo::LineString struct">LineString</a></div><div class="item-right docblock-short"><p>An ordered collection of two or more <a href="struct.Coordinate.html" title="Coordinate"><code>Coordinate</code></a>s, representing a
 path between locations.</p>
-</td></tr><tr class="module-item"><td><a class="struct" href="struct.MultiLineString.html" title="geo::MultiLineString struct">MultiLineString</a></td><td class="docblock-short"><p>A collection of
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.MultiLineString.html" title="geo::MultiLineString struct">MultiLineString</a></div><div class="item-right docblock-short"><p>A collection of
 <a href="line_string/struct.LineString.html"><code>LineString</code>s</a>. Can
 be created from a <code>Vec</code> of <code>LineString</code>s or from an
 Iterator which yields <code>LineString</code>s. Iterating over this
 object yields the component <code>LineString</code>s.</p>
-</td></tr><tr class="module-item"><td><a class="struct" href="struct.MultiPoint.html" title="geo::MultiPoint struct">MultiPoint</a></td><td class="docblock-short"><p>A collection of <a href="struct.Point.html"><code>Point</code>s</a>. Can
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.MultiPoint.html" title="geo::MultiPoint struct">MultiPoint</a></div><div class="item-right docblock-short"><p>A collection of <a href="struct.Point.html"><code>Point</code>s</a>. Can
 be created from a <code>Vec</code> of <code>Point</code>s, or from an
 Iterator which yields <code>Point</code>s. Iterating over this
 object yields the component <code>Point</code>s.</p>
-</td></tr><tr class="module-item"><td><a class="struct" href="struct.MultiPolygon.html" title="geo::MultiPolygon struct">MultiPolygon</a></td><td class="docblock-short"><p>A collection of <a href="struct.Polygon.html"><code>Polygon</code>s</a>. Can
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.MultiPolygon.html" title="geo::MultiPolygon struct">MultiPolygon</a></div><div class="item-right docblock-short"><p>A collection of <a href="struct.Polygon.html"><code>Polygon</code>s</a>. Can
 be created from a <code>Vec</code> of <code>Polygon</code>s, or from an
 Iterator which yields <code>Polygon</code>s. Iterating over this
 object yields the component <code>Polygon</code>s.</p>
-</td></tr><tr class="module-item"><td><a class="struct" href="struct.Point.html" title="geo::Point struct">Point</a></td><td class="docblock-short"><p>A single point in 2D space.</p>
-</td></tr><tr class="module-item"><td><a class="struct" href="struct.Polygon.html" title="geo::Polygon struct">Polygon</a></td><td class="docblock-short"><p>A bounded two-dimensional area.</p>
-</td></tr><tr class="module-item"><td><a class="struct" href="struct.Rect.html" title="geo::Rect struct">Rect</a></td><td class="docblock-short"><p>An <em>axis-aligned</em> bounded 2D rectangle whose area is
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Point.html" title="geo::Point struct">Point</a></div><div class="item-right docblock-short"><p>A single point in 2D space.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Polygon.html" title="geo::Polygon struct">Polygon</a></div><div class="item-right docblock-short"><p>A bounded two-dimensional area.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Rect.html" title="geo::Rect struct">Rect</a></div><div class="item-right docblock-short"><p>An <em>axis-aligned</em> bounded 2D rectangle whose area is
 defined by minimum and maximum <code>Coordinate</code>s.</p>
-</td></tr><tr class="module-item"><td><a class="struct" href="struct.Triangle.html" title="geo::Triangle struct">Triangle</a></td><td class="docblock-short"><p>A bounded 2D area whose three vertices are defined by
+</div></div><div class="item-row"><div class="item-left module-item"><a class="struct" href="struct.Triangle.html" title="geo::Triangle struct">Triangle</a></div><div class="item-right docblock-short"><p>A bounded 2D area whose three vertices are defined by
 <code>Coordinate</code>s. The semantics and validity are that of
 the equivalent <a href="struct.Polygon.html" title="Polygon"><code>Polygon</code></a>; in addition, the three
 vertices must not be collinear and they must be distinct.</p>
-</td></tr></table><h2 id="enums" class="section-header"><a href="#enums">Enums</a></h2>
-<table><tr class="module-item"><td><a class="enum" href="enum.Closest.html" title="geo::Closest enum">Closest</a></td><td class="docblock-short"><p>The result of trying to find the closest spot on an object to a point.</p>
-</td></tr><tr class="module-item"><td><a class="enum" href="enum.Geometry.html" title="geo::Geometry enum">Geometry</a></td><td class="docblock-short"><p>An enum representing any possible geometry type.</p>
-</td></tr></table><h2 id="traits" class="section-header"><a href="#traits">Traits</a></h2>
-<table><tr class="module-item"><td><a class="trait" href="trait.CoordFloat.html" title="geo::CoordFloat trait">CoordFloat</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="trait" href="trait.CoordNum.html" title="geo::CoordNum trait">CoordNum</a></td><td class="docblock-short"><p>The type of an x or y value of a point/coordinate.</p>
-</td></tr><tr class="module-item"><td><a class="trait" href="trait.GeoFloat.html" title="geo::GeoFloat trait">GeoFloat</a></td><td class="docblock-short"><p>A common numeric trait used for geo algorithms.</p>
-</td></tr><tr class="module-item"><td><a class="trait" href="trait.GeoNum.html" title="geo::GeoNum trait">GeoNum</a></td><td class="docblock-short"></td></tr><tr class="module-item"><td><a class="trait" href="trait.ToGeo.html" title="geo::ToGeo trait">ToGeo</a></td><td class="docblock-short"><span class="stab deprecated" title="">Deprecated</span></td></tr></table></section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../" data-current-crate="geo" data-search-index-js="../search-index.js" data-search-js="../search.js"></div>
-    <script src="../main.js"></script>
+</div></div></div><h2 id="enums" class="small-section-header"><a href="#enums">Enums</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.Closest.html" title="geo::Closest enum">Closest</a></div><div class="item-right docblock-short"><p>The result of trying to find the closest spot on an object to a point.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="enum" href="enum.Geometry.html" title="geo::Geometry enum">Geometry</a></div><div class="item-right docblock-short"><p>An enum representing any possible geometry type.</p>
+</div></div></div><h2 id="traits" class="small-section-header"><a href="#traits">Traits</a></h2>
+<div class="item-table"><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.CoordFloat.html" title="geo::CoordFloat trait">CoordFloat</a></div><div class="item-right docblock-short"></div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.CoordNum.html" title="geo::CoordNum trait">CoordNum</a></div><div class="item-right docblock-short"><p>The type of an x or y value of a point/coordinate.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.GeoFloat.html" title="geo::GeoFloat trait">GeoFloat</a></div><div class="item-right docblock-short"><p>A common numeric trait used for geo algorithms.</p>
+</div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.GeoNum.html" title="geo::GeoNum trait">GeoNum</a></div><div class="item-right docblock-short"></div></div><div class="item-row"><div class="item-left module-item"><a class="trait" href="trait.ToGeo.html" title="geo::ToGeo trait">ToGeo</a><span class="stab deprecated" title="">Deprecated</span></div><div class="item-right docblock-short"></div></div></div></section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../" data-current-crate="geo" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0 (9d1b2106e 2022-02-23)" ></div>
 </body></html>

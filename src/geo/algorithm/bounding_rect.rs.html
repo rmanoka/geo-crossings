@@ -1,4 +1,6 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;rajsekar&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;geo-0.18.0&#x2F;src&#x2F;algorithm&#x2F;bounding_rect.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>bounding_rect.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a href='../../../geo/index.html'><div class='logo-container rust-logo'><img src='https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;georust&#x2F;meta&#x2F;master&#x2F;logo&#x2F;logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input"name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav><section id="main" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `&#x2F;home&#x2F;rajsekar&#x2F;.cargo&#x2F;registry&#x2F;src&#x2F;github.com-1ecc6299db9ec823&#x2F;geo-0.18.0&#x2F;src&#x2F;algorithm&#x2F;bounding_rect.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>bounding_rect.rs - source</title><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Regular.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../FiraSans-Medium.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Regular.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceSerif4-Bold.ttf.woff2"><link rel="preload" as="font" type="font/woff2" crossorigin href="../../../SourceCodePro-Semibold.ttf.woff2"><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled><link rel="stylesheet" type="text/css" href="../../../light.css" id="themeStyle"><script id="default-settings" ></script><script src="../../../storage.js"></script><script src="../../../crates.js"></script><script defer src="../../../main.js"></script><script defer src="../../../source-script.js"></script><script defer src="../../../source-files.js"></script>
+    <noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png"><link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><link rel="icon" type="image/svg+xml" href="../../../favicon.svg"></head><body class="rustdoc source"><!--[if lte IE 11]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu" role="button">&#9776;</div><a class="sidebar-logo" href="../../../geo/index.html"><div class="logo-container"><img src="https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;georust&#x2F;meta&#x2F;master&#x2F;logo&#x2F;logo.png" alt="logo"></div>
+        </a></nav><main><div class="width-limiter"><div class="sub-container"><a class="sub-logo-container" href="../../../geo/index.html"><img src="https:&#x2F;&#x2F;raw.githubusercontent.com&#x2F;georust&#x2F;meta&#x2F;master&#x2F;logo&#x2F;logo.png" alt="logo"></a><nav class="sub"><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu" title="themes"><img width="18" height="18" alt="Pick another theme!" src="../../../brush.svg"></button><div id="theme-choices" role="menu"></div></div><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" id="help-button" title="help">?</button><a id="settings-menu" href="../../../settings.html" title="settings"><img width="18" height="18" alt="Change settings" src="../../../wheel.svg"></a></div></form></nav></div><section id="main-content" class="content"><div class="example-wrap"><pre class="line-numbers"><span id="1">  1</span>
 <span id="2">  2</span>
 <span id="3">  3</span>
 <span id="4">  4</span>
@@ -339,8 +341,7 @@
 <span id="339">339</span>
 <span id="340">340</span>
 <span id="341">341</span>
-</pre><pre class="rust">
-<span class="kw">use</span> <span class="kw">crate</span><span class="ident">::utils</span>::{<span class="ident">partial_max</span>, <span class="ident">partial_min</span>};
+</pre><pre class="rust"><code><span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::utils</span>::{<span class="ident">partial_max</span>, <span class="ident">partial_min</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">CoordNum</span>, <span class="ident">Coordinate</span>, <span class="ident">Geometry</span>, <span class="ident">GeometryCollection</span>, <span class="ident">GeometryCow</span>, <span class="ident">Line</span>, <span class="ident">LineString</span>,
     <span class="ident">MultiLineString</span>, <span class="ident">MultiPoint</span>, <span class="ident">MultiPolygon</span>, <span class="ident">Point</span>, <span class="ident">Polygon</span>, <span class="ident">Rect</span>, <span class="ident">Triangle</span>,
@@ -372,7 +373,7 @@
     <span class="doccomment">/// assert_eq!(116.34, bounding_rect.min().y);</span>
     <span class="doccomment">/// assert_eq!(118.34, bounding_rect.max().y);</span>
     <span class="doccomment">/// ```</span>
-    <span class="kw">fn</span> <span class="ident">bounding_rect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::Output</span>;
+    <span class="kw">fn</span> <span class="ident">bounding_rect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span>;
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">BoundingRect</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Point</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>
@@ -383,7 +384,7 @@
 
     <span class="doccomment">/// Return the bounding rectangle for a `Point`. It will have zero width</span>
     <span class="doccomment">/// and zero height.</span>
-    <span class="kw">fn</span> <span class="ident">bounding_rect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::Output</span> {
+    <span class="kw">fn</span> <span class="ident">bounding_rect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
         <span class="ident">Rect::new</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="number">0</span>)
     }
 }
@@ -396,7 +397,7 @@
 
     <span class="doccomment">///</span>
     <span class="doccomment">/// Return the BoundingRect for a MultiPoint</span>
-    <span class="kw">fn</span> <span class="ident">bounding_rect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::Output</span> {
+    <span class="kw">fn</span> <span class="ident">bounding_rect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
         <span class="ident">get_bounding_rect</span>(<span class="self">self</span>.<span class="number">0</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">p</span><span class="op">|</span> <span class="ident">p</span>.<span class="number">0</span>))
     }
 }
@@ -407,7 +408,7 @@
 {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Rect</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">bounding_rect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::Output</span> {
+    <span class="kw">fn</span> <span class="ident">bounding_rect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
         <span class="ident">Rect::new</span>(<span class="self">self</span>.<span class="ident">start</span>, <span class="self">self</span>.<span class="ident">end</span>)
     }
 }
@@ -420,7 +421,7 @@
 
     <span class="doccomment">///</span>
     <span class="doccomment">/// Return the BoundingRect for a LineString</span>
-    <span class="kw">fn</span> <span class="ident">bounding_rect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::Output</span> {
+    <span class="kw">fn</span> <span class="ident">bounding_rect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
         <span class="ident">line_string_bounding_rect</span>(<span class="self">self</span>)
     }
 }
@@ -433,7 +434,7 @@
 
     <span class="doccomment">///</span>
     <span class="doccomment">/// Return the BoundingRect for a MultiLineString</span>
-    <span class="kw">fn</span> <span class="ident">bounding_rect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::Output</span> {
+    <span class="kw">fn</span> <span class="ident">bounding_rect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
         <span class="ident">get_bounding_rect</span>(<span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">line</span><span class="op">|</span> <span class="ident">line</span>.<span class="number">0</span>.<span class="ident">iter</span>().<span class="ident">cloned</span>()))
     }
 }
@@ -446,7 +447,7 @@
 
     <span class="doccomment">///</span>
     <span class="doccomment">/// Return the BoundingRect for a Polygon</span>
-    <span class="kw">fn</span> <span class="ident">bounding_rect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::Output</span> {
+    <span class="kw">fn</span> <span class="ident">bounding_rect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
         <span class="kw">let</span> <span class="ident">line</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">exterior</span>();
         <span class="ident">get_bounding_rect</span>(<span class="ident">line</span>.<span class="number">0</span>.<span class="ident">iter</span>().<span class="ident">cloned</span>())
     }
@@ -460,7 +461,7 @@
 
     <span class="doccomment">///</span>
     <span class="doccomment">/// Return the BoundingRect for a MultiPolygon</span>
-    <span class="kw">fn</span> <span class="ident">bounding_rect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::Output</span> {
+    <span class="kw">fn</span> <span class="ident">bounding_rect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
         <span class="ident">get_bounding_rect</span>(
             <span class="self">self</span>.<span class="ident">iter</span>()
                 .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">poly</span><span class="op">|</span> <span class="ident">poly</span>.<span class="ident">exterior</span>().<span class="number">0</span>.<span class="ident">iter</span>().<span class="ident">cloned</span>()),
@@ -474,7 +475,7 @@
 {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Rect</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">bounding_rect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::Output</span> {
+    <span class="kw">fn</span> <span class="ident">bounding_rect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
         <span class="ident">get_bounding_rect</span>(<span class="self">self</span>.<span class="ident">to_array</span>().<span class="ident">iter</span>().<span class="ident">cloned</span>()).<span class="ident">unwrap</span>()
     }
 }
@@ -485,7 +486,7 @@
 {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">Rect</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">bounding_rect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::Output</span> {
+    <span class="kw">fn</span> <span class="ident">bounding_rect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
         <span class="kw-2">*</span><span class="self">self</span>
     }
 }
@@ -496,8 +497,8 @@
 {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Rect</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
-    <span class="kw">crate</span><span class="macro">::geometry_delegate_impl!</span> {
-       <span class="kw">fn</span> <span class="ident">bounding_rect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::Output</span>;
+    <span class="macro">crate::geometry_delegate_impl!</span> {
+       <span class="kw">fn</span> <span class="ident">bounding_rect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span>;
     }
 }
 
@@ -507,8 +508,8 @@
 {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Rect</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
-    <span class="kw">crate</span><span class="macro">::geometry_cow_delegate_impl!</span> {
-       <span class="kw">fn</span> <span class="ident">bounding_rect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::Output</span>;
+    <span class="macro">crate::geometry_cow_delegate_impl!</span> {
+       <span class="kw">fn</span> <span class="ident">bounding_rect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span>;
     }
 }
 
@@ -518,21 +519,21 @@
 {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Rect</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>;
 
-    <span class="kw">fn</span> <span class="ident">bounding_rect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span><span class="ident">::Output</span> {
+    <span class="kw">fn</span> <span class="ident">bounding_rect</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) -&gt; <span class="ident"><span class="self">Self</span>::Output</span> {
         <span class="self">self</span>.<span class="ident">iter</span>().<span class="ident">fold</span>(<span class="prelude-val">None</span>, <span class="op">|</span><span class="ident">acc</span>, <span class="ident">next</span><span class="op">|</span> {
             <span class="kw">let</span> <span class="ident">next_bounding_rect</span> <span class="op">=</span> <span class="ident">next</span>.<span class="ident">bounding_rect</span>();
 
             <span class="kw">match</span> (<span class="ident">acc</span>, <span class="ident">next_bounding_rect</span>) {
-                (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-                (<span class="prelude-val">Some</span>(<span class="ident">r</span>), <span class="prelude-val">None</span>) <span class="op">|</span> (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">r</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">r</span>),
-                (<span class="prelude-val">Some</span>(<span class="ident">r1</span>), <span class="prelude-val">Some</span>(<span class="ident">r2</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">bounding_rect_merge</span>(<span class="ident">r1</span>, <span class="ident">r2</span>)),
+                (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) =&gt; <span class="prelude-val">None</span>,
+                (<span class="prelude-val">Some</span>(<span class="ident">r</span>), <span class="prelude-val">None</span>) <span class="op">|</span> (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="ident">r</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="ident">r</span>),
+                (<span class="prelude-val">Some</span>(<span class="ident">r1</span>), <span class="prelude-val">Some</span>(<span class="ident">r2</span>)) =&gt; <span class="prelude-val">Some</span>(<span class="ident">bounding_rect_merge</span>(<span class="ident">r1</span>, <span class="ident">r2</span>)),
             }
         })
     }
 }
 
 <span class="comment">// Return a new rectangle that encompasses the provided rectangles</span>
-<span class="kw">fn</span> <span class="ident">bounding_rect_merge</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">CoordNum</span><span class="op">&gt;</span>(<span class="ident">a</span>: <span class="ident">Rect</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">b</span>: <span class="ident">Rect</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Rect</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
+<span class="kw">fn</span> <span class="ident">bounding_rect_merge</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">CoordNum</span><span class="op">&gt;</span>(<span class="ident">a</span>: <span class="ident">Rect</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>, <span class="ident">b</span>: <span class="ident">Rect</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>) -&gt; <span class="ident">Rect</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
     <span class="ident">Rect::new</span>(
         <span class="ident">Coordinate</span> {
             <span class="ident">x</span>: <span class="ident">partial_min</span>(<span class="ident">a</span>.<span class="ident">min</span>().<span class="ident">x</span>, <span class="ident">b</span>.<span class="ident">min</span>().<span class="ident">x</span>),
@@ -547,9 +548,9 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="kw">super</span><span class="ident">::bounding_rect_merge</span>;
-    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::algorithm::bounding_rect::BoundingRect</span>;
-    <span class="kw">use</span> <span class="kw">crate</span><span class="ident">::line_string</span>;
+    <span class="kw">use</span> <span class="ident"><span class="kw">super</span>::bounding_rect_merge</span>;
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::algorithm::bounding_rect::BoundingRect</span>;
+    <span class="kw">use</span> <span class="ident"><span class="kw">crate</span>::line_string</span>;
     <span class="kw">use</span> <span class="kw">crate</span>::{
         <span class="ident">polygon</span>, <span class="ident">Coordinate</span>, <span class="ident">Geometry</span>, <span class="ident">GeometryCollection</span>, <span class="ident">Line</span>, <span class="ident">LineString</span>, <span class="ident">MultiLineString</span>,
         <span class="ident">MultiPoint</span>, <span class="ident">MultiPolygon</span>, <span class="ident">Point</span>, <span class="ident">Polygon</span>, <span class="ident">Rect</span>,
@@ -681,7 +682,6 @@
         );
     }
 }
-</pre></div>
-</section><section id="search" class="content hidden"></section><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="geo" data-search-index-js="../../../search-index.js" data-search-js="../../../search.js"></div>
-    <script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script>
+</code></pre></div>
+</section><section id="search" class="content hidden"></section></div></main><div id="rustdoc-vars" data-root-path="../../../" data-current-crate="geo" data-themes="ayu,dark,light" data-resource-suffix="" data-rustdoc-version="1.59.0 (9d1b2106e 2022-02-23)" ></div>
 </body></html>
