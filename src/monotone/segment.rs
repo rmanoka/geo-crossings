@@ -1,7 +1,7 @@
 use geo::{kernels::Orientation, winding_order::WindingOrder, Coordinate, GeoNum, Line, LineString};
 use log::debug;
 use smallvec::SmallVec;
-use std::{cmp::Ordering, iter::FromIterator};
+use std::{cmp::Ordering, iter::FromIterator, pin::Pin};
 
 use crate::{
     events::{Event, EventType},
@@ -136,8 +136,13 @@ impl<T: GeoNum> Segment<T> {
     }
 
     /// Segment's inner setter.
-    pub fn helper_mut(&mut self) -> Option<&mut Helper<T>> {
-        self.helper.as_mut()
+    pub fn helper_mut(self: Pin<&mut Self>) -> Option<&mut Helper<T>> {
+        // # Safety
+        // It is safe for the algo's use-case
+        // TODO: is this safe even if T: !Unpin?
+        unsafe {
+            self.get_unchecked_mut()
+        }.helper.as_mut()
     }
 }
 

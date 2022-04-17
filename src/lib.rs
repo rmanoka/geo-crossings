@@ -1,4 +1,7 @@
-//! Implements the line crossings algorithm.
+//! Implements a few plane-sweep / line-crossings flavored algorithms.
+//!
+//! 1. [Line Crossings](#line-crossings)
+//! 1. [Monotone Decomposition](#monotone-decomposition)
 //!
 //! # Line Crossings
 //!
@@ -36,6 +39,10 @@
 //! assert_eq!(iter.count(), 3);
 //! ```
 //!
+//! # Monotone Decomposition
+//!
+//! Partitions a polygon into monotone pieces.  See [`monotone_chains`].
+//!
 //! [Bentley-Ottman]: //en.wikipedia.org/wiki/Bentley%E2%80%93Ottmann_algorithm
 //! [`Line`]: geo::Line
 //! [`Point`]: geo::Point
@@ -51,3 +58,4 @@ pub mod crossings;
 pub use crossings::{Crossable, Crossing, CrossingsIter, Intersections};
 
 pub mod monotone;
+pub use monotone::{Sweep, monotone_chains};

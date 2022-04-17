@@ -1,17 +1,34 @@
 use std::iter::FromIterator;
 
-use geo::{winding_order::WindingOrder, GeoNum, LineString};
+use geo::{winding_order::WindingOrder, GeoNum, LineString, Polygon};
 use log::debug;
 use smallvec::SmallVec;
+
+use crate::monotone::ops::MonoPoly;
 
 use super::{winding_inverse, Chain, Link, Sweep};
 
 const CHAIN_STACK_SIZE: usize = 16;
 type Chains<T> = SmallVec<[Chain<T>; CHAIN_STACK_SIZE]>;
 
-pub fn monotone_chains<T: GeoNum + Unpin>(
-    ring: LineString<T>,
-) -> Vec<(LineString<T>, LineString<T>)> {
+/// Partition a valid polygon into monotone pieces.
+///
+/// Uses the [`Sweep`] algorithm to parition a polygon into
+/// sub-polygons, each of which is monotone. The
+/// sub-polygons are returns as a pair of the top and bottom
+/// line-string.
+///
+/// # Validity
+///
+/// Only non-self intersecting polygons are accepted. That
+/// is, no two edges of any of the exterior or interior
+/// rings may intersect internally. Further, the graph
+/// formed by the vertices and the edges must be a 2-degree
+/// regular graph. Note that the algorithm may panic
+/// arbitrarily on invalid input.
+pub fn monotone_chains<T: GeoNum>(
+    poly: Polygon<T>,
+) -> Vec<MonoPoly<T>> {
     let mut chains = Chains::<T>::new();
 
     let finalize_pair = |p1: &Chain<T>, p2: &Chain<T>| {
@@ -28,7 +45,7 @@ pub fn monotone_chains<T: GeoNum + Unpin>(
         );
     };
 
-    let sweep = Box::pin(Sweep::from_closed_ring(ring));
+    let sweep = Box::pin(Sweep::from_polygon(poly));
     for event in sweep {
         let mut curr_idx = None;
         let pt = event.pt;
@@ -224,7 +241,7 @@ pub fn monotone_chains<T: GeoNum + Unpin>(
         .map(|(topdx, botdx)| {
             let top_ls = std::mem::replace(&mut lines[topdx], LineString(vec![]));
             let bot_ls = std::mem::replace(&mut lines[botdx], LineString(vec![]));
-            (top_ls, bot_ls)
+            MonoPoly::new(top_ls, bot_ls)
         })
         .collect()
 }
@@ -236,11 +253,12 @@ mod tests {
     use approx::assert_relative_eq;
     use geo::{map_coords::MapCoords, prelude::Area, Coordinate, LineString, Polygon};
 
-    fn verify_monotone(ring: LineString<f64>) {
-        let true_area = Polygon::new(ring.clone(), vec![]).unsigned_area();
-        let total_area: f64 = monotone_chains(ring)
+    fn verify_monotone(poly: Polygon<f64>) {
+        let true_area = poly.unsigned_area();
+        let total_area: f64 = monotone_chains(poly)
             .into_iter()
-            .map(|(top, down)| {
+            .map(|mp| {
+                let (top, down) = mp.into_ls_pair();
                 eprintln!("Pair:");
                 eprintln!("\t{top:?}");
                 eprintln!("\t{down:?}");
@@ -279,9 +297,15 @@ mod tests {
             [-1., -1.].into(),
         ]);
         let mirror: LineString<_> = ring.map_coords(|&(x, y)| (-x, y));
+        let hole = LineString(vec![
+            Coordinate::<f64>::from([0.1, 0.1]),
+            [0.1, 0.2].into(),
+            [0.2, 0.2].into(),
+            [0.2, 0.1].into(),
+        ]);
 
-        verify_monotone(ring);
+        verify_monotone(Polygon::new(ring, vec![hole]));
         eprintln!("==================================== mirror =================================");
-        verify_monotone(mirror);
+        verify_monotone(Polygon::new(mirror, vec![]));
     }
 }

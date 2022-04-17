@@ -7,6 +7,9 @@ pub use sweep::Sweep;
 mod chains;
 pub use chains::monotone_chains;
 
+mod ops;
+pub use ops::MonoPoly;
+
 use geo::{kernels::Orientation, winding_order::WindingOrder};
 
 fn winding_order_from_orientation(ori: Orientation) -> Option<WindingOrder> {

@@ -2,7 +2,7 @@ use geo::{
     coords_iter::CoordsIter,
     kernels::Kernel,
     winding_order::{Winding, WindingOrder},
-    Coordinate, GeoNum, LineString,
+    Coordinate, GeoNum, LineString, Polygon,
 };
 use log::debug;
 use pin_project_lite::pin_project;
@@ -18,10 +18,19 @@ use super::{
 use crate::{
     events::{Event, EventType},
     segments::{ActiveSegment, SegmentAccess},
-    SweepPoint,
+    SweepPoint, monotone::winding_inverse,
 };
 
 pin_project! {
+    /// Monotone decomposition sweep implementation.
+    ///
+    /// Implements the plane-sweep used by the polygon
+    /// decomposition algorithm. Users should typically use
+    /// [`crate::monotone::monotone_chains`].
+    ///
+    /// Implementation is based on the algorithm. description in these [awesome lecture notes].
+    ///
+    /// [awesome lecture notes]: https://www.cs.umd.edu/class/spring2020/cmsc754/Lects/lect05-triangulate.pdf
     pub struct Sweep<T: GeoNum> {
         #[pin]
         segments: Slab<Segment<T>>,
@@ -40,44 +49,32 @@ pub struct SweepEvent<T: GeoNum> {
     pub links: Links<T>,
 }
 
-impl<T: GeoNum + Unpin> Sweep<T> {
-    pub fn from_closed_ring(mut ring: LineString<T>) -> Self {
-        ring.close();
-        assert!(ring.coords_count() > 3);
+impl<T: GeoNum> Sweep<T> {
+    pub fn from_polygon(poly: Polygon<T>) -> Self {
+        let n = poly.coords_count();
+        let mut segments = Slab::with_capacity(n + 1);
+        let events = Vec::with_capacity(2 * n);
 
-        let mut segments = Slab::with_capacity(ring.coords_count() + 1);
-        let mut events = Vec::with_capacity(2 * ring.coords_count());
-
-        let winding = ring.winding_order().expect("ring has a winding order");
-        debug!("input winding: {winding:?}");
+        // Insert dummy segment for point (we never add it to the b-tree).
         let entry = segments.vacant_entry();
         let pt_key = entry.key();
         assert_eq!(pt_key, 0);
-
         entry.insert(Segment::new_point(pt_key, Coordinate::zero()));
-        for line in ring.lines() {
-            // debug!("processing: {line:?}");
-            if line.start == line.end {
-                continue;
-            }
 
-            let entry = segments.vacant_entry();
-            let segment = Segment::new(entry.key(), line, winding.clone());
-            for ev in entry.insert(segment).events() {
-                events.push(ev);
-            }
-        }
-
-        events.sort_unstable();
-        Sweep {
+        let mut sweep = Sweep {
             segments,
             events,
             pt_key,
             active_segments: BTreeSet::new(),
             _pin: PhantomPinned,
+        };
+        sweep.add_closed_ring(poly.exterior(), false);
+        for hole in poly.interiors() {
+            sweep.add_closed_ring(hole, true);
         }
+        sweep.events.sort_unstable();
+        sweep
     }
-
     pub fn process_event(mut self: Pin<&mut Self>) -> Option<SweepEvent<T>> {
         let mut links = Links::new();
         let (pt, segs) = match self.get_next_segments() {
@@ -99,7 +96,7 @@ impl<T: GeoNum + Unpin> Sweep<T> {
             }
             // If the segment to be removed has a helper, we
             // process it.
-            let mut segment = self.as_mut().storage_index_mut(e.segment_key);
+            let segment = self.as_mut().storage_index_mut(e.segment_key);
             // &self.segments[e.segment_key];
             if let Some(helper) = &segment.helper() {
                 if helper.is_merge() {
@@ -141,7 +138,7 @@ impl<T: GeoNum + Unpin> Sweep<T> {
                     .next_key(*this.pt_key, &this.segments)
                     .expect("fix-up: next_key should be available")
             };
-            let mut segment = self.as_mut().storage_index_mut(next);
+            let segment = self.as_mut().storage_index_mut(next);
             let helper = segment
                 .helper()
                 .expect("fix-up: next-segment must have helper");
@@ -170,7 +167,7 @@ impl<T: GeoNum + Unpin> Sweep<T> {
                     segment.helper_mut().unwrap().reset_merge();
                 }
             }
-            let mut segment = self.as_mut().storage_index_mut(next);
+            let segment = self.as_mut().storage_index_mut(next);
             let helper = segment.helper_mut().unwrap();
             *helper.point_mut() = pt;
             if is_merge {
@@ -241,7 +238,7 @@ impl<T: GeoNum + Unpin> Sweep<T> {
     }
 }
 
-impl<T: GeoNum + Unpin> Iterator for Pin<Box<Sweep<T>>> {
+impl<T: GeoNum> Iterator for Pin<Box<Sweep<T>>> {
     type Item = SweepEvent<T>;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -249,10 +246,42 @@ impl<T: GeoNum + Unpin> Iterator for Pin<Box<Sweep<T>>> {
     }
 }
 
-impl<T: GeoNum + Unpin> Sweep<T> {
+impl<T: GeoNum> Sweep<T> {
+    fn add_closed_ring(&mut self, ring: &LineString<T>, is_hole: bool) {
+        assert!(ring.is_closed());
+        assert!(ring.coords_count() > 3);
+
+        let winding = {
+            let winding = ring.winding_order().expect("ring has a winding order");
+            if is_hole {
+                winding_inverse(winding)
+            } else {
+                winding
+            }
+        };
+        debug!("input winding: {winding:?}");
+        for line in ring.lines() {
+            // debug!("processing: {line:?}");
+            if line.start == line.end {
+                continue;
+            }
+
+            let entry = self.segments.vacant_entry();
+            let segment = Segment::new(entry.key(), line, winding.clone());
+            for ev in entry.insert(segment).events() {
+                self.events.push(ev);
+            }
+        }
+
+    }
+
     fn store_point(self: Pin<&mut Self>, coord: Coordinate<T>) {
         let pt_key = self.pt_key;
-        *self.storage_index_mut(pt_key).get_mut() = Segment::new_point(pt_key, coord);
+        // Safety: the pt. segment is never stored as an
+        // `ActiveSegment` in the b-tree-set.
+        unsafe {
+            *self.storage_index_mut(pt_key).get_unchecked_mut() = Segment::new_point(pt_key, coord);
+        }
     }
 
     fn storage_index_mut(self: Pin<&mut Self>, key: usize) -> Pin<&mut Segment<T>> {
