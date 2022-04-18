@@ -102,7 +102,7 @@ impl<'a, T: GeoFloat> Scanner<'a, T> {
         }
     }
 
-    pub fn advance_to<'b>(&'b mut self, until: T) -> impl Iterator<Item = Option<Trapz<T>>> + 'b
+    pub fn advance_to<'b>(&'b mut self, until: T) -> impl Iterator<Item = Trapz<T>> + 'b
     where
         T: 'a,
     {
@@ -113,7 +113,7 @@ impl<'a, T: GeoFloat> Scanner<'a, T> {
         iter::from_fn(move || {
             if this.curr.x >= until { return None; }
             this.advance_next(until)
-        })
+        }).flatten()
     }
 
     pub fn advance_upto<F: FnMut(Trapz<T>)>(&mut self, until: T, mut proc: F) {
@@ -307,11 +307,11 @@ mod tests {
     #[test]
     fn check_ops_scanner() {
         init_log();
-        verify_scanner_area(poly_simple_merge());
-        verify_scanner_area(poly_simple_split());
+        verify_scanner_area(&poly_simple_merge());
+        verify_scanner_area(&poly_simple_split());
     }
 
-    fn verify_scanner_area(poly: Polygon<f64>) {
+    fn verify_scanner_area(poly: &Polygon<f64>) {
         let bbox = poly
             .bounding_rect()
             .expect("check_ops_scanner: bounding_rect");
@@ -333,10 +333,11 @@ mod tests {
                 (0..NUM_SLICES)
                     .map(|_| {
                         let right = (left + slice_width).min(right);
+
                         let mut area = 0.;
-                        scanner.advance_upto(right, |trapz| {
+                        for trapz in scanner.advance_to(right) {
                             area += trapz.area();
-                        });
+                        }
                         left = right;
                         area
                     })

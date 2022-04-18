@@ -26,7 +26,11 @@ name = "rand-line-crossings"
 harness = false
 
 [[bench]]
-name = "perf-line-crossings"
+name = "mono-raster"
+harness = false
+
+[[bench]]
+name = "prof-line-crossings"
 harness = false
 
 [profile.bench]

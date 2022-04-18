@@ -59,3 +59,7 @@ pub use crossings::{Crossable, Crossing, CrossingsIter, Intersections};
 
 pub mod monotone;
 pub use monotone::{Sweep, monotone_chains};
+
+#[cfg(test)]
+#[path = "../benches/utils/random.rs"]
+pub mod random;

@@ -1,10 +1,10 @@
 use std::iter::FromIterator;
 
-use geo::{winding_order::WindingOrder, GeoNum, LineString, Polygon};
+use geo::{winding_order::WindingOrder, GeoNum, LineString, Polygon, kernels::{Kernel, Orientation}};
 use log::debug;
 use smallvec::SmallVec;
 
-use crate::monotone::ops::MonoPoly;
+use crate::monotone::{ops::MonoPoly, segment::VertexType};
 
 use super::{winding_inverse, Chain, Link, Sweep};
 
@@ -27,7 +27,7 @@ type Chains<T> = SmallVec<[Chain<T>; CHAIN_STACK_SIZE]>;
 /// regular graph. Note that the algorithm may panic
 /// arbitrarily on invalid input.
 pub fn monotone_chains<T: GeoNum>(
-    poly: Polygon<T>,
+    poly: &Polygon<T>,
 ) -> Vec<MonoPoly<T>> {
     let mut chains = Chains::<T>::new();
 
@@ -50,7 +50,8 @@ pub fn monotone_chains<T: GeoNum>(
         let mut curr_idx = None;
         let pt = event.pt;
 
-        debug!("event {ty:?} @ {pt:?}", ty = event.ty);
+        let ty = event.ty;
+        debug!("event {ty:?} @ {pt:?}", ty = ty);
         for link in event.links {
             debug!("link: {link:?}");
             match link {
@@ -91,7 +92,7 @@ pub fn monotone_chains<T: GeoNum>(
                     debug!("chain: advance {idx} to {next:?}");
                     chain.advance(next);
                 }
-                Link::Merge { prev, next } => {
+                Link::Merge { prev, next, limbs } => {
                     debug_assert_eq!(next, event.pt);
                     let num = chains
                         .iter_mut()
@@ -100,10 +101,22 @@ pub fn monotone_chains<T: GeoNum>(
                             !ch.done() && ch.next() == prev
                         })
                         .map(|(i, ch)| {
-                            ch.advance(next);
                             debug!("chain: advance {i} to {next:?}");
+                            ch.advance(next);
+                            if matches!(ty, VertexType::Split) {
+                                if ch.interior() == &WindingOrder::Clockwise {
+                                    let bot = limbs.unwrap().1;
+                                    debug!("chain: advance {i} to {bot:?}");
+                                    ch.advance(bot);
+                                } else {
+                                    let top = limbs.unwrap().0;
+                                    debug!("chain: advance {i} to {top:?}");
+                                    ch.advance(top);
+                                }
+                            }
                         })
                         .count();
+
 
                     debug_assert_eq!(num, 2);
                 }
@@ -114,14 +127,45 @@ pub fn monotone_chains<T: GeoNum>(
                     bot,
                 } => {
                     debug_assert_eq!(next, event.pt);
-                    // Find unique chain at prev, and move it.
-                    let (idx, chain) = chains
-                        .iter_mut()
+                    let prevs: Vec<usize> = chains
+                        .iter()
                         .enumerate()
-                        .find(|&(_i, ref ch): &(usize, &mut Chain<T>)| {
-                            !ch.done() && ch.curr() == prev
+                        .filter_map(|(i, ch)| {
+                            if !ch.done() && ch.curr() == prev {
+                                Some(i)
+                            } else {
+                                None
+                            }
                         })
-                        .expect("chain for split");
+                        .collect();
+
+                    let (idx, chain) = if prevs.len() == 1 {
+                        (prevs[0], &mut chains[prevs[0]])
+                    } else if prevs.len() == 2 {
+                        // Handle merge from another
+                        let (ccw_idx, cw_idx) = if chains[prevs[0]].interior() == &WindingOrder::CounterClockwise {
+                            (prevs[0], prevs[1])
+                        } else {
+                            debug_assert_eq!(chains[prevs[1]].interior(), &WindingOrder::CounterClockwise);
+                            (prevs[1], prevs[0])
+                        };
+                        if T::Ker::orient2d(next.coord(), prev.coord(), chains[ccw_idx].next().coord()) == Orientation::CounterClockwise {
+                            (ccw_idx, &mut chains[ccw_idx])
+                        } else {
+                            (cw_idx, &mut chains[cw_idx])
+                        }
+                    } else {
+                        panic!("too many chains with curr == prev at split event");
+                    };
+
+                    // // Find unique chain at prev, and move it.
+                    // let (idx, chain) = chains
+                    //     .iter_mut()
+                    //     .enumerate()
+                    //     .find(|&(_i, ref ch): &(usize, &mut Chain<T>)| {
+                    //         !ch.done() && ch.curr() == prev
+                    //     })
+                    //     .expect("chain for split");
 
                     let old_next = chain.pop();
                     debug!(
@@ -174,10 +218,10 @@ pub fn monotone_chains<T: GeoNum>(
                 }
             },
         ));
-        debug_assert_eq!(looks.len() % 2, 0);
-        debug!("looks: {len}", len = looks.len());
 
         // Reduce current point
+        debug_assert_eq!(looks.len() % 2, 0);
+        debug!("looks: {len}", len = looks.len());
         match curr_idx {
             Some(curr_idx) if looks.len() > 0 => {
                 debug_assert_eq!(looks.len(), 2);
@@ -248,16 +292,17 @@ pub fn monotone_chains<T: GeoNum>(
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use super::super::tests::*;
-    use crate::{crossings::tests::init_log, SweepPoint};
+    use super::*;
+    use crate::{crossings::tests::init_log, SweepPoint, random};
     use approx::assert_relative_eq;
     use geo::{prelude::Area, Polygon};
     use log::info;
+    use rand::thread_rng;
 
     fn verify_monotone(poly: Polygon<f64>) {
         let true_area = poly.unsigned_area();
-        let total_area: f64 = monotone_chains(poly)
+        let total_area: f64 = monotone_chains(&poly)
             .into_iter()
             .map(|mp| {
                 info!("multi-polygon: {mp:?}");
@@ -291,5 +336,9 @@ mod tests {
         verify_monotone(poly_simple_merge());
         eprintln!("==================================== mirror: simple-split =================================");
         verify_monotone(poly_simple_split());
+        eprintln!("==================================== random =================================");
+        let poly = random::simple_polygon(thread_rng(), 16);
+        eprintln!("{poly:?}");
+        verify_monotone(poly);
     }
 }

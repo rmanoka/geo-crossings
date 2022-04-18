@@ -189,6 +189,7 @@ pub enum Link<T: GeoNum> {
     Merge {
         prev: SweepPoint<T>,
         next: SweepPoint<T>,
+        limbs: Option<(SweepPoint<T>, SweepPoint<T>)>,
     },
     Split {
         prev: SweepPoint<T>,

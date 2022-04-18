@@ -50,7 +50,7 @@ pub struct SweepEvent<T: GeoNum> {
 }
 
 impl<T: GeoNum> Sweep<T> {
-    pub fn from_polygon(poly: Polygon<T>) -> Self {
+    pub fn from_polygon(poly: &Polygon<T>) -> Self {
         let n = poly.coords_count();
         let mut segments = Slab::with_capacity(n + 1);
         let events = Vec::with_capacity(2 * n);
@@ -106,6 +106,7 @@ impl<T: GeoNum> Sweep<T> {
                     links.push(Link::Merge {
                         prev: pt2,
                         next: pt,
+                        limbs: None,
                     });
                 }
             }
@@ -142,6 +143,12 @@ impl<T: GeoNum> Sweep<T> {
             let helper = segment
                 .helper()
                 .expect("fix-up: next-segment must have helper");
+
+            let (top, bot) = if ixn.interior != WindingOrder::Clockwise {
+                (ixn.other_1, ixn.other_2)
+            } else {
+                (ixn.other_2, ixn.other_1)
+            };
             if helper.is_merge() || force {
                 let pt2 = helper.point();
                 // info!("F merging[split={force}]: {pt1:?} -> {pt2:?}", pt1 = pt,);
@@ -149,18 +156,13 @@ impl<T: GeoNum> Sweep<T> {
                     Link::Merge {
                         prev: pt2,
                         next: pt,
+                        limbs: Some((top, bot)),
                     }
                 } else {
-                    let (top, bot) = if ixn.interior != WindingOrder::Clockwise {
-                        (ixn.other_1, ixn.other_2)
-                    } else {
-                        (ixn.other_2, ixn.other_1)
-                    };
                     Link::Split {
                         prev: pt2,
                         next: pt,
-                        top,
-                        bot,
+                        top, bot,
                     }
                 });
                 if !is_merge {
