@@ -249,35 +249,34 @@ pub fn monotone_chains<T: GeoNum>(
 #[cfg(test)]
 mod tests {
     use super::*;
+    use super::super::tests::*;
     use crate::{crossings::tests::init_log, SweepPoint};
     use approx::assert_relative_eq;
-    use geo::{map_coords::MapCoords, prelude::Area, Coordinate, LineString, Polygon};
+    use geo::{prelude::Area, Polygon};
+    use log::info;
 
     fn verify_monotone(poly: Polygon<f64>) {
         let true_area = poly.unsigned_area();
         let total_area: f64 = monotone_chains(poly)
             .into_iter()
             .map(|mp| {
+                info!("multi-polygon: {mp:?}");
                 let (top, down) = mp.into_ls_pair();
-                eprintln!("Pair:");
-                eprintln!("\t{top:?}");
-                eprintln!("\t{down:?}");
 
-                let mut top = top.0;
-                let mut down = down.0;
+                {
+                    let top = &top.0;
+                    let down = &down.0;
 
-                for win in top.windows(2).chain(down.windows(2)) {
-                    assert!(SweepPoint::from(win[0]) < win[1].into());
+                    for win in top.windows(2).chain(down.windows(2)) {
+                        assert!(SweepPoint::from(win[0]) < win[1].into());
+                    }
                 }
 
-                down.reverse();
-                assert_eq!(down.first(), top.last());
-                top.extend(down.drain(1..));
+                let poly = MonoPoly::new(top, down).into_polygon();
+                let area = poly.unsigned_area();
 
-                let geom = LineString(top);
-                assert!(geom.is_closed());
-
-                Polygon::new(geom, vec![]).unsigned_area()
+                info!("area = {area}");
+                area
             })
             .sum();
         eprintln!("{total_area} vs {true_area}");
@@ -288,24 +287,9 @@ mod tests {
     fn check_chains_iter() {
         init_log();
 
-        let ring = LineString(vec![
-            Coordinate::<f64>::from([0., 0.]),
-            [-1., 1.].into(),
-            [0., 2.].into(),
-            [2., 0.].into(),
-            [0., -2.].into(),
-            [-1., -1.].into(),
-        ]);
-        let mirror: LineString<_> = ring.map_coords(|&(x, y)| (-x, y));
-        let hole = LineString(vec![
-            Coordinate::<f64>::from([0.1, 0.1]),
-            [0.1, 0.2].into(),
-            [0.2, 0.2].into(),
-            [0.2, 0.1].into(),
-        ]);
-
-        verify_monotone(Polygon::new(ring, vec![hole]));
-        eprintln!("==================================== mirror =================================");
-        verify_monotone(Polygon::new(mirror, vec![]));
+        eprintln!("==================================== simple-merge =================================");
+        verify_monotone(poly_simple_merge());
+        eprintln!("==================================== mirror: simple-split =================================");
+        verify_monotone(poly_simple_split());
     }
 }
