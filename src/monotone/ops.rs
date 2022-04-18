@@ -264,8 +264,8 @@ pub struct Trip<T: GeoNum> {
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Trapz<T: GeoNum> {
-    left: Trip<T>,
-    right: Trip<T>,
+    pub left: Trip<T>,
+    pub right: Trip<T>,
 }
 
 impl<T: GeoNum> From<(Trip<T>, Trip<T>)> for Trapz<T> {

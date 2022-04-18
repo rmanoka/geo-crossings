@@ -20,25 +20,18 @@ where
     F: FnMut() -> Vec<Line<f64>>,
     I: Display + Copy,
 {
-    let samples: Vec<_> = (0..sample_size)
-        .map(|_| {
+    let samples = Samples::from_fn(
+        sample_size,
+        || {
             let lines = gen();
             let expected = count_brute(&lines);
             (lines, expected)
-        })
-        .collect();
-
-    let mut curr = 0;
-    let mut iter_gen = || {
-        let ret = curr;
-        curr += 1;
-        curr %= samples.len();
-        &samples[ret]
-    };
+        }
+    );
 
     g.bench_with_input(BenchmarkId::new("Bentley-Ottman", param), &(), |b, _| {
         b.iter_batched(
-            &mut iter_gen,
+            samples.sampler(),
             |lines| {
                 assert_eq!(count_bo(&lines.0), lines.1);
             },
@@ -47,7 +40,7 @@ where
     });
     g.bench_with_input(BenchmarkId::new("Brute-Force", param), &(), |b, _| {
         b.iter_batched(
-            &mut iter_gen,
+            samples.sampler(),
             |lines| {
                 assert_eq!(count_brute(&lines.0), lines.1);
             },
@@ -56,7 +49,7 @@ where
     });
     g.bench_with_input(BenchmarkId::new("R-Tree", param), &(), |b, _| {
         b.iter_batched(
-            &mut iter_gen,
+            samples.sampler(),
             |lines| {
                 assert_eq!(count_rtree(&lines.0), lines.1);
             },

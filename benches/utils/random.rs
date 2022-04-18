@@ -80,7 +80,7 @@ impl<T> Samples<T> {
             &self.0[ret]
         }
     }
-    pub fn from_fn<F: Fn() -> T>(size: usize, proc: F) -> Self {
+    pub fn from_fn<F: FnMut() -> T>(size: usize, mut proc: F) -> Self {
         Self((0..size).map(|_| proc()).collect())
     }
 }

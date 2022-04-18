@@ -20,6 +20,9 @@ rand = "0.8.4"
 rand_distr = "0.4.1"
 geo-types = { version = "0.7.2", features = [ "rstar" ] }
 approx = "0.5.1"
+geo-rasterize = "0.1.2"
+ndarray = "0.15.4"
+euclid = "0.22.7"
 
 [[bench]]
 name = "rand-line-crossings"
