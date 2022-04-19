@@ -1,11 +1,12 @@
-use std::{cmp::Ordering, iter};
-
 use geo::{
     line_interpolate_point::LineInterpolatePoint, Coordinate, GeoFloat, GeoNum, Line, LineString,
     Polygon,
 };
+use std::{cmp::Ordering, iter::from_fn};
 
 use crate::SweepPoint;
+
+use super::{Trapz, Trip};
 
 #[derive(Clone)]
 pub struct MonoPoly<T: GeoNum> {
@@ -31,6 +32,9 @@ impl<T: GeoNum> MonoPoly<T> {
         assert_ne!(top.0.first(), top.0.last());
 
         for win in top.0.windows(2).chain(bot.0.windows(2)) {
+            if SweepPoint::from(win[0]) >= SweepPoint::from(win[1]) {
+                eprintln!("ERR: {:?} >= {:?}", win[0], win[1]);
+            }
             assert!(SweepPoint::from(win[0]) < SweepPoint::from(win[1]));
         }
         Self { top, bot }
@@ -68,14 +72,13 @@ impl<T: GeoNum> MonoPoly<T> {
 }
 
 impl<T: GeoFloat> MonoPoly<T> {
+    #[inline]
     pub fn scan_lines(&self, left: T) -> Scanner<'_, T> {
         let mut scanner = Scanner::new(self);
         scanner.advance_to(left).count();
         scanner
     }
 }
-
-impl<T: GeoFloat> MonoPoly<T> {}
 
 pub struct Scanner<'a, T: GeoFloat> {
     poly: &'a MonoPoly<T>,
@@ -102,6 +105,133 @@ impl<'a, T: GeoFloat> Scanner<'a, T> {
         }
     }
 
+    pub fn cross_bounds(
+        &mut self,
+        right: T,
+        cross_min: T,
+        cross_max: T,
+        height: usize,
+    ) -> (usize, usize) {
+        let mut bot_min = T::infinity();
+        let mut top_max = -T::neg_infinity();
+
+        for trapz in self.advance_to(right) {
+            top_max = top_max.max(trapz.left.top).max(trapz.right.top);
+            bot_min = bot_min.min(trapz.left.bot).min(trapz.right.bot);
+        }
+
+        // *. top_max >= top_min; bot_max >= bot_min
+        //    otherwise, we didn't see any item
+        if top_max < bot_min {
+            return (height, 0);
+        }
+
+        // *. set up transform to pixels
+        let height_t = T::from(height).unwrap();
+        let slice_height = (cross_max - cross_min) / height_t;
+        let cross_idx = |y: T| {
+            let j: T = (y - cross_min) / slice_height;
+            let j = j.max(T::zero()).min(height_t);
+            let j = j.floor().to_usize().unwrap();
+            j.min(height - 1)
+        };
+
+        // intersection: [bot_min, top_max]
+        bot_min = bot_min.max(cross_min);
+        top_max = top_max.min(cross_max);
+        if top_max < bot_min {
+            return (height, 0);
+        }
+
+        let j_min = cross_idx(bot_min);
+        let j_max = cross_idx(top_max);
+
+        (j_min, j_max)
+    }
+
+    pub fn cross_area(
+        &mut self,
+        right: T,
+        cross_min: T,
+        cross_max: T,
+        array: &mut [T],
+    ) {
+        let height = array.len();
+
+        // *. set up transform to pixels
+        let height_t = T::from(height).unwrap();
+        let slice_height = (cross_max - cross_min) / height_t;
+        let cross_idx = |y: T| {
+            let j_t: T = (y - cross_min) / slice_height;
+            let j_t = j_t.max(T::zero()).min(height_t);
+            let j = j_t.floor().to_usize().unwrap();
+            j.min(height - 1)
+        };
+
+        let cross_pt = |j: usize| {
+            T::from(j).unwrap() * slice_height + cross_min
+        };
+
+        for trapz in self.advance_to(right) {
+            let left = trapz.left;
+            let right = trapz.right;
+
+            let mut top_coords: Vec<Coordinate<_>> = vec![];
+            let mut bot_coords: Vec<Coordinate<_>> = vec![];
+            if left.bot <= right.bot {
+                // left-bot is the left-most coord after flip.
+                top_coords.push((left.bot, left.x).into());
+                bot_coords.push((left.bot, left.x).into());
+
+                // since right > left, it flips to the top.
+                top_coords.push((right.bot, right.x).into());
+                if right.top > right.bot {
+                    top_coords.push((right.top, right.x).into());
+                }
+                if left.top > left.bot {
+                    bot_coords.push((left.top, left.x).into());
+                }
+            } else {
+                // right-bot is the left-most coord after flip.
+                top_coords.push((right.bot, right.x).into());
+                bot_coords.push((right.bot, right.x).into());
+
+                if right.top > right.bot {
+                    top_coords.push((right.top, right.x).into());
+                }
+                bot_coords.push((left.bot, left.x).into());
+                if left.top > left.bot {
+                    bot_coords.push((left.top, left.x).into());
+                }
+            }
+
+            // lt is in bot_coords, rt in top_c
+            if left.top <= right.top {
+                bot_coords.push((right.top, right.x).into());
+            } else {
+                top_coords.push((left.top, left.x).into());
+            }
+            let tpoly = MonoPoly::new(LineString(top_coords), LineString(bot_coords));
+            let mut scanner = tpoly.scan_lines(cross_min);
+
+            let bot_min = left.bot.min(right.bot);
+            let top_max = left.top.max(right.top);
+
+            if bot_min >= cross_max || top_max <= cross_min {
+                continue;
+            }
+
+            let j_min = cross_idx(bot_min);
+            let j_max = cross_idx(top_max);
+            for j in j_min..=j_max {
+                let jt = cross_pt(j + 1);
+                for tz in scanner.advance_to(jt) {
+                    array[j] = array[j] + tz.area();
+                }
+            }
+        }
+    }
+
     pub fn advance_to<'b>(&'b mut self, until: T) -> impl Iterator<Item = Trapz<T>> + 'b
     where
         T: 'a,
@@ -110,10 +240,13 @@ impl<'a, T: GeoFloat> Scanner<'a, T> {
         // Some day, we should understand:
         // https://users.rust-lang.org/t/why-mut-t-is-not-covariant-with-t/54944
         let this: &mut Scanner<'b, T> = unsafe { std::mem::transmute(self) };
-        iter::from_fn(move || {
-            if this.curr.x >= until { return None; }
+        from_fn(move || {
+            if this.curr.x >= until {
+                return None;
+            }
             this.advance_next(until)
-        }).flatten()
+        })
+        .flatten()
     }
 
     pub fn advance_upto<F: FnMut(Trapz<T>)>(&mut self, until: T, mut proc: F) {
@@ -252,99 +385,5 @@ impl<'a, T: GeoFloat> Scanner<'a, T> {
                 )),
             }
         }
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub struct Trip<T: GeoNum> {
-    pub x: T,
-    pub top: T,
-    pub bot: T,
-}
-
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub struct Trapz<T: GeoNum> {
-    pub left: Trip<T>,
-    pub right: Trip<T>,
-}
-
-impl<T: GeoNum> From<(Trip<T>, Trip<T>)> for Trapz<T> {
-    fn from(tup: (Trip<T>, Trip<T>)) -> Self {
-        Trapz {
-            left: tup.0,
-            right: tup.1,
-        }
-    }
-}
-
-impl<T: GeoFloat> Trapz<T> {
-    #[inline]
-    pub fn area(&self) -> T {
-        let t1 = &self.left;
-        let t2 = &self.right;
-
-        let a = t1.top - t1.bot;
-        let b = t2.top - t2.bot;
-        debug_assert!(a >= T::zero() && b >= T::zero());
-        let h = t2.x - t1.x;
-        let two = T::one() + T::one();
-        (a + b) / two * h
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use approx::assert_relative_eq;
-    use geo::prelude::{Area, BoundingRect};
-    use log::info;
-
-    use crate::crossings::tests::init_log;
-    use crate::monotone_chains;
-
-    use super::super::tests::*;
-    use super::*;
-
-    #[test]
-    fn check_ops_scanner() {
-        init_log();
-        verify_scanner_area(&poly_simple_merge());
-        verify_scanner_area(&poly_simple_split());
-    }
-
-    fn verify_scanner_area(poly: &Polygon<f64>) {
-        let bbox = poly
-            .bounding_rect()
-            .expect("check_ops_scanner: bounding_rect");
-
-        let left = bbox.min().x;
-        let right = bbox.max().x;
-
-        const NUM_SLICES: usize = 1000000;
-        let slice_width = (right - left) / NUM_SLICES as f64;
-
-        let true_area = poly.unsigned_area();
-        let total_area: f64 = monotone_chains(poly)
-            .into_iter()
-            .map(|mono| -> f64 {
-                let mut left = left;
-                info!("processing mono-polygon: {mono:?}");
-                let mut scanner = mono.scan_lines(left);
-
-                (0..NUM_SLICES)
-                    .map(|_| {
-                        let right = (left + slice_width).min(right);
-
-                        let mut area = 0.;
-                        for trapz in scanner.advance_to(right) {
-                            area += trapz.area();
-                        }
-                        left = right;
-                        area
-                    })
-                    .sum()
-            })
-            .sum();
-        info!("{total_area} vs {true_area}");
-        assert_relative_eq!(total_area, true_area, epsilon = 1.0e-6);
     }
 }

@@ -1,4 +1,6 @@
-use geo::{kernels::Orientation, winding_order::WindingOrder, Coordinate, GeoNum, Line, LineString};
+use geo::{
+    kernels::Orientation, winding_order::WindingOrder, Coordinate, GeoNum, Line, LineString,
+};
 use log::debug;
 use smallvec::SmallVec;
 use std::{cmp::Ordering, iter::FromIterator, pin::Pin};
@@ -140,9 +142,7 @@ impl<T: GeoNum> Segment<T> {
         // # Safety
         // It is safe for the algo's use-case
         // TODO: is this safe even if T: !Unpin?
-        unsafe {
-            self.get_unchecked_mut()
-        }.helper.as_mut()
+        unsafe { self.get_unchecked_mut() }.helper.as_mut()
     }
 }
 

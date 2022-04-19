@@ -1,10 +1,14 @@
 use std::iter::FromIterator;
 
-use geo::{winding_order::WindingOrder, GeoNum, LineString, Polygon, kernels::{Kernel, Orientation}};
+use geo::{
+    kernels::{Kernel, Orientation},
+    winding_order::WindingOrder,
+    GeoNum, LineString, Polygon,
+};
 use log::debug;
 use smallvec::SmallVec;
 
-use crate::monotone::{ops::MonoPoly, segment::VertexType};
+use crate::monotone::{segment::VertexType, MonoPoly};
 
 use super::{winding_inverse, Chain, Link, Sweep};
 
@@ -26,9 +30,7 @@ type Chains<T> = SmallVec<[Chain<T>; CHAIN_STACK_SIZE]>;
 /// formed by the vertices and the edges must be a 2-degree
 /// regular graph. Note that the algorithm may panic
 /// arbitrarily on invalid input.
-pub fn monotone_chains<T: GeoNum>(
-    poly: &Polygon<T>,
-) -> Vec<MonoPoly<T>> {
+pub fn monotone_chains<T: GeoNum>(poly: &Polygon<T>) -> Vec<MonoPoly<T>> {
     let mut chains = Chains::<T>::new();
 
     let finalize_pair = |p1: &Chain<T>, p2: &Chain<T>| {
@@ -117,7 +119,6 @@ pub fn monotone_chains<T: GeoNum>(
                         })
                         .count();
 
-
                     debug_assert_eq!(num, 2);
                 }
                 Link::Split {
@@ -143,13 +144,22 @@ pub fn monotone_chains<T: GeoNum>(
                         (prevs[0], &mut chains[prevs[0]])
                     } else if prevs.len() == 2 {
                         // Handle merge from another
-                        let (ccw_idx, cw_idx) = if chains[prevs[0]].interior() == &WindingOrder::CounterClockwise {
-                            (prevs[0], prevs[1])
-                        } else {
-                            debug_assert_eq!(chains[prevs[1]].interior(), &WindingOrder::CounterClockwise);
-                            (prevs[1], prevs[0])
-                        };
-                        if T::Ker::orient2d(next.coord(), prev.coord(), chains[ccw_idx].next().coord()) == Orientation::CounterClockwise {
+                        let (ccw_idx, cw_idx) =
+                            if chains[prevs[0]].interior() == &WindingOrder::CounterClockwise {
+                                (prevs[0], prevs[1])
+                            } else {
+                                debug_assert_eq!(
+                                    chains[prevs[1]].interior(),
+                                    &WindingOrder::CounterClockwise
+                                );
+                                (prevs[1], prevs[0])
+                            };
+                        if T::Ker::orient2d(
+                            next.coord(),
+                            prev.coord(),
+                            chains[ccw_idx].next().coord(),
+                        ) == Orientation::CounterClockwise
+                        {
                             (ccw_idx, &mut chains[ccw_idx])
                         } else {
                             (cw_idx, &mut chains[cw_idx])
@@ -223,7 +233,7 @@ pub fn monotone_chains<T: GeoNum>(
         debug_assert_eq!(looks.len() % 2, 0);
         debug!("looks: {len}", len = looks.len());
         match curr_idx {
-            Some(curr_idx) if looks.len() > 0 => {
+            Some(curr_idx) if !looks.is_empty() => {
                 debug_assert_eq!(looks.len(), 2);
                 let (pair, other) = if chains[looks[0]].other() == curr_idx {
                     (looks[0], looks[1])
@@ -244,7 +254,7 @@ pub fn monotone_chains<T: GeoNum>(
                 chains[other].advance(new_next);
                 debug!("chain: advance: {other} to {new_next:?}");
             }
-            None if looks.len() > 0 => {
+            None if !looks.is_empty() => {
                 debug_assert_eq!(looks.len() % 2, 0);
                 for idx in looks {
                     let ch1 = &chains[idx];
@@ -294,7 +304,7 @@ pub fn monotone_chains<T: GeoNum>(
 mod tests {
     use super::super::tests::*;
     use super::*;
-    use crate::{crossings::tests::init_log, SweepPoint, random};
+    use crate::{crossings::tests::init_log, random, SweepPoint};
     use approx::assert_relative_eq;
     use geo::{prelude::Area, Polygon};
     use log::info;
@@ -332,12 +342,14 @@ mod tests {
     fn check_chains_iter() {
         init_log();
 
-        eprintln!("==================================== simple-merge =================================");
+        eprintln!(
+            "==================================== simple-merge ================================="
+        );
         verify_monotone(poly_simple_merge());
         eprintln!("==================================== mirror: simple-split =================================");
         verify_monotone(poly_simple_split());
         eprintln!("==================================== random =================================");
-        let poly = random::simple_polygon(thread_rng(), 16);
+        let poly = random::steppy_polygon(thread_rng(), 16);
         eprintln!("{poly:?}");
         verify_monotone(poly);
     }

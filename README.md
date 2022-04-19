@@ -9,7 +9,7 @@ Some benchmarks are available in the `benches` directory.
 ### Monotone Decomposition
 
 We see its usage as a simple rasterizer and benchmark against geo_rasterize.
-https://rmanoka.github.io/geo-crossings/criterion/Zig-zag%20polygon%20rasterize/report/
+https://rmanoka.github.io/geo-crossings/criterion/reports/Zig-zag%20polygon%20rasterize/
 
 ## License
 

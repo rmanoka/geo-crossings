@@ -1,10 +1,12 @@
 #![allow(unused)]
 use std::f64::consts::PI;
 
-use geo::{map_coords::MapCoords, rotate::RotatePoint, Coordinate, Line, Rect, Polygon, LineString};
+use geo::{
+    map_coords::MapCoords, rotate::RotatePoint, Coordinate, Line, LineString, Polygon, Rect, prelude::ConvexHull,
+};
 
 use rand::{thread_rng, Rng};
-use rand_distr::{Standard, Normal, Distribution};
+use rand_distr::{Distribution, Normal, Standard};
 
 #[inline]
 pub fn uniform_point<R: Rng>(rng: &mut R, bounds: Rect<f64>) -> Coordinate<f64> {
@@ -40,26 +42,49 @@ pub fn scaled_generator(dims: Coordinate<f64>, scale: usize) -> impl Fn() -> Lin
     }
 }
 
-pub fn simple_polygon<R: Rng>(mut rng: R, steps: usize) -> Polygon<f64> {
+pub fn convex_polygon<R: Rng>(mut rng: R, steps: usize) -> Polygon<f64> {
+    let mut ring = Vec::with_capacity(steps);
+    let ang_step = 2. * PI / steps as f64;
+    let ang_nudge = ang_step / 16.;
+
+    let sn = Normal::<f64>::new(0.0, 1.0).unwrap();
+    let mut angle = 0.0;
+    (0..steps).for_each(|_| {
+        let r: f64 = sn.sample(&mut rng).abs();
+
+        let ang_nudge = sn.sample(&mut rng) * ang_nudge;
+        angle += ang_nudge;
+
+        let (sin, cos) = ang_nudge.sin_cos();
+        ring.push((r * cos, r * sin).into());
+
+        angle += ang_step;
+    });
+
+    let poly = Polygon::new(LineString(ring), vec![]);
+    poly.convex_hull()
+}
+
+pub fn steppy_polygon<R: Rng>(mut rng: R, steps: usize) -> Polygon<f64> {
     let mut ring = Vec::with_capacity(2 * steps);
 
     let ystep = 1.0;
     let nudge_std = ystep / 1000.0;
     let mut y = 0.0;
     let normal = Normal::new(0.0, nudge_std * nudge_std).unwrap();
+    let shift = 50.0;
 
     ring.push((0.0, 0.0).into());
     (0..steps).for_each(|_| {
-        let x: f64 = rng.sample(Standard);
+        let x: f64 = rng.sample::<f64, _>(Standard) * shift / 2.;
         let x = (x * 10.) as i64 as f64 / 10.;
         y += ystep;
         // y += normal.sample(&mut rng);
         ring.push((x, y).into());
     });
-    let shift = 50.0;
     ring.push((shift, y).into());
     (0..steps).for_each(|_| {
-        let x: f64 = rng.sample(Standard);
+        let x: f64 = rng.sample::<f64, _>(Standard) * shift;
         let x = (x * 10.) as i64 as f64 / 10.;
         y -= ystep;
         // y += normal.sample(&mut rng);

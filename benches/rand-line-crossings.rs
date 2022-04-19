@@ -20,14 +20,11 @@ where
     F: FnMut() -> Vec<Line<f64>>,
     I: Display + Copy,
 {
-    let samples = Samples::from_fn(
-        sample_size,
-        || {
-            let lines = gen();
-            let expected = count_brute(&lines);
-            (lines, expected)
-        }
-    );
+    let samples = Samples::from_fn(sample_size, || {
+        let lines = gen();
+        let expected = count_brute(&lines);
+        (lines, expected)
+    });
 
     g.bench_with_input(BenchmarkId::new("Bentley-Ottman", param), &(), |b, _| {
         b.iter_batched(

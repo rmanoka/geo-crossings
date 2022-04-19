@@ -12,8 +12,10 @@ log = "0.4.14"
 rstar = "0.8.3"
 pin-project-lite = "0.2.8"
 smallvec = "1.8.0"
+itertools = "0.10.3"
 
 [dev-dependencies]
+ndarray = "0.15.4"
 env_logger = "0.8.4"
 criterion = "0.3.4"
 rand = "0.8.4"
@@ -21,7 +23,6 @@ rand_distr = "0.4.1"
 geo-types = { version = "0.7.2", features = [ "rstar" ] }
 approx = "0.5.1"
 geo-rasterize = "0.1.2"
-ndarray = "0.15.4"
 euclid = "0.22.7"
 
 [[bench]]
@@ -36,5 +37,5 @@ harness = false
 name = "prof-line-crossings"
 harness = false
 
-[profile.bench]
-debug = true
+# [profile.bench]
+# debug = true

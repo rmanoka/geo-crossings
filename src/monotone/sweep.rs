@@ -17,8 +17,9 @@ use super::{
 
 use crate::{
     events::{Event, EventType},
+    monotone::winding_inverse,
     segments::{ActiveSegment, SegmentAccess},
-    SweepPoint, monotone::winding_inverse,
+    SweepPoint,
 };
 
 pin_project! {
@@ -162,7 +163,8 @@ impl<T: GeoNum> Sweep<T> {
                     Link::Split {
                         prev: pt2,
                         next: pt,
-                        top, bot,
+                        top,
+                        bot,
                     }
                 });
                 if !is_merge {
@@ -274,7 +276,6 @@ impl<T: GeoNum> Sweep<T> {
                 self.events.push(ev);
             }
         }
-
     }
 
     fn store_point(self: Pin<&mut Self>, coord: Coordinate<T>) {
