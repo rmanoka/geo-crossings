@@ -8,7 +8,7 @@ use geo::{
     map_coords::MapCoords,
     prelude::{Area, BoundingRect},
     rotate::RotatePoint,
-    Coordinate, Polygon,
+    Coordinate, Polygon, coordinate_position::CoordPos,
 };
 use geo_crossings::monotone_chains;
 use geo_rasterize::BinaryBuilder;
@@ -34,10 +34,12 @@ fn our_rasterize(poly: &Polygon<f64>, width: usize, height: usize) -> Array2<boo
         let mut scanner = mono.scan_lines(left);
 
         (0..width).for_each(|i| {
+            let mut arr_mut = arr.slice_mut(s![i, ..]);
+            let slice = arr_mut.as_slice_mut().unwrap();
             let right = left + slice_width * i as f64;
             let (jmin, jmax) = scanner.cross_bounds(right, cross_min, cross_max, height);
             for j in jmin..=jmax {
-                arr[(i, j)] = true;
+                slice[j] = true;
             }
         });
     });
@@ -95,8 +97,8 @@ fn geo_intersects(poly: &Polygon<f64>, width: usize, height: usize) -> Array2<bo
                 y: j as f64 + 0.5,
             };
 
-            use geo::algorithm::intersects::Intersects;
-            if poly.intersects(&coord) {
+            use geo::algorithm::coordinate_position::CoordinatePosition;
+            if poly.coordinate_position(&coord) != CoordPos::Outside {
                 arr[(j, i)] = true;
             }
         }
@@ -218,6 +220,16 @@ fn run_convex<T: Measurement>(c: &mut Criterion<T>) {
                 polys.sampler(),
                 |&(ref poly, _)| {
                     our_rasterize(poly, NUM_SLICES, NUM_SLICES);
+                },
+                BatchSize::SmallInput,
+            );
+        });
+
+        group.bench_with_input(BenchmarkId::new("geo_coord_pos", steps), &(), |b, _| {
+            b.iter_batched(
+                polys.sampler(),
+                |&(ref poly, _)| {
+                    geo_intersects(poly, NUM_SLICES, NUM_SLICES);
                 },
                 BatchSize::SmallInput,
             );

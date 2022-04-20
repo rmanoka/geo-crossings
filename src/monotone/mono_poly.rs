@@ -113,7 +113,7 @@ impl<'a, T: GeoFloat> Scanner<'a, T> {
         height: usize,
     ) -> (usize, usize) {
         let mut bot_min = T::infinity();
-        let mut top_max = -T::neg_infinity();
+        let mut top_max = T::neg_infinity();
 
         for trapz in self.advance_to(right) {
             top_max = top_max.max(trapz.left.top).max(trapz.right.top);
@@ -122,6 +122,12 @@ impl<'a, T: GeoFloat> Scanner<'a, T> {
 
         // *. top_max >= top_min; bot_max >= bot_min
         //    otherwise, we didn't see any item
+        if top_max < bot_min {
+            return (height, 0);
+        }
+        // intersection: [bot_min, top_max]
+        bot_min = bot_min.max(cross_min);
+        top_max = top_max.min(cross_max);
         if top_max < bot_min {
             return (height, 0);
         }
@@ -136,12 +142,6 @@ impl<'a, T: GeoFloat> Scanner<'a, T> {
             j.min(height - 1)
         };
 
-        // intersection: [bot_min, top_max]
-        bot_min = bot_min.max(cross_min);
-        top_max = top_max.min(cross_max);
-        if top_max < bot_min {
-            return (height, 0);
-        }
 
         let j_min = cross_idx(bot_min);
         let j_max = cross_idx(top_max);
@@ -232,6 +232,7 @@ impl<'a, T: GeoFloat> Scanner<'a, T> {
         }
     }
 
+    #[inline]
     pub fn advance_to<'b>(&'b mut self, until: T) -> impl Iterator<Item = Trapz<T>> + 'b
     where
         T: 'a,

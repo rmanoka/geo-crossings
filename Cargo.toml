@@ -7,7 +7,7 @@ edition = "2018"
 
 [dependencies]
 slab = "0.4.3"
-geo = "0.18.0"
+geo = "0.20.1"
 log = "0.4.14"
 rstar = "0.8.3"
 pin-project-lite = "0.2.8"
@@ -20,7 +20,7 @@ env_logger = "0.8.4"
 criterion = "0.3.4"
 rand = "0.8.4"
 rand_distr = "0.4.1"
-geo-types = { version = "0.7.2", features = [ "rstar" ] }
+geo-types = { version = "0.7.4", features = [ "rstar" ] }
 approx = "0.5.1"
 geo-rasterize = "0.1.2"
 euclid = "0.22.7"
