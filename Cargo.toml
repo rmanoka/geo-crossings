@@ -37,5 +37,9 @@ harness = false
 name = "prof-line-crossings"
 harness = false
 
-# [profile.bench]
-# debug = true
+[[bench]]
+name = "prof-rasterize"
+harness = false
+
+[profile.bench]
+debug = true

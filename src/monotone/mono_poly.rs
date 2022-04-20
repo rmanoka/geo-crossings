@@ -134,9 +134,9 @@ impl<'a, T: GeoFloat> Scanner<'a, T> {
 
         // *. set up transform to pixels
         let height_t = T::from(height).unwrap();
-        let slice_height = (cross_max - cross_min) / height_t;
+        let slice_height_inv =  height_t / (cross_max - cross_min);
         let cross_idx = |y: T| {
-            let j: T = (y - cross_min) / slice_height;
+            let j: T = (y - cross_min) * slice_height_inv;
             let j = j.max(T::zero()).min(height_t);
             let j = j.floor().to_usize().unwrap();
             j.min(height - 1)
@@ -242,12 +242,15 @@ impl<'a, T: GeoFloat> Scanner<'a, T> {
         // https://users.rust-lang.org/t/why-mut-t-is-not-covariant-with-t/54944
         let this: &mut Scanner<'b, T> = unsafe { std::mem::transmute(self) };
         from_fn(move || {
-            if this.curr.x >= until {
-                return None;
+            while this.curr.x < until {
+                match this.advance_next(until) {
+                    Some(Some(t)) => return Some(t),
+                    None => return None,
+                    _ => {},
+                }
             }
-            this.advance_next(until)
+            None
         })
-        .flatten()
     }
 
     pub fn advance_upto<F: FnMut(Trapz<T>)>(&mut self, until: T, mut proc: F) {
