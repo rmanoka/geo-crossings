@@ -2,7 +2,7 @@
 use std::f64::consts::PI;
 
 use geo::{
-    map_coords::MapCoords, rotate::RotatePoint, Coordinate, Line, LineString, Polygon, Rect, prelude::ConvexHull,
+    map_coords::MapCoords, rotate::RotatePoint, Coordinate, Line, LineString, Polygon, Rect, prelude::ConvexHull, concave_hull::ConcaveHull,
 };
 
 use rand::{thread_rng, Rng};
@@ -42,27 +42,27 @@ pub fn scaled_generator(dims: Coordinate<f64>, scale: usize) -> impl Fn() -> Lin
     }
 }
 
-pub fn convex_polygon<R: Rng>(mut rng: R, steps: usize) -> Polygon<f64> {
+pub fn circular_polygon<R: Rng>(mut rng: R, steps: usize) -> Polygon<f64> {
     let mut ring = Vec::with_capacity(steps);
     let ang_step = 2. * PI / steps as f64;
-    let ang_nudge = ang_step / 16.;
+    let ang_nudge = ang_step / 100.;
 
     let sn = Normal::<f64>::new(0.0, 1.0).unwrap();
-    let mut angle = 0.0;
+    let mut angle: f64 = 0.0;
     (0..steps).for_each(|_| {
-        let r: f64 = sn.sample(&mut rng).abs();
+        let r: f64 = sn.sample(&mut rng).abs() + 0.1;
 
         let ang_nudge = sn.sample(&mut rng) * ang_nudge;
-        angle += ang_nudge;
+        // angle += ang_nudge;
 
-        let (sin, cos) = ang_nudge.sin_cos();
+        let (sin, cos) = angle.sin_cos();
         ring.push((r * cos, r * sin).into());
 
         angle += ang_step;
     });
 
     let poly = Polygon::new(LineString(ring), vec![]);
-    poly.convex_hull()
+    poly
 }
 
 pub fn steppy_polygon<R: Rng>(mut rng: R, steps: usize) -> Polygon<f64> {

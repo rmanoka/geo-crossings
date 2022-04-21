@@ -10,7 +10,7 @@ use std::f64::consts::PI;
 
 use criterion::{measurement::Measurement, *};
 use geo::{
-    prelude::Area,
+    prelude::{Area, ConvexHull},
     rotate::RotatePoint,
 };
 
@@ -80,7 +80,7 @@ fn run_convex<T: Measurement>(c: &mut Criterion<T>) {
     (3..12).for_each(|scale| {
         let steps = 1 << scale;
         let polys = Samples::from_fn(SAMPLE_SIZE, || {
-            let poly = random::convex_polygon(thread_rng(), steps);
+            let poly = random::circular_polygon(thread_rng(), steps).convex_hull();
 
             let angle: f64 = thread_rng().sample::<f64, _>(Standard) * PI * 2.0;
             // 90 degrees is the worst inputs for our algo.

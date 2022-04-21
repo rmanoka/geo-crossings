@@ -111,25 +111,33 @@ impl<'a, T: GeoFloat> Scanner<'a, T> {
         cross_min: T,
         cross_max: T,
         height: usize,
-    ) -> (usize, usize) {
+    ) -> Option<(usize, usize, T, T)> {
+
         let mut bot_min = T::infinity();
         let mut top_max = T::neg_infinity();
 
+        let mut top_min = T::infinity();
+        let mut bot_max = T::neg_infinity();
+
         for trapz in self.advance_to(right) {
             top_max = top_max.max(trapz.left.top).max(trapz.right.top);
+            top_min = top_min.min(trapz.left.top).min(trapz.right.top);
+            bot_max = bot_max.max(trapz.left.bot).max(trapz.right.bot);
             bot_min = bot_min.min(trapz.left.bot).min(trapz.right.bot);
         }
 
         // *. top_max >= top_min; bot_max >= bot_min
         //    otherwise, we didn't see any item
         if top_max < bot_min {
-            return (height, 0);
+            return None;
         }
+
+
         // intersection: [bot_min, top_max]
         bot_min = bot_min.max(cross_min);
         top_max = top_max.min(cross_max);
         if top_max < bot_min {
-            return (height, 0);
+            return None;
         }
 
         // *. set up transform to pixels
@@ -146,7 +154,7 @@ impl<'a, T: GeoFloat> Scanner<'a, T> {
         let j_min = cross_idx(bot_min);
         let j_max = cross_idx(top_max);
 
-        (j_min, j_max)
+        Some((j_min, j_max, bot_max, top_min))
     }
 
     pub fn cross_area(
@@ -393,5 +401,11 @@ impl<'a, T: GeoFloat> Scanner<'a, T> {
                 )),
             }
         }
+    }
+
+    /// Get the scanner's curr.
+    #[must_use]
+    pub fn curr(&self) -> Trip<T> {
+        self.curr
     }
 }

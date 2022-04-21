@@ -27,7 +27,11 @@ pub fn our_rasterize(poly: &Polygon<f64>, width: usize, height: usize) -> Array2
         let mut arr_start = 0;
         for i in 0..width {
             let right = left + slice_width * i as f64;
-            let (jmin, jmax) = scanner.cross_bounds(right, cross_min, cross_max, height);
+            let (jmin, jmax, _, _) = if let Some(b) = scanner.cross_bounds(right, cross_min, cross_max, height) {
+                b
+            } else {
+                continue;
+            };
 
             let slice = &mut arr[arr_start..(arr_start + width)];
             for j in jmin..=jmax {
