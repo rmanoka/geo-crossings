@@ -19,7 +19,7 @@ use rand_distr::Standard;
 
 fn run_complex<T: Measurement>(c: &mut Criterion<T>) {
     const SAMPLE_SIZE: usize = 16;
-    const NUM_SLICES: usize = 4096;
+    const NUM_SLICES: usize = 1024;
 
     let mut group = c.benchmark_group("profile monotone-rasterize with Zig-zag polygons");
     group.plot_config(PlotConfiguration::default().summary_scale(AxisScale::Logarithmic));
@@ -40,7 +40,7 @@ fn run_complex<T: Measurement>(c: &mut Criterion<T>) {
             b.iter_batched(
                 polys.sampler(),
                 |&(ref poly, _)| {
-                    our_area(poly, NUM_SLICES, NUM_SLICES);
+                    our_rasterize(poly, NUM_SLICES, NUM_SLICES);
                 },
                 BatchSize::SmallInput,
             );

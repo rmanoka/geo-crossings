@@ -1,3 +1,5 @@
+#![allow(unused)]
+
 use geo::{
     map_coords::MapCoords,
     prelude::BoundingRect,
@@ -21,23 +23,21 @@ pub fn our_rasterize(poly: &Polygon<f64>, width: usize, height: usize) -> Array2
     let cross_min = bbox.min().y;
     let cross_max = bbox.max().y;
 
-    for mono in monotone_chains(&poly) {
+    let polys = monotone_chains(&poly);
+    for mono in polys.iter() {
         let mut scanner = mono.scan_lines(left);
 
         let mut arr_start = 0;
         for i in 0..width {
             let right = left + slice_width * i as f64;
-            let (jmin, jmax, _, _) = if let Some(b) = scanner.cross_bounds(right, cross_min, cross_max, height) {
-                b
-            } else {
-                continue;
-            };
+            let (jmin, jmax) = scanner.cross_ubounds(right, cross_min, cross_max, height);
+            if jmin > jmax { continue; }
 
-            let slice = &mut arr[arr_start..(arr_start + width)];
+            let slice = &mut arr[arr_start..(arr_start + height)];
             for j in jmin..=jmax {
                 slice[j] = true;
             }
-            arr_start += width;
+            arr_start += height;
         }
     }
     Array2::from_shape_vec((width, height), arr).unwrap()

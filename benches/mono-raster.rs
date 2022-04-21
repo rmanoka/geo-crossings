@@ -110,6 +110,68 @@ fn run_convex<T: Measurement>(c: &mut Criterion<T>) {
             );
         });
 
+        // group.bench_with_input(BenchmarkId::new("geo_coord_pos", steps), &(), |b, _| {
+        //     b.iter_batched(
+        //         polys.sampler(),
+        //         |&(ref poly, _)| {
+        //             geo_intersects(poly, NUM_SLICES, NUM_SLICES);
+        //         },
+        //         BatchSize::SmallInput,
+        //     );
+        // });
+
+        group.bench_with_input(BenchmarkId::new("montone_rasterize_areas", steps), &(), |b, _| {
+            b.iter_batched(
+                polys.sampler(),
+                |&(ref poly, _)| {
+                    our_area(poly, NUM_SLICES, NUM_SLICES);
+                },
+                BatchSize::SmallInput,
+            );
+        });
+    });
+}
+
+fn run_circular<T: Measurement>(c: &mut Criterion<T>) {
+    const SAMPLE_SIZE: usize = 16;
+    const NUM_SLICES: usize = 1024;
+
+    let mut group = c.benchmark_group("Circular polygon rasterize");
+    group.plot_config(PlotConfiguration::default().summary_scale(AxisScale::Logarithmic));
+
+    (3..12).for_each(|scale| {
+        let steps = 1 << scale;
+        let polys = Samples::from_fn(SAMPLE_SIZE, || {
+            let poly = random::circular_polygon(thread_rng(), steps).convex_hull();
+
+            let angle: f64 = thread_rng().sample::<f64, _>(Standard) * PI * 2.0;
+            // 90 degrees is the worst inputs for our algo.
+            // let angle: f64 = PI / 2.0;
+            let poly = poly.rotate_around_point(angle, poly.exterior().0[0].into());
+            let area = poly.unsigned_area();
+            (poly, area)
+        });
+
+        group.bench_with_input(BenchmarkId::new("geo_rasterize", steps), &(), |b, _| {
+            b.iter_batched(
+                polys.sampler(),
+                |&(ref poly, _)| {
+                    geo_rasterize(poly, NUM_SLICES, NUM_SLICES);
+                },
+                BatchSize::SmallInput,
+            );
+        });
+
+        group.bench_with_input(BenchmarkId::new("montone_rasterize", steps), &(), |b, _| {
+            b.iter_batched(
+                polys.sampler(),
+                |&(ref poly, _)| {
+                    our_rasterize(poly, NUM_SLICES, NUM_SLICES);
+                },
+                BatchSize::SmallInput,
+            );
+        });
+
         group.bench_with_input(BenchmarkId::new("geo_coord_pos", steps), &(), |b, _| {
             b.iter_batched(
                 polys.sampler(),
@@ -186,6 +248,6 @@ fn run_complex_vs_sample_size<T: Measurement>(c: &mut Criterion<T>) {
 }
 
 
-criterion_group!(verts_vs_time, run_complex, run_convex);
+criterion_group!(verts_vs_time, run_complex, run_convex, run_circular);
 criterion_group!(samples_vs_time, run_complex_vs_sample_size);
 criterion_main!(verts_vs_time, samples_vs_time);

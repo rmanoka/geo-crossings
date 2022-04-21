@@ -1,5 +1,6 @@
 mod segment;
 mod sweep;
+mod rasterize;
 
 use segment::{Chain, Link, Segment};
 pub use sweep::Sweep;
