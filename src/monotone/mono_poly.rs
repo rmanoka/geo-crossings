@@ -1,5 +1,5 @@
 use geo::{
-    line_interpolate_point::LineInterpolatePoint, Coordinate, GeoFloat, GeoNum, Line, LineString,
+    Coordinate, GeoFloat, GeoNum, LineString,
     Polygon,
 };
 use std::{cmp::Ordering, iter::from_fn};
@@ -324,11 +324,15 @@ impl<'a, T: GeoFloat> Scanner<'a, T> {
                 return p2.y;
             }
             let frac = (x - p1.x) / (p2.x - p1.x);
-            Line::new(p1, p2)
-                .line_interpolate_point(frac)
-                .expect("interpolate mono-poly segment")
-                .0
-                .y
+            let y = frac * (p2.y - p1.y) + p1.y;
+
+            let (min_y, max_y) = if p1.y > p2.y {
+                (p2.y, p1.y)
+            } else {
+                (p1.y, p2.y)
+            };
+
+            y.max(min_y).min(max_y)
         };
         let (new_top, new_bot, ord, new_x) = match (top_val, bot_val) {
             (None, None) => return None,
