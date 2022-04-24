@@ -1,6 +1,6 @@
 use geo::{
     Coordinate, GeoFloat, GeoNum, LineString,
-    Polygon,
+    Polygon, prelude::BoundingRect, Rect,
 };
 use std::{cmp::Ordering, iter::from_fn};
 
@@ -12,6 +12,31 @@ use super::{Trapz, Trip};
 pub struct MonoPoly<T: GeoNum> {
     top: LineString<T>,
     bot: LineString<T>,
+}
+
+impl<T: GeoNum> BoundingRect<T> for MonoPoly<T> {
+    type Output = Rect<T>;
+
+    fn bounding_rect(&self) -> Self::Output {
+        let min_x = self.top.0[0].x;
+        let max_x = self.top.0.last().unwrap().x;
+
+        let mut max_y = self.top.0[0].y;
+        for coord in self.top.0.iter() {
+            if coord.y > max_y {
+                max_y = coord.y;
+            }
+        }
+        let mut min_y = max_y;
+        for coord in self.bot.0.iter() {
+            if coord.y < min_y {
+                min_y = coord.y;
+            }
+        }
+        assert!(min_x < max_x);
+        assert!(min_y < max_y);
+        Rect::new((min_x, min_y), (max_x, max_y))
+    }
 }
 
 impl<T: GeoNum> std::fmt::Debug for MonoPoly<T> {
