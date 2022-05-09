@@ -2,12 +2,12 @@ use slab::Slab;
 use std::{cmp::Ordering, collections::BTreeSet, fmt::Debug, ops::Bound};
 
 /// Internal representation used in ordered sets.
-pub(crate) struct ActiveSegment<T> {
+pub(crate) struct Active<T> {
     key: usize,
     storage: *const Slab<T>,
 }
 
-impl<T: Debug> Debug for ActiveSegment<T> {
+impl<T: Debug> Debug for Active<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("ActiveSegment")
             .field("key", &self.key)
@@ -16,7 +16,7 @@ impl<T: Debug> Debug for ActiveSegment<T> {
     }
 }
 
-impl<T> ActiveSegment<T> {
+impl<T> Active<T> {
     /// Create a new active segment pointing to the given storage.
     ///
     /// # Safety
@@ -32,7 +32,7 @@ impl<T> ActiveSegment<T> {
     /// Violating this will not lead to a memory-UB, but may
     /// cause panics or incorrect output.
     unsafe fn new(key: usize, storage: &Slab<T>) -> Self {
-        ActiveSegment {
+        Active {
             key,
             storage: storage as *const _,
         }
@@ -48,7 +48,7 @@ impl<T> ActiveSegment<T> {
 /// Partial equality based on key.
 ///
 /// This is consistent with the `PartialOrd` impl.
-impl<T> PartialEq for ActiveSegment<T> {
+impl<T> PartialEq for Active<T> {
     #[inline]
     fn eq(&self, other: &Self) -> bool {
         self.key == other.key
@@ -56,12 +56,12 @@ impl<T> PartialEq for ActiveSegment<T> {
 }
 
 /// Assert total equality.
-impl<T: PartialOrd> Eq for ActiveSegment<T> {}
+impl<T: PartialOrd> Eq for Active<T> {}
 
 /// Partial ordering defined as per algorithm.
 ///
 /// This is requires the same pre-conditions as for [`LineOrPoint`].
-impl<T: PartialOrd> PartialOrd for ActiveSegment<T> {
+impl<T: PartialOrd> PartialOrd for Active<T> {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         self.get()
             .expect("ActiveSegment::partial_cmp: could not find key in storage")
@@ -74,7 +74,7 @@ impl<T: PartialOrd> PartialOrd for ActiveSegment<T> {
 }
 
 /// Assert total ordering same as `PartialOrd` impl.
-impl<T: PartialOrd> Ord for ActiveSegment<T> {
+impl<T: PartialOrd> Ord for Active<T> {
     #[inline]
     fn cmp(&self, other: &Self) -> Ordering {
         self.partial_cmp(other)
@@ -83,22 +83,22 @@ impl<T: PartialOrd> Ord for ActiveSegment<T> {
 }
 
 /// Helper trait to insert, remove and get adjacent segments from ordered set.
-pub(crate) trait SegmentAccess {
+pub(crate) trait Access {
     type SegmentType;
     fn prev_key(&self, key: usize, storage: &Slab<Self::SegmentType>) -> Option<usize>;
     fn next_key(&self, key: usize, storage: &Slab<Self::SegmentType>) -> Option<usize>;
-    unsafe fn add_segment(&mut self, key: usize, storage: &Slab<Self::SegmentType>);
-    fn remove_segment(&mut self, key: usize, storage: &Slab<Self::SegmentType>);
+    unsafe fn add_key(&mut self, key: usize, storage: &Slab<Self::SegmentType>);
+    fn remove_key(&mut self, key: usize, storage: &Slab<Self::SegmentType>);
 }
 
-impl<T: PartialOrd> SegmentAccess for BTreeSet<ActiveSegment<T>> {
+impl<T: PartialOrd> Access for BTreeSet<Active<T>> {
     type SegmentType = T;
 
     #[inline]
     fn prev_key(&self, key: usize, storage: &Slab<Self::SegmentType>) -> Option<usize> {
         // Safety: aseg is only valid till end of function, and we
         // are holding an immut. reference to the storage.
-        let aseg = unsafe { ActiveSegment::new(key, storage) };
+        let aseg = unsafe { Active::new(key, storage) };
         self.range((Bound::Unbounded, Bound::Excluded(aseg)))
             .next_back()
             .map(|s| s.key)
@@ -108,23 +108,23 @@ impl<T: PartialOrd> SegmentAccess for BTreeSet<ActiveSegment<T>> {
     fn next_key(&self, key: usize, storage: &Slab<Self::SegmentType>) -> Option<usize> {
         // Safety: aseg is only valid till end of function, and we
         // are holding a immut. reference to the storage.
-        let aseg = unsafe { ActiveSegment::new(key, storage) };
+        let aseg = unsafe { Active::new(key, storage) };
         self.range((Bound::Excluded(aseg), Bound::Unbounded))
             .next()
             .map(|s| s.key)
     }
 
     #[inline]
-    unsafe fn add_segment(&mut self, key: usize, storage: &Slab<Self::SegmentType>) {
+    unsafe fn add_key(&mut self, key: usize, storage: &Slab<Self::SegmentType>) {
         debug_assert!(storage.contains(key));
-        assert!(self.insert(ActiveSegment::new(key, storage)));
+        assert!(self.insert(Active::new(key, storage)));
     }
 
     #[inline]
-    fn remove_segment(&mut self, key: usize, storage: &Slab<Self::SegmentType>) {
+    fn remove_key(&mut self, key: usize, storage: &Slab<Self::SegmentType>) {
         debug_assert!(storage.contains(key));
         // Safety: temporary active segment is valid as we're holding
         // a immut. reference to `storage`.
-        assert!(self.remove(&unsafe { ActiveSegment::new(key, storage) }));
+        assert!(self.remove(&unsafe { Active::new(key, storage) }));
     }
 }

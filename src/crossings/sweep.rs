@@ -1,16 +1,18 @@
 use geo::GeoFloat;
-use std::{cmp::Ordering, collections::BTreeSet, fmt::Debug};
+use log::{debug, trace};
+use slab::Slab;
+use std::{
+    cmp::Ordering,
+    collections::{BTreeSet, BinaryHeap},
+    fmt::Debug,
+};
 
 use crate::{
     events::{Event, EventType, SweepPoint},
     line_or_point::LineOrPoint::{self, *},
-    segments::{ActiveSegment, SegmentAccess},
+    active::{Active, Access},
     Crossable, Crossing,
 };
-use std::collections::BinaryHeap;
-
-use log::{debug, trace};
-use slab::Slab;
 
 /// A segment of input [`LineOrPoint`] generated during the sweep.
 #[derive(Debug, Clone, Copy)]
@@ -213,7 +215,7 @@ where
 {
     segments: Box<Slab<Segment<C>>>,
     events: BinaryHeap<Event<C::Scalar>>,
-    active_segments: BTreeSet<ActiveSegment<Segment<C>>>,
+    active_segments: BTreeSet<Active<Segment<C>>>,
 }
 
 impl<C: Crossable + Clone> Sweep<C> {
@@ -468,7 +470,7 @@ impl<C: Crossable + Clone> Sweep<C> {
                 // de-allocated until `self` is dropped.
                 unsafe {
                     self.active_segments
-                        .add_segment(event.segment_key, &self.segments);
+                        .add_key(event.segment_key, &self.segments);
                 }
 
                 let mut segment_key = Some(event.segment_key);
@@ -482,7 +484,7 @@ impl<C: Crossable + Clone> Sweep<C> {
                 // Safety: `self.segments` is a `Box` that is not
                 // de-allocated until `self` is dropped.
                 self.active_segments
-                    .remove_segment(event.segment_key, &self.segments);
+                    .remove_key(event.segment_key, &self.segments);
 
                 let mut segment_key = Some(event.segment_key);
                 while let Some(key) = segment_key {

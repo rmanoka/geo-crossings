@@ -18,7 +18,7 @@ use super::{
 use crate::{
     events::{Event, EventType},
     monotone::winding_inverse,
-    segments::{ActiveSegment, SegmentAccess},
+    active::{Active, Access},
     SweepPoint,
 };
 
@@ -38,7 +38,7 @@ pin_project! {
         segments: Slab<Segment<T>>,
         pt_key: usize,
         events: Vec<Event<T>>,
-        active_segments: BTreeSet<ActiveSegment<Segment<T>>>,
+        active_segments: BTreeSet<Active<Segment<T>>>,
         _pin: PhantomPinned,
     }
 }
@@ -114,7 +114,7 @@ impl<T: GeoNum> Sweep<T> {
             }
             let this = self.as_mut().project();
             this.active_segments
-                .remove_segment(e.segment_key, &this.segments);
+                .remove_key(e.segment_key, &this.segments);
         };
 
         handle_remove(&ixn.event_1);
@@ -230,7 +230,7 @@ impl<T: GeoNum> Sweep<T> {
             // default values set in the constructor are appropriate.
             unsafe {
                 this.active_segments
-                    .add_segment(e.segment_key, &this.segments);
+                    .add_key(e.segment_key, &this.segments);
             }
         };
         handle_insert(&ixn.event_1);
