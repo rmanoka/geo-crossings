@@ -29,7 +29,8 @@ pin_project! {
     /// decomposition algorithm. Users should typically use
     /// [`crate::monotone::monotone_chains`].
     ///
-    /// Implementation is based on the algorithm. description in these [awesome lecture notes].
+    /// Implementation is based on the algorithm description
+    /// in these [awesome lecture notes].
     ///
     /// [awesome lecture notes]: https://www.cs.umd.edu/class/spring2020/cmsc754/Lects/lect05-triangulate.pdf
     pub struct Sweep<T: GeoNum> {

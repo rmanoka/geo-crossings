@@ -116,13 +116,13 @@ impl<T: PartialOrd> SegmentAccess for BTreeSet<ActiveSegment<T>> {
 
     #[inline]
     unsafe fn add_segment(&mut self, key: usize, storage: &Slab<Self::SegmentType>) {
-        assert!(storage.contains(key));
+        debug_assert!(storage.contains(key));
         assert!(self.insert(ActiveSegment::new(key, storage)));
     }
 
     #[inline]
     fn remove_segment(&mut self, key: usize, storage: &Slab<Self::SegmentType>) {
-        assert!(storage.contains(key));
+        debug_assert!(storage.contains(key));
         // Safety: temporary active segment is valid as we're holding
         // a immut. reference to `storage`.
         assert!(self.remove(&unsafe { ActiveSegment::new(key, storage) }));

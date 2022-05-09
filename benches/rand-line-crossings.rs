@@ -57,10 +57,10 @@ where
 
 fn short<T: Measurement>(c: &mut Criterion<T>) {
     const NUM_LINES: usize = 4096;
-    const SAMPLE_SIZE: usize = 16;
+    const SAMPLE_SIZE: usize = 10;
 
     let mut group = c.benchmark_group("Short lines");
-    group.sample_size(2 * SAMPLE_SIZE);
+    group.sample_size(10);
     group.plot_config(PlotConfiguration::default().summary_scale(AxisScale::Logarithmic));
 
     (0..10).for_each(|scale| {

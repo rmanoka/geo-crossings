@@ -103,7 +103,7 @@ impl<C: Crossable> Segment<C> {
         match intersection {
             // Handle point intersection
             Point(r) => {
-                assert!(
+                debug_assert!(
                     p <= r && r <= q,
                     "intersection point was not ordered within the line!"
                 );
@@ -124,7 +124,7 @@ impl<C: Crossable> Segment<C> {
             }
             // Handle overlapping segments
             Line(r1, r2) => {
-                assert!(
+                debug_assert!(
                     p <= r1 && r2 <= q,
                     "overlapping segment was not ordered within the line!"
                 );
@@ -434,10 +434,8 @@ impl<C: Crossable + Clone> Sweep<C> {
                         };
                         if handle_end_event {
                             let event = self.events.pop().unwrap();
-                            assert!(
-                                self.handle_event(event, cb),
-                                "special right-end event handling failed"
-                            )
+                            let done = self.handle_event(event, cb);
+                            debug_assert!(done, "special right-end event handling failed")
                         }
 
                         // 2. Split segment, adding extra segments as needed.
@@ -499,12 +497,14 @@ impl<C: Crossable + Clone> Sweep<C> {
                     let next_geom = self.segments[next_key].geom;
                     if let Some(adj_intersection) = prev_geom.intersect_line(&next_geom) {
                         // 1. Split prev_segment, and extra splits to storage
-                        assert!(
-                            self.adjust_one_segment(prev_key, adj_intersection)
-                                .is_none()
-                                && self
-                                    .adjust_one_segment(next_key, adj_intersection)
-                                    .is_none(),
+                        let first = self
+                            .adjust_one_segment(prev_key, adj_intersection)
+                            .is_none();
+                        let second = self
+                            .adjust_one_segment(next_key, adj_intersection)
+                            .is_none();
+                        debug_assert!(
+                            first && second,
                             "adjacent segments @ removal can't overlap!"
                         );
                     }
@@ -522,7 +522,7 @@ impl<C: Crossable + Clone> Sweep<C> {
                         let adj_overlap_key = self.adjust_one_segment(adj_key, adj_intersection);
 
                         // Can't have overlap with a point
-                        assert!(adj_overlap_key.is_none());
+                        debug_assert!(adj_overlap_key.is_none());
                     }
                 }
 
@@ -541,6 +541,7 @@ impl<C: Crossable + Clone> Sweep<C> {
     /// Process the next event in heap.
     ///
     /// Calls the callback unless the event is spurious.
+    #[inline]
     pub fn next_event<F: FnMut(Crossing<C>)>(
         &mut self,
         mut cb: F,
@@ -554,6 +555,7 @@ impl<C: Crossable + Clone> Sweep<C> {
     }
 
     /// Peek and return the next point in the sweep.
+    #[inline]
     pub fn peek_point(&self) -> Option<SweepPoint<C::Scalar>> {
         self.events.peek().map(|e| e.point)
     }
