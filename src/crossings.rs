@@ -2,10 +2,13 @@ use geo::{
     line_intersection::{line_intersection, LineIntersection},
     Coordinate, GeoFloat, Line,
 };
+use log::trace;
 use std::{fmt::Debug, iter::FromIterator, rc::Rc, sync::Arc};
 
 mod sweep;
-use sweep::Sweep;
+pub(crate) use sweep::Sweep;
+
+use crate::line_or_point::LineOrPoint;
 
 /// Interface for types that can be processed to detect crossings.
 ///
@@ -64,7 +67,7 @@ blanket_impl_smart_pointer!(Arc<T>);
 /// This type is used to convey the part of the input geometry that is
 /// intersecting at a given intersection. This is returned by the
 /// [`CrossingsIter::intersections`] method.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Copy)]
 pub struct Crossing<C: Crossable> {
     /// The input associated with this segment.
     pub crossable: C,
@@ -76,7 +79,7 @@ pub struct Crossing<C: Crossable> {
     /// [`CrossingsIter`]. If it ends at the point (`at_left` is
     /// `false`), then it is guaranteed to not contain any other
     /// intersection point in its interior.
-    pub line: Line<C::Scalar>,
+    pub line: LineOrPoint<C::Scalar>,
 
     /// Whether this is the first segment of the input line.
     pub first_segment: bool,
@@ -84,11 +87,18 @@ pub struct Crossing<C: Crossable> {
     /// Flag that is `true` if the next geom in the sequence overlaps
     /// (i.e. intersects at more than one point) with this. Not
     /// relevant and `false` if this is a point.
+    ///
+    /// Note that the overlapping segments may not always
+    /// _all_ get batched together. They may be reported as
+    /// one or more set of overlapping segments in an
+    /// arbitrary order.
     pub has_overlap: bool,
 
     /// Flag that is `true` if the `geom` starts at the intersection
     /// point. Otherwise, it ends at the intersection point.
     pub at_left: bool,
+
+    pub(crate) key: usize,
 }
 
 /// Iterator that yields all crossings.
@@ -98,8 +108,8 @@ pub struct Crossing<C: Crossable> {
 /// iterator of [`Crossable`]. The implementation uses the
 /// [Bentley-Ottman] algorithm and runs in time O((n + k) log n) time;
 /// this is faster than a brute-force search for intersections across
-/// all pairs of input segments if k, the number of intersections is
-/// small compared to n^2.
+/// all pairs of input segments if k --- the number of intersections
+/// --- is small compared to n^2.
 ///
 /// ## Usage
 ///
@@ -132,8 +142,16 @@ pub struct CrossingsIter<C: Crossable + Clone> {
 impl<C: Crossable + Clone> CrossingsIter<C> {
     /// Returns the segments that intersect the last point yielded by
     /// the iterator.
-    pub fn intersections(&mut self) -> &mut [Crossing<C>] {
+    pub fn intersections_mut(&mut self) -> &mut [Crossing<C>] {
         &mut self.segments
+    }
+
+    pub fn intersections(&self) -> &[Crossing<C>] {
+        &self.segments
+    }
+
+    pub(crate) fn prev_active(&self, c: &Crossing<C>) -> Option<&C> {
+        self.sweep.prev_active(c).map(|s| s.crossable())
     }
 }
 
@@ -158,8 +176,15 @@ impl<C: Crossable + Clone> Iterator for CrossingsIter<C> {
 
         segments.clear();
         let mut last_point = self.sweep.peek_point();
+        trace!("pt: {last_point:?}");
         while last_point == self.sweep.peek_point() && self.sweep.peek_point().is_some() {
-            last_point = self.sweep.next_event(|crossing| segments.push(crossing));
+            last_point = self.sweep.next_event(|seg, ty| {
+                trace!(
+                    "cb: {seg:?} {ty:?} (crossable = {cross:?})",
+                    cross = LineOrPoint::from(seg.crossable().line())
+                );
+                segments.push(Crossing::from_segment(seg, ty))
+            });
         }
 
         if segments.is_empty() {
@@ -227,7 +252,7 @@ impl<C: Crossable + Clone> FromIterator<C> for Intersections<C> {
 impl<C: Crossable + Clone> Intersections<C> {
     fn intersection(&mut self) -> Option<(C, C, LineIntersection<C::Scalar>)> {
         let (si, sj) = {
-            let segments = self.inner.intersections();
+            let segments = self.inner.intersections_mut();
             (&segments[self.idx], &segments[self.jdx])
         };
         // Ignore intersections that have already been processed
@@ -240,21 +265,23 @@ impl<C: Crossable + Clone> Intersections<C> {
             (!si.at_left || si.first_segment) && (!sj.at_left || sj.first_segment)
         };
 
-        should_compute.then(|| {
+        if should_compute {
             let si = si.crossable.clone();
             let sj = sj.crossable.clone();
 
             let int = line_intersection(si.line(), sj.line())
                 .expect("line_intersection returned `None` disagreeing with `CrossingsIter`");
 
-            (si, sj, int)
-        })
+            Some((si, sj, int))
+        } else {
+            None
+        }
     }
 
     fn step(&mut self) -> bool {
-        let seg_len = self.inner.intersections().len();
+        let seg_len = self.inner.intersections_mut().len();
         if 1 + self.jdx < seg_len {
-            self.is_overlap = self.is_overlap && self.inner.intersections()[self.jdx].has_overlap;
+            self.is_overlap = self.is_overlap && self.inner.intersections_mut()[self.jdx].has_overlap;
             self.jdx += 1;
         } else {
             self.idx += 1;
@@ -264,13 +291,13 @@ impl<C: Crossable + Clone> Intersections<C> {
                     if self.pt.is_none() {
                         return false;
                     }
-                    if self.inner.intersections().len() > 1 {
+                    if self.inner.intersections_mut().len() > 1 {
                         break;
                     }
                 }
                 self.idx = 0;
             }
-            self.is_overlap = self.inner.intersections()[self.idx].has_overlap;
+            self.is_overlap = self.inner.intersections_mut()[self.idx].has_overlap;
             self.jdx = self.idx + 1;
         }
         true
@@ -295,14 +322,16 @@ impl<C: Crossable + Clone> Iterator for Intersections<C> {
 
 #[cfg(test)]
 pub(crate) mod tests {
-    use geo::Line;
+    use geo::{Line, Polygon, Rect};
+    use log::info;
     use std::io::Write;
+
+    use crate::line_or_point::LineOrPoint;
 
     use super::*;
 
     pub(crate) fn init_log() {
         let _ = env_logger::builder()
-            .is_test(true)
             .format(|buf, record| writeln!(buf, "{} - {}", record.level(), record.args()))
             .try_init();
     }
@@ -348,5 +377,30 @@ pub(crate) mod tests {
             })
             .count();
         assert_eq!(count, 9);
+    }
+
+    #[test]
+    #[ignore]
+    fn check_adhoc_crossings() {
+        init_log();
+
+        let mut input = vec![];
+        let poly1: Polygon<_> = Rect::new((0., 0.), (1., 1.)).into();
+        let poly2: Polygon<_> = Rect::new((0.5, 1.), (2., 2.)).into();
+        input.extend(poly1.exterior().lines());
+        input.extend(poly2.exterior().lines());
+
+        let mut iter: CrossingsIter<_> = input.into_iter().collect();
+        while let Some(pt) = iter.next() {
+            info!("pt: {pt:?}");
+            iter.intersections_mut().iter().for_each(|i| {
+                info!(
+                    "\t{geom:?} ({at_left}) {ovl}",
+                    geom = LineOrPoint::from(i.line),
+                    at_left = if i.at_left { "S" } else { "E" },
+                    ovl = if i.has_overlap { "[OVL] " } else { "" },
+                );
+            });
+        }
     }
 }

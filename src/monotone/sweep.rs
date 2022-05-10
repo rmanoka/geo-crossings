@@ -17,7 +17,7 @@ use super::{
 
 use crate::{
     events::{Event, EventType},
-    monotone::winding_inverse,
+    utils::winding_inverse,
     active::{Active, Access},
     SweepPoint,
 };
@@ -278,7 +278,6 @@ impl<T: GeoNum> Sweep<T> {
             }
         }
     }
-
     fn store_point(self: Pin<&mut Self>, coord: Coordinate<T>) {
         let pt_key = self.pt_key;
         // Safety: the pt. segment is never stored as an
@@ -287,11 +286,9 @@ impl<T: GeoNum> Sweep<T> {
             *self.storage_index_mut(pt_key).get_unchecked_mut() = Segment::new_point(pt_key, coord);
         }
     }
-
     fn storage_index_mut(self: Pin<&mut Self>, key: usize) -> Pin<&mut Segment<T>> {
         unsafe { self.map_unchecked_mut(|s| &mut s.segments[key]) }
     }
-
     fn get_next_segments(&self) -> Option<(SweepPoint<T>, usize)> {
         let events_left = self.events.len();
         if events_left == 0 {
@@ -309,7 +306,6 @@ impl<T: GeoNum> Sweep<T> {
 
         Some((next_point, start_idx))
     }
-
     fn find_intersection_type(
         self: Pin<&mut Self>,
         pt: SweepPoint<T>,

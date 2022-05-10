@@ -9,8 +9,8 @@ use log::debug;
 use smallvec::SmallVec;
 
 use crate::monotone::{segment::VertexType, MonoPoly};
-
-use super::{winding_inverse, Chain, Link, Sweep};
+use crate::utils::winding_inverse;
+use super::{Chain, Link, Sweep};
 
 const CHAIN_STACK_SIZE: usize = 16;
 type Chains<T> = SmallVec<[Chain<T>; CHAIN_STACK_SIZE]>;

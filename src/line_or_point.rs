@@ -62,6 +62,13 @@ impl<T: GeoNum> LineOrPoint<T> {
             LineOrPoint::Line(p, _) => p,
         }
     }
+
+    pub fn second(&self) -> SweepPoint<T> {
+        *match self {
+            LineOrPoint::Point(p) => p,
+            LineOrPoint::Line(_, p) => p,
+        }
+    }
 }
 impl<T: GeoFloat> LineOrPoint<T> {
     /// Intersect a line with self and return a point, a overlapping segment or `None`.

@@ -21,21 +21,6 @@ fn winding_order_from_orientation(ori: Orientation) -> Option<WindingOrder> {
     }
 }
 
-#[allow(dead_code)]
-fn winding_order_as_orientation(winding: &WindingOrder) -> Orientation {
-    match winding {
-        WindingOrder::Clockwise => Orientation::Clockwise,
-        WindingOrder::CounterClockwise => Orientation::CounterClockwise,
-    }
-}
-
-fn winding_inverse(winding: WindingOrder) -> WindingOrder {
-    match winding {
-        WindingOrder::Clockwise => WindingOrder::CounterClockwise,
-        WindingOrder::CounterClockwise => WindingOrder::Clockwise,
-    }
-}
-
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct Trip<T: GeoNum> {
     pub x: T,

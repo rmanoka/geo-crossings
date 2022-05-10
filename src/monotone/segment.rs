@@ -8,7 +8,7 @@ use std::{cmp::Ordering, iter::FromIterator, pin::Pin};
 use crate::{
     events::{Event, EventType},
     line_or_point::LineOrPoint,
-    monotone::winding_inverse,
+    utils::winding_inverse,
     SweepPoint,
 };
 

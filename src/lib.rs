@@ -52,14 +52,20 @@ mod events;
 pub use events::SweepPoint;
 
 mod line_or_point;
+pub use line_or_point::LineOrPoint;
+
 mod active;
 
 pub mod crossings;
 pub use crossings::{Crossable, Crossing, CrossingsIter, Intersections};
 
 pub mod monotone;
-pub use monotone::{monotone_chains, Sweep};
+pub use monotone::{monotone_chains, Sweep as MonotoneSweep};
+
+pub mod bops;
 
 #[cfg(test)]
 #[path = "../benches/utils/random.rs"]
 pub mod random;
+
+pub(crate) mod utils;
