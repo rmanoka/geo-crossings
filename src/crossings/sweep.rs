@@ -3,12 +3,12 @@ use log::trace;
 use slab::Slab;
 use std::{
     cmp::Ordering,
-    collections::{BTreeSet, BinaryHeap},
+    collections::BinaryHeap,
     fmt::Debug,
 };
 
 use crate::{
-    active::{Access, Active},
+    active::{Access, Active, SplayWrap},
     events::{Event, EventType, SweepPoint},
     line_or_point::LineOrPoint::{self, *},
     Crossable, Crossing,
@@ -16,14 +16,14 @@ use crate::{
 
 /// A segment of input [`LineOrPoint`] generated during the sweep.
 #[derive(Clone, Copy)]
-pub(crate) struct Segment<C: Crossable> {
+pub struct Segment<C: Crossable> {
     pub(crate) geom: LineOrPoint<C::Scalar>,
     key: usize,
     crossable: C,
     first_segment: bool,
     left_event_done: bool,
-    pub(crate) overlapping: Option<usize>,
-    pub(crate) is_overlapping: bool,
+    overlapping: Option<usize>,
+    is_overlapping: bool,
 }
 
 impl<C: Crossable> Debug for Segment<C> {
@@ -34,7 +34,11 @@ impl<C: Crossable> Debug for Segment<C> {
             key = self.key,
             geom = self.geom,
             first = if self.first_segment { "[1st]" } else { "" },
-            has = if self.overlapping.is_some() { "HAS" } else { "NON" },
+            has = if self.overlapping.is_some() {
+                "HAS"
+            } else {
+                "NON"
+            },
             ovl = if self.is_overlapping { "OVL" } else { "NON" },
         )
     }
@@ -228,16 +232,23 @@ impl<C: Crossable> PartialOrd for Segment<C> {
 /// iterator interfaces built around this sweep.
 ///
 /// [Bentley-Ottman]: //en.wikipedia.org/wiki/Bentley%E2%80%93Ottmann_algorithm
-pub struct Sweep<C: Crossable>
+pub struct Sweep<C, A = SplayWrap<Active<Segment<C>>>>
 where
     C: Crossable + Clone,
+    A: Access<SegmentType = Segment<C>>,
 {
     segments: Box<Slab<Segment<C>>>,
     events: BinaryHeap<Event<C::Scalar>>,
-    active_segments: BTreeSet<Active<Segment<C>>>,
+    active_segments: A,
+    // active_segments: SplayWrap<Active<Segment<C>>>,
+    // active_segments: BTreeSet<Active<Segment<C>>>,
 }
 
-impl<C: Crossable + Clone> Sweep<C> {
+impl<C, A> Sweep<C, A>
+where
+    C: Crossable + Clone,
+    A: Access<SegmentType = Segment<C>>,
+{
     pub fn new<I: IntoIterator<Item = C>>(iter: I) -> Self {
         let iter = iter.into_iter();
         let size = {
@@ -281,8 +292,8 @@ impl<C: Crossable + Clone> Sweep<C> {
                 let child_overlapping = self.segments[child_key].overlapping;
                 let child_crossable = self.segments[child_key].crossable().clone();
 
-                let new_key = Segment::new(&mut self.segments, child_crossable, Some(segment_geom))
-                    .key();
+                let new_key =
+                    Segment::new(&mut self.segments, child_crossable, Some(segment_geom)).key();
                 self.segments[target_key].overlapping = Some(new_key);
                 self.segments[new_key].is_overlapping = true;
 
@@ -300,7 +311,8 @@ impl<C: Crossable + Clone> Sweep<C> {
         let segment = &mut self.segments[key];
         trace!(
             "adjust_for_intersection: {:?}\n\twith: {:?}",
-            segment, adj_intersection
+            segment,
+            adj_intersection
         );
         let adjust_output = segment.adjust_for_intersection(adj_intersection);
         trace!("adjust_output: {:?}", adjust_output);
@@ -331,7 +343,10 @@ impl<C: Crossable + Clone> Sweep<C> {
             Unchanged { overlap } => overlap.then(|| key),
             SplitOnce { overlap, right } => {
                 let new_key = self.create_segment(adj_cross, Some(right), Some(key));
-                trace!("adj1: created segment: {seg:?}", seg = self.segments[new_key]);
+                trace!(
+                    "adj1: created segment: {seg:?}",
+                    seg = self.segments[new_key]
+                );
                 match overlap {
                     Some(false) => Some(key),
                     Some(true) => Some(new_key),

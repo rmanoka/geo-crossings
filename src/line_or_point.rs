@@ -78,7 +78,7 @@ impl<T: GeoFloat> LineOrPoint<T> {
         assert!(other.is_line(), "tried to intersect with a point variant!");
 
         let line = other.line();
-        match *self {
+        let lpt = match *self {
             LineOrPoint::Point(p) => {
                 if <T as HasKernel>::Ker::orient2d(line.start, p.coord(), line.end)
                     == Orientation::Collinear
@@ -101,7 +101,21 @@ impl<T: GeoFloat> LineOrPoint<T> {
                     LineIntersection::Collinear { intersection } => intersection.into(),
                 })
             }
+        };
+        if let Some(lp) = lpt {
+            debug_assert!(
+                lp.first() >= self.first()
+                && (lp.first() <= self.second())
+                    && (lp.first() >= other.first())
+                    && (lp.first() <= other.second()),
+                "intersection not in total-order: {lp:?}\n\tLine({lp1:?} - {lp2:?}) X Line({lp3:?} - {lp4:?})",
+                lp1 = self.first(),
+                lp2 = self.second(),
+                lp3 = other.first(),
+                lp4 = other.second(),
+            );
         }
+        lpt
     }
 
     #[cfg(test)]

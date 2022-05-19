@@ -25,6 +25,11 @@ approx = "0.5.1"
 geo-rasterize = "0.1.2"
 euclid = "0.22.7"
 wkt = "0.10.1"
+geojson = { version = "0.22.3", features = [ "geo-types" ] }
+anyhow = "1.0.57"
+serde = "1.0.137"
+serde_json = "1.0.81"
+serde_derive = "1.0.137"
 
 [[bench]]
 name = "rand-line-crossings"
@@ -40,6 +45,10 @@ harness = false
 
 [[bench]]
 name = "prof-rasterize"
+harness = false
+
+[[bench]]
+name = "boolean-ops"
 harness = false
 
 [profile.bench]

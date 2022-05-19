@@ -1,8 +1,10 @@
 use slab::Slab;
 use std::{cmp::Ordering, collections::BTreeSet, fmt::Debug, ops::Bound};
 
+use crate::SplaySet;
+
 /// Internal representation used in ordered sets.
-pub(crate) struct Active<T> {
+pub struct Active<T> {
     key: usize,
     storage: *const Slab<T>,
 }
@@ -37,11 +39,11 @@ impl<T> Active<T> {
             storage: storage as *const _,
         }
     }
-    fn get(&self) -> Option<&T> {
+    fn get(&self) -> &T {
         // Safety: reference is guaranteed to be valid by the `new`
         // method.
         let slab = unsafe { &*self.storage as &Slab<_> };
-        slab.get(self.key)
+        unsafe { slab.get_unchecked(self.key) }
     }
 }
 
@@ -64,11 +66,9 @@ impl<T: PartialOrd> Eq for Active<T> {}
 impl<T: PartialOrd> PartialOrd for Active<T> {
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         self.get()
-            .expect("ActiveSegment::partial_cmp: could not find key in storage")
             .partial_cmp(
                 other
                     .get()
-                    .expect("ActiveSegment::partial_cmp: could not find key in storage"),
             )
     }
 }
@@ -83,7 +83,7 @@ impl<T: PartialOrd> Ord for Active<T> {
 }
 
 /// Helper trait to insert, remove and get adjacent segments from ordered set.
-pub(crate) trait Access {
+pub trait Access: Default {
     type SegmentType;
     fn prev_key(&self, key: usize, storage: &Slab<Self::SegmentType>) -> Option<usize>;
     fn next_key(&self, key: usize, storage: &Slab<Self::SegmentType>) -> Option<usize>;
@@ -126,5 +126,45 @@ impl<T: PartialOrd> Access for BTreeSet<Active<T>> {
         // Safety: temporary active segment is valid as we're holding
         // a immut. reference to `storage`.
         assert!(self.remove(&unsafe { Active::new(key, storage) }));
+    }
+}
+
+pub struct SplayWrap<T: Ord>(SplaySet<T, Box<dyn Fn(&T, &T) -> Ordering>>);
+
+impl<T: Ord> Default for SplayWrap<T> {
+    fn default() -> Self {
+        Self(SplaySet::new(Box::new(|a: &T, b: &T| a.cmp(b))))
+    }
+}
+
+impl<T: PartialOrd> Access for SplayWrap<Active<T>> {
+    type SegmentType = T;
+
+    fn prev_key(&self, key: usize, storage: &Slab<Self::SegmentType>) -> Option<usize> {
+        // Safety: aseg is only valid till end of function, and we
+        // are holding an immut. reference to the storage.
+        let aseg = unsafe { Active::new(key, storage) };
+        self.0.prev(&aseg)
+            .map(|s| s.key)
+    }
+
+    fn next_key(&self, key: usize, storage: &Slab<Self::SegmentType>) -> Option<usize> {
+        // Safety: aseg is only valid till end of function, and we
+        // are holding an immut. reference to the storage.
+        let aseg = unsafe { Active::new(key, storage) };
+        self.0.next(&aseg)
+            .map(|s| s.key)
+    }
+
+    unsafe fn add_key(&mut self, key: usize, storage: &Slab<Self::SegmentType>) {
+        debug_assert!(storage.contains(key));
+        assert!(self.0.insert(Active::new(key, storage)));
+    }
+
+    fn remove_key(&mut self, key: usize, storage: &Slab<Self::SegmentType>) {
+        debug_assert!(storage.contains(key));
+        // Safety: temporary active segment is valid as we're holding
+        // a immut. reference to `storage`.
+        assert!(self.0.remove(&unsafe { Active::new(key, storage) }));
     }
 }

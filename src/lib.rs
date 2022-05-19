@@ -63,6 +63,10 @@ pub mod monotone;
 pub use monotone::{monotone_chains, Sweep as MonotoneSweep};
 
 pub mod bops;
+pub use bops::BooleanOp;
+
+pub mod splay;
+pub use splay::*;
 
 #[cfg(test)]
 #[path = "../benches/utils/random.rs"]

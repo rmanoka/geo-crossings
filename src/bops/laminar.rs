@@ -90,6 +90,10 @@ pub fn assemble<T: GeoFloat>(rings: Vec<Ring<T>>) -> Vec<Polygon<T>> {
                 polygons[p_idx] = Some(Polygon::new(rings[p_idx].coords().clone(), vec![]));
             }
             polygons[p_idx].as_mut().unwrap().interiors_push(r.coords().clone());
+        } else {
+            if polygons[idx].is_none() {
+                polygons[idx] = Some(Polygon::new(rings[idx].coords().clone(), vec![]));
+            }
         }
     });
 
