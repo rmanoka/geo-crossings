@@ -1,8 +1,27 @@
-use geo::{winding_order::WindingOrder, Line};
+use geo::{winding_order::WindingOrder, Line, GeoFloat, Polygon};
 use std::{cell::Cell, fmt::Display};
 
+trait BooleanOp: Sized {
+    fn intersect(&self, other: &Self) -> Vec<Self>;
+    fn union(&self, other: &Self) -> Vec<Self>;
+}
+
+impl<T: GeoFloat> BooleanOp for Polygon<T> {
+    fn intersect(&self, other: &Self) -> Vec<Self> {
+        let bop = Op::new(self, other, OpType::Intersection);
+        let rings = bop.sweep();
+        assemble(rings)
+    }
+
+    fn union(&self, other: &Self) -> Vec<Self> {
+        let bop = Op::new(self, other, OpType::Union);
+        let rings = bop.sweep();
+        assemble(rings)
+    }
+}
+
 mod op;
-pub use op::{Op, OpType};
+use op::*;
 
 mod rings;
 use rings::*;
