@@ -285,17 +285,17 @@ where
         if let Some(parent) = parent {
             let segment_geom = segment.geom;
 
-            let mut child = self.segments[parent].overlapping;
+            let mut child = unsafe { self.segments.get_unchecked(parent) }.overlapping;
             let mut target_key = segment_key;
 
             while let Some(child_key) = child {
-                let child_overlapping = self.segments[child_key].overlapping;
-                let child_crossable = self.segments[child_key].crossable().clone();
+                let child_overlapping = unsafe { self.segments.get_unchecked(child_key) }.overlapping;
+                let child_crossable = unsafe { self.segments.get_unchecked(child_key) }.crossable().clone();
 
                 let new_key =
                     Segment::new(&mut self.segments, child_crossable, Some(segment_geom)).key();
-                self.segments[target_key].overlapping = Some(new_key);
-                self.segments[new_key].is_overlapping = true;
+                unsafe { self.segments.get_unchecked_mut(target_key) }.overlapping = Some(new_key);
+                unsafe { self.segments.get_unchecked_mut(new_key) }.is_overlapping = true;
 
                 target_key = new_key;
                 child = child_overlapping;
@@ -308,7 +308,7 @@ where
         key: usize,
         adj_intersection: LineOrPoint<C::Scalar>,
     ) -> SplitSegments<C::Scalar> {
-        let segment = &mut self.segments[key];
+        let segment = unsafe { self.segments.get_unchecked_mut(key) };
         trace!(
             "adjust_for_intersection: {:?}\n\twith: {:?}",
             segment,
@@ -325,7 +325,7 @@ where
 
         let mut child = segment.overlapping;
         while let Some(child_key) = child {
-            let child_seg = &mut self.segments[child_key];
+            let child_seg = unsafe { self.segments.get_unchecked_mut(child_key) };
             child_seg.geom = new_geom;
             child = child_seg.overlapping;
         }
@@ -336,7 +336,7 @@ where
         key: usize,
         adj_intersection: LineOrPoint<C::Scalar>,
     ) -> Option<usize> {
-        let adj_segment = &mut self.segments[key];
+        let adj_segment = &mut unsafe { self.segments.get_unchecked(key) };
         let adj_cross = adj_segment.crossable().clone();
         use SplitSegments::*;
         match self.adjust_for_intersection(key, adj_intersection) {
@@ -345,7 +345,7 @@ where
                 let new_key = self.create_segment(adj_cross, Some(right), Some(key));
                 trace!(
                     "adj1: created segment: {seg:?}",
-                    seg = self.segments[new_key]
+                    seg = unsafe { self.segments.get_unchecked(new_key) }
                 );
                 match overlap {
                     Some(false) => Some(key),
@@ -392,12 +392,12 @@ where
     }
     fn chain_overlap(&mut self, src_key: usize, tgt_key: usize) {
         trace!("chaining: {src_key} -> {tgt_key}");
-        let mut segment = &mut self.segments[src_key];
+        let mut segment = unsafe { self.segments.get_unchecked_mut(src_key) };
         while let Some(ovlp_key) = segment.overlapping {
-            segment = &mut self.segments[ovlp_key];
+            segment = unsafe { self.segments.get_unchecked_mut(ovlp_key) };
         }
         segment.overlapping = Some(tgt_key);
-        self.segments[tgt_key].is_overlapping = true;
+        unsafe { self.segments.get_unchecked_mut(tgt_key) }.is_overlapping = true;
     }
     fn handle_event<F>(&mut self, event: Event<C::Scalar>, cb: &mut F) -> bool
     where
@@ -442,7 +442,7 @@ where
                             let int_pt = adj_intersection.first();
                             // Check its not first point of the adjusted, but is
                             // first point of current segment
-                            int_pt != self.segments[adj_key].geom.first()
+                            int_pt != unsafe { self.segments.get_unchecked(adj_key) }.geom.first()
                                 && int_pt == segment.geom.first()
                         };
                         if handle_end_event {
@@ -455,7 +455,7 @@ where
                         let seg_overlap_key =
                             self.adjust_one_segment(event.segment_key, adj_intersection);
                         // Update segment as it may have changed in storage
-                        segment = self.segments[event.segment_key].clone();
+                        segment = unsafe { self.segments.get_unchecked(event.segment_key) }.clone();
 
                         assert_eq!(
                             adj_overlap_key.is_some(),
@@ -473,7 +473,7 @@ where
                                 // We do not need to continue iteration, but
                                 // should callback if the left event of the
                                 // now-parent has already been processed.
-                                if self.segments[adj_ovl_key].left_event_done {
+                                if unsafe { self.segments.get_unchecked(adj_ovl_key) }.left_event_done {
                                     should_add = false;
                                     break;
                                 }
@@ -494,10 +494,10 @@ where
                 }
                 let mut segment_key = Some(event.segment_key);
                 while let Some(key) = segment_key {
-                    let segment = &self.segments[key];
+                    let segment = &unsafe { self.segments.get_unchecked(key) };
                     cb(segment, event.ty);
                     segment_key = segment.overlapping;
-                    self.segments[key].left_event_done = true;
+                    unsafe { self.segments.get_unchecked_mut(key) }.left_event_done = true;
                 }
             }
             LineRight => {
@@ -508,15 +508,15 @@ where
 
                 let mut segment_key = Some(event.segment_key);
                 while let Some(key) = segment_key {
-                    let segment = &self.segments[key];
+                    let segment = &unsafe { self.segments.get_unchecked(key) };
                     cb(segment, event.ty);
                     segment_key = segment.overlapping;
                     self.segments.remove(key);
                 }
 
                 if let (Some(prev_key), Some(next_key)) = (prev, next) {
-                    let prev_geom = self.segments[prev_key].geom;
-                    let next_geom = self.segments[next_key].geom;
+                    let prev_geom = unsafe { self.segments.get_unchecked(prev_key) }.geom;
+                    let next_geom = unsafe { self.segments.get_unchecked(next_key) }.geom;
                     if let Some(adj_intersection) = prev_geom.intersect_line(&next_geom) {
                         // 1. Split prev_segment, and extra splits to storage
                         let first = self
@@ -585,7 +585,7 @@ where
         debug_assert!(c.at_left);
         self.active_segments
             .prev_key(c.key, &self.segments)
-            .map(|k| &self.segments[k])
+            .map(|k| unsafe { self.segments.get_unchecked(k) })
     }
 }
 
