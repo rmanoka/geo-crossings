@@ -1,12 +1,18 @@
 use std::cmp::Ordering;
 
+use float_next_after::NextAfter;
 use geo::{
     kernels::{HasKernel, Kernel, Orientation},
     line_intersection::LineIntersection,
     Coordinate, GeoFloat, GeoNum, Line,
 };
+use log::error;
 
 use crate::events::SweepPoint;
+
+pub trait Float: GeoFloat + NextAfter<Self> {}
+impl<T: GeoFloat + NextAfter<T>> Float for T {}
+
 
 /// Either a line segment or a point.
 ///
@@ -78,7 +84,7 @@ impl<T: GeoFloat> LineOrPoint<T> {
         assert!(other.is_line(), "tried to intersect with a point variant!");
 
         let line = other.line();
-        let lpt = match *self {
+        match *self {
             LineOrPoint::Point(p) => {
                 if <T as HasKernel>::Ker::orient2d(line.start, p.coord(), line.end)
                     == Orientation::Collinear
@@ -101,21 +107,53 @@ impl<T: GeoFloat> LineOrPoint<T> {
                     LineIntersection::Collinear { intersection } => intersection.into(),
                 })
             }
-        };
-        if let Some(lp) = lpt {
-            debug_assert!(
-                lp.first() >= self.first()
-                && (lp.first() <= self.second())
-                    && (lp.first() >= other.first())
-                    && (lp.first() <= other.second()),
-                "intersection not in total-order: {lp:?}\n\tLine({lp1:?} - {lp2:?}) X Line({lp3:?} - {lp4:?})",
-                lp1 = self.first(),
-                lp2 = self.second(),
-                lp3 = other.first(),
-                lp4 = other.second(),
-            );
         }
-        lpt
+    }
+}
+
+impl<T: Float> LineOrPoint<T> {
+
+    pub fn intersect_line_ordered(&self, other: &Self) -> Option<Self> {
+        match self.intersect_line(other) {
+            Some(LineOrPoint::Point(mut pt)) => {
+                let (mut x, y) = pt.coord().x_y();
+
+                let c = self.first().coord();
+
+                if x == c.x && y < c.y {
+                    x = x.next_after(T::infinity());
+                }
+                pt = Coordinate { x, y }.into();
+
+                debug_assert!(
+                    pt >= self.first(),
+                    "intersection not in total-order with first line: {pt:?}\n\tLine({lp1:?} - {lp2:?}) X Line({lp3:?} - {lp4:?})",
+                    lp1 = self.first(),
+                    lp2 = self.second(),
+                    lp3 = other.first(),
+                    lp4 = other.second(),
+                );
+                debug_assert!(
+                    pt >= other.first(),
+                    "intersection not in total-order with second line: {pt:?}\n\tLine({lp1:?} - {lp2:?}) X Line({lp3:?} - {lp4:?})",
+                    lp1 = self.first(),
+                    lp2 = self.second(),
+                    lp3 = other.first(),
+                    lp4 = other.second(),
+                );
+                // FIXME: line_Intersection may return points
+                // that are not "within the line bounds" as per
+                // the ordering. This causes issues with the
+                // sweep.
+                Some(LineOrPoint::Point(pt))
+            },
+            e => e,
+        }
+        // if let Some(LineOrPoint::Point(pt)) = &mut lpt {
+            // if lp.first() < self.first() {
+
+            // }
+        // }
     }
 
     #[cfg(test)]

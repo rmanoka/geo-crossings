@@ -1,30 +1,53 @@
-use geo::{winding_order::WindingOrder, GeoFloat, Line, Polygon, MultiPolygon, GeoNum};
+use geo::{
+    coords_iter::CoordsIter, winding_order::WindingOrder, GeoNum, Line, MultiPolygon,
+    Polygon,
+};
 use std::{cell::Cell, fmt::Display};
+use crate::Float;
 
 pub trait BooleanOp: Sized {
     type Scalar: GeoNum;
 
-    fn intersection(&self, other: &Self) -> MultiPolygon<Self::Scalar>;
-    fn union(&self, other: &Self) -> MultiPolygon<Self::Scalar>;
+    fn boolean_op(&self, other: &Self, op: OpType) -> MultiPolygon<Self::Scalar>;
+    fn intersection(&self, other: &Self) -> MultiPolygon<Self::Scalar> {
+        self.boolean_op(other, OpType::Intersection)
+    }
+    fn union(&self, other: &Self) -> MultiPolygon<Self::Scalar> {
+        self.boolean_op(other, OpType::Union)
+    }
+    fn xor(&self, other: &Self) -> MultiPolygon<Self::Scalar> {
+        self.boolean_op(other, OpType::Xor)
+    }
+    fn difference(&self, other: &Self) -> MultiPolygon<Self::Scalar> {
+        self.boolean_op(other, OpType::Difference)
+    }
 }
 
-impl<T: GeoFloat> BooleanOp for Polygon<T> {
+impl<T: Float> BooleanOp for Polygon<T> {
     type Scalar = T;
 
-    fn intersection(&self, other: &Self) -> MultiPolygon<Self::Scalar> {
-        let bop = Op::new(self, other, OpType::Intersection);
+    fn boolean_op(&self, other: &Self, op: OpType) -> MultiPolygon<Self::Scalar> {
+        let mut bop = Op::new(op, self.coords_count() + other.coords_count());
+        bop.add_polygon(self, true);
+        bop.add_polygon(other, false);
         let rings = bop.sweep();
         assemble(rings).into()
     }
+}
+impl<T: Float> BooleanOp for MultiPolygon<T> {
+    type Scalar = T;
 
-    fn union(&self, other: &Self) -> MultiPolygon<Self::Scalar> {
-        let bop = Op::new(self, other, OpType::Union);
+    fn boolean_op(&self, other: &Self, op: OpType) -> MultiPolygon<Self::Scalar> {
+        let mut bop = Op::new(op, self.coords_count() + other.coords_count());
+        bop.add_multi_polygon(self, true);
+        bop.add_multi_polygon(other, false);
         let rings = bop.sweep();
         assemble(rings).into()
     }
 }
 
 mod op;
+pub use op::OpType;
 use op::*;
 
 mod rings;
@@ -36,20 +59,24 @@ use laminar::*;
 #[cfg(test)]
 mod tests {
     #![allow(unused)]
-    use anyhow::{Context, Result, bail};
-    use geo::{Geometry, MultiPolygon, Polygon, Rect};
+    use anyhow::{bail, Context, Result};
+    use geo::{dimensions::HasDimensions, prelude::Area, Geometry, MultiPolygon, Polygon, Rect};
+    use geo_booleanop::boolean::BooleanOp as OtherBOp;
     use geojson::{Feature, GeoJson};
-    use log::info;
+    use glob::glob;
+    use log::{error, info};
     use rand::thread_rng;
     use serde_derive::Serialize;
     use std::{
         convert::{TryFrom, TryInto},
         error::Error,
-        fs::read_to_string,
+        fs::{read_to_string, File},
+        panic::{catch_unwind, resume_unwind},
+        path::{Path, PathBuf}, io::{BufWriter, stdout},
     };
     use wkt::{ToWkt, TryFromWkt};
 
-    use crate::{crossings::tests::init_log, random::*};
+    use crate::{crossings::tests::init_log, random::*, bops_utils::{convert_mpoly, convert_back_mpoly}, BooleanOp};
 
     use super::*;
 
@@ -94,9 +121,12 @@ mod tests {
 
     fn check_sweep(wkt1: &str, wkt2: &str, ty: OpType) -> Result<MultiPolygon<f64>> {
         init_log();
-        let poly1 = Polygon::<f64>::try_from_wkt_str(wkt1).unwrap();
-        let poly2 = Polygon::try_from_wkt_str(wkt2).unwrap();
-        let bop = Op::new(&poly1, &poly2, ty);
+        let poly1 = MultiPolygon::<f64>::try_from_wkt_str(wkt1).unwrap();
+        let poly2 = MultiPolygon::try_from_wkt_str(wkt2).unwrap();
+        let mut bop = Op::new(ty, 0);
+        bop.add_multi_polygon(&poly1, true);
+        bop.add_multi_polygon(&poly2, false);
+
         let rings = bop.sweep();
         info!("Got {n} rings", n = rings.len());
         for ring in rings.iter() {
@@ -116,141 +146,219 @@ mod tests {
     }
 
     #[test]
-    fn generate_ds() -> Result<(), Box<dyn Error>> {
-        init_log();
-        for fix in vec![
-            "fixtures/fatal1.geojson",
-            "fixtures/fatal2.geojson",
-            "fixtures/generic_test_cases/basic1_poly.geojson",
-            "fixtures/generic_test_cases/basic2_poly_with_hole.geojson",
-            "fixtures/generic_test_cases/basic3_multi_poly.geojson",
-            "fixtures/generic_test_cases/basic4_multi_poly_with_hole.geojson",
-            "fixtures/generic_test_cases/checkerboard1.geojson",
-            "fixtures/generic_test_cases/closed_loop1.geojson",
-            "fixtures/generic_test_cases/collinear_segments1.geojson",
-            "fixtures/generic_test_cases/daef_cross_selfintersecting.geojson",
-            "fixtures/generic_test_cases/daef_holed_rectangle2.geojson",
-            "fixtures/generic_test_cases/daef_polygonwithholes_holed.geojson",
-            "fixtures/generic_test_cases/disjoint_boxes.geojson",
-            "fixtures/generic_test_cases/fatal1.geojson",
-            "fixtures/generic_test_cases/fatal2.geojson",
-            // "fixtures/generic_test_cases/fatal3.geojson",
-            "fixtures/generic_test_cases/fatal4.geojson",
-            "fixtures/generic_test_cases/filling_rectangle.geojson",
-            "fixtures/generic_test_cases/hourglasses.geojson",
-            "fixtures/generic_test_cases/intersections_at_endpoints.geojson",
-            "fixtures/generic_test_cases/issue103.geojson",
-            "fixtures/generic_test_cases/issue110.geojson",
-            "fixtures/generic_test_cases/issue68.geojson",
-            "fixtures/generic_test_cases/issue69.geojson",
-            "fixtures/generic_test_cases/issue69_sub1.geojson",
-            "fixtures/generic_test_cases/issue71.geojson",
-            // "fixtures/generic_test_cases/issue76.geojson",
-            "fixtures/generic_test_cases/issue93.geojson",
-            "fixtures/generic_test_cases/issue96.geojson",
-            "fixtures/generic_test_cases/issue99.geojson",
-            "fixtures/generic_test_cases/many_rects.geojson",
-            "fixtures/generic_test_cases/nested_polys1.geojson",
-            "fixtures/generic_test_cases/nested_polys2.geojson",
-            "fixtures/generic_test_cases/nested_polys3.geojson",
-            "fixtures/generic_test_cases/overlap_loop.geojson",
-            "fixtures/generic_test_cases/overlapping_segments1.geojson",
-            "fixtures/generic_test_cases/overlapping_segments2.geojson",
-            "fixtures/generic_test_cases/overlapping_segments3.geojson",
-            "fixtures/generic_test_cases/overlap_y.geojson",
-            "fixtures/generic_test_cases/polygon_trapezoid_edge_overlap.geojson",
-            "fixtures/generic_test_cases/rust_issue12.geojson",
-            "fixtures/generic_test_cases/tie.geojson",
-            "fixtures/generic_test_cases/touching_boxes.geojson",
-            "fixtures/generic_test_cases/vertical_ulp_slopes1.geojson",
-            "fixtures/generic_test_cases/vertical_ulp_slopes2.geojson",
-            "fixtures/generic_test_cases/xor_holes1.geojson",
-            "fixtures/generic_test_cases/xor_holes2.geojson",
-            "fixtures/hourglasses.geojson",
-            "fixtures/overlap_loop.geojson",
-            "fixtures/overlap_y.geojson",
-            "fixtures/polygon_trapezoid_edge_overlap.geojson",
-            "fixtures/rectangles.geojson",
-            "fixtures/touching_boxes.geojson",
-            "fixtures/two_shapes.geojson",
-            "fixtures/two_triangles.geojson",
-        ] {
-            if let Err(e) = try_run_fixture(fix) {
-                info!("error running fixture: {fix}");
-                info!("\t{e}");
-            }
+    fn test_complex_rects() -> Result<(), Box<dyn Error>> {
+        let wkt1 = "MULTIPOLYGON(((-1 -2,-1.0000000000000002 2,-0.8823529411764707 2,-0.8823529411764706 -2,-1 -2)),((-0.7647058823529411 -2,-0.7647058823529412 2,-0.6470588235294118 2,-0.6470588235294118 -2,-0.7647058823529411 -2)),((-0.5294117647058824 -2,-0.5294117647058825 2,-0.41176470588235287 2,-0.4117647058823529 -2,-0.5294117647058824 -2)),((-0.2941176470588236 -2,-0.2941176470588236 2,-0.17647058823529418 2,-0.17647058823529416 -2,-0.2941176470588236 -2)),((-0.05882352941176472 -2,-0.05882352941176472 2,0.05882352941176472 2,0.05882352941176472 -2,-0.05882352941176472 -2)),((0.17647058823529416 -2,0.17647058823529416 2,0.29411764705882365 2,0.2941176470588236 -2,0.17647058823529416 -2)),((0.4117647058823528 -2,0.41176470588235287 2,0.5294117647058821 2,0.5294117647058822 -2,0.4117647058823528 -2)),((0.6470588235294117 -2,0.6470588235294118 2,0.7647058823529411 2,0.7647058823529411 -2,0.6470588235294117 -2)),((0.8823529411764706 -2,0.8823529411764707 2,1.0000000000000002 2,1 -2,0.8823529411764706 -2)))";
+        let wkt2 = "MULTIPOLYGON(((-2 -1,2 -1.0000000000000002,2 -0.8823529411764707,-2 -0.8823529411764706,-2 -1)),((-2 -0.7647058823529411,2 -0.7647058823529412,2 -0.6470588235294118,-2 -0.6470588235294118,-2 -0.7647058823529411)),((-2 -0.5294117647058824,2 -0.5294117647058825,2 -0.41176470588235287,-2 -0.4117647058823529,-2 -0.5294117647058824)),((-2 -0.2941176470588236,2 -0.2941176470588236,2 -0.17647058823529418,-2 -0.17647058823529416,-2 -0.2941176470588236)),((-2 -0.05882352941176472,2 -0.05882352941176472,2 0.05882352941176472,-2 0.05882352941176472,-2 -0.05882352941176472)),((-2 0.17647058823529416,2 0.17647058823529416,2 0.29411764705882365,-2 0.2941176470588236,-2 0.17647058823529416)),((-2 0.4117647058823528,2 0.41176470588235287,2 0.5294117647058821,-2 0.5294117647058822,-2 0.4117647058823528)),((-2 0.6470588235294117,2 0.6470588235294118,2 0.7647058823529411,-2 0.7647058823529411,-2 0.6470588235294117)),((-2 0.8823529411764706,2 0.8823529411764707,2 1.0000000000000002,-2 1,-2 0.8823529411764706)))";
 
-            #[derive(Serialize)]
-            struct TestCase {
-                p1: String,
-                p2: String,
-                op: String,
-                expected: String,
-                ours: String,
-            }
+        let mp1 = MultiPolygon::<f64>::try_from_wkt_str(&wkt1)?;
+        let mp2 = MultiPolygon::<f64>::try_from_wkt_str(&wkt2)?;
 
-            fn try_run_fixture(fix: &str) -> Result<()> {
-                let data = read_to_string(fix)?;
-                let gjson: GeoJson = data.parse()?;
-                match gjson {
-                    GeoJson::FeatureCollection(fc) => {
-                        if fc.features.len() <= 2 {
-                            bail!("no ops geoms. found");
-                        }
-                        info!("reading: {fix}");
-                        let p1: Polygon<f64> = feature_as_geom(&fc.features[0])
-                            .context("geom 1 was not a polygon")?;
-                        let p2: Polygon<_> = feature_as_geom(&fc.features[1])
-                            .context("geom 2 was not a polygon")?;
-                        info!("p1: {wkt}", wkt = p1.to_wkt());
-                        info!("p2: {wkt}", wkt = p2.to_wkt());
-                        fc.features.into_iter().skip(2).try_for_each(|feat| -> Result<()> {
-                            let p: Geometry<f64> = feature_as_geom(&feat)?;
-                            let props = feat.properties.unwrap();
-                            let ty = props["operation"].as_str()
-                                .context("operation was not a string")?;
-                            info!(
-                                "op: {ty} {wkt}",
-                                wkt = p.to_wkt(),
-                            );
-
-                            if ty == "intersection" {
-                                let is = p1.intersection(&p2);
-                                info!("ours: {wkt}", wkt = is.to_wkt());
-                            } else if ty == "union" {
-                                let un = p1.union(&p2);
-                                info!("ours: {wkt}", wkt = un.to_wkt());
-
-                            }
-
-                            Ok(())
-                        });
-                        // for feat in fc.features {
-                        //     let p1: Geometry<f64> = feat.geometry.unwrap().try_into()?;
-                        //     let p
-                        //     info!("{p1:?}");
-                        // }
-                    }
-                    _ => unreachable!(),
+        for p1 in mp1.0.iter() {
+            let p1 = MultiPolygon::from(p1.clone());
+            for p2 in mp2.0.iter() {
+                let p2 = MultiPolygon::from(p2.clone());
+                let result = catch_unwind(|| -> Result<()> {
+                    check_sweep(&p1.wkt_string(), &p2.wkt_string(), OpType::Union)?;
+                    Ok(())
+                });
+                if result.is_err() {
+                    error!("p1: {wkt}", wkt = p1.wkt_string());
+                    error!("p2: {wkt}", wkt = p2.wkt_string());
+                    resume_unwind(result.unwrap_err());
                 }
-                Ok(())
             }
         }
-
+        Ok(())
+    }
+    #[test]
+    fn test_complex_rects1() -> Result<(), Box<dyn Error>> {
+        let wkt1 = "MULTIPOLYGON(((-1 -2,-1.0000000000000002 2,-0.8823529411764707 2,-0.8823529411764706 -2,-1 -2)))";
+        let wkt2 = "MULTIPOLYGON(((-2 -1,2 -1.0000000000000002,2 -0.8823529411764707,-2 -0.8823529411764706,-2 -1)))";
+        check_sweep(wkt1, wkt2, OpType::Union)?;
         Ok(())
     }
 
-    fn feature_as_geom<T, E>(feat: &Feature) -> Result<T>
-    where
-        T: TryFrom<Geometry<f64>, Error = E>,
-        E: std::fmt::Debug + Error + Sync + Send + 'static,
-    {
+    #[test]
+    #[ignore]
+    fn generate_ds() -> Result<(), Box<dyn Error>> {
+        init_log();
+
+        let proj_path = std::env::var("CARGO_MANIFEST_DIR").unwrap();
+        let mut cases = vec![];
+        for fix in glob(&format!("{proj_path}/fixtures/**/*.geojson"))? {
+            let fix = fix?;
+            info!("Running fixture {fix}...", fix = fix.display());
+            match try_run_fixture(&fix) {
+                Ok(c) => {
+                    info!("\tfixture succeeded.  Got {n} cases", n = c.len());
+                    cases.extend(c)
+                }
+                Err(e) => {
+                    error!("error running fixture: {fix:?}");
+                    error!("\t{e}");
+                }
+            }
+        }
+        #[derive(Serialize)]
+        struct TestCase {
+            p1: String,
+            p2: String,
+            op: String,
+            expected: String,
+            ours: String,
+            theirs: String,
+            comment: String,
+        }
+
+        fn panic_message(e: Box<dyn std::any::Any + Send + 'static>) -> String {
+            e.downcast::<String>()
+                .map(|b| *b)
+                .unwrap_or_else(|e| {
+                    e.downcast::<&str>().map(|b| b.to_string()).unwrap_or_else(|e| {
+                        resume_unwind(e)
+                    })
+                })
+        }
+
+        fn try_run_fixture(fix: &Path) -> Result<Vec<TestCase>> {
+            let data = read_to_string(fix)?;
+            let gjson: GeoJson = data.parse()?;
+            let cases = if let GeoJson::FeatureCollection(fc) = gjson {
+                if fc.features.len() <= 2 {
+                    return Ok(vec![]);
+                }
+                let p1 = feature_as_geom(&fc.features[0]).context("geom 1 not readable")?;
+                let p2 = feature_as_geom(&fc.features[1]).context("geom 2 not readable")?;
+
+                let prev_p1 = convert_mpoly(&p1);
+                let prev_p2 = convert_mpoly(&p2);
+
+                info!("p1: {wkt}", wkt = p1.to_wkt());
+                info!("p2: {wkt}", wkt = p2.to_wkt());
+                fc
+                    .features
+                    .into_iter()
+                    .skip(2)
+                    .map(|feat| -> Result<_> {
+                        let p = feature_as_geom(&feat)?;
+                        let props = feat.properties.unwrap();
+                        let ty = props["operation"]
+                            .as_str()
+                            .context("operation was not a string")?;
+                        info!("op: {ty} {wkt}", wkt = p.to_wkt(),);
+
+                        let result = catch_unwind(|| {
+                            let geoms = if ty == "intersection" {
+                                p1.intersection(&p2)
+                            } else if ty == "union" {
+                                p1.union(&p2)
+                            } else if ty == "xor" {
+                                p1.xor(&p2)
+                            } else if ty == "diff" {
+                                p1.difference(&p2)
+                            } else if ty == "diff_ba" {
+                                p2.difference(&p1)
+                            } else {
+                                error!("unexpected op: {ty}");
+                                unreachable!()
+                            };
+                            info!("ours: {wkt}", wkt = geoms.to_wkt());
+                            geoms
+                        });
+
+                        let their_result = catch_unwind(|| {
+                            let geoms = if ty == "intersection" {
+                                prev_p1.intersection(&prev_p2)
+                            } else if ty == "union" {
+                                prev_p1.union(&prev_p2)
+                            } else if ty == "xor" {
+                                prev_p1.xor(&prev_p2)
+                            } else if ty == "diff" {
+                                prev_p1.difference(&prev_p2)
+                            } else if ty == "diff_ba" {
+                                prev_p2.difference(&prev_p1)
+                            } else {
+                                error!("unexpected op: {ty}");
+                                unreachable!()
+                            };
+                            let geoms = convert_back_mpoly(&geoms);
+                            let wkt = geoms.wkt_string();
+                            info!("theirs: {wkt}");
+                            wkt
+                        });
+                        let theirs = their_result.unwrap_or_else(|e| {
+                            error!("theirs panicked");
+                            "pannik".to_string()
+                        });
+
+                        let (comment, our_geom) = match result {
+                            Ok(our_geom) => {
+                                let diff = catch_unwind(|| p.difference(&our_geom));
+                                let comment = match diff {
+                                    Ok(diff) => {
+                                        info!("difference: {wkt}", wkt = diff.to_wkt());
+                                        if !diff.is_empty() {
+                                            info!("output was not identical:");
+                                            info!(
+                                                "\tours: {wkt}",
+                                                wkt = our_geom.wkt_string()
+                                            );
+                                            info!("op: {ty} {wkt}", wkt = p.to_wkt(),);
+                                            let area = diff.unsigned_area();
+                                            let err = area / p.unsigned_area();
+                                            info!("\trel. error = {err}");
+                                            format!("relerr: {err:.2}")
+                                        } else {
+                                            "identical".to_string()
+                                        }
+                                    }
+                                    Err(e) => {
+                                        let msg = panic_message(e);
+                                        error!("compute panicked: {msg}!");
+                                        format!("diff-panic: {msg}")
+                                    },
+                                };
+                                (comment, Some(our_geom))
+                            }
+                            Err(e) => {
+                                let msg = panic_message(e);
+                                error!("compute panicked: {msg}!");
+                                (format!("panic: {msg}"), None)
+                            },
+                        };
+
+                        Ok(TestCase {
+                            p1: p1.wkt_string(),
+                            p2: p2.wkt_string(),
+                            op: ty.to_string(),
+                            ours: our_geom.map(|g| g.wkt_string()).unwrap_or_default(),
+                            expected: p.wkt_string(),
+                            comment, theirs,
+                        })
+                    })
+                    .collect::<Result<_>>()?
+            } else {
+                unreachable!()
+            };
+            Ok(cases)
+        }
+
+        let file = File::create("rust-geo-booleanop-fixtures.json")?;
+        serde_json::to_writer(BufWriter::new(file), &cases)?;
+        Ok(())
+    }
+
+    fn feature_as_geom(feat: &Feature) -> Result<MultiPolygon<f64>> {
         let p: Geometry<f64> = feat
             .geometry
             .clone()
             .context("missing geometry in feature")?
             .try_into()
             .context("could not parse feature as geometry")?;
-        Ok(p.try_into()?)
+        Ok(match p {
+            Geometry::Polygon(p) => p.into(),
+            Geometry::MultiPolygon(p) => p,
+            _ => bail!("unexpected type of geometry"),
+        })
     }
 }

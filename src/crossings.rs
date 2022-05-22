@@ -8,8 +8,7 @@ use std::{fmt::Debug, iter::FromIterator, rc::Rc, sync::Arc};
 mod sweep;
 pub(crate) use sweep::Sweep;
 
-use crate::line_or_point::LineOrPoint;
-
+use crate::{line_or_point::Float, LineOrPoint};
 /// Interface for types that can be processed to detect crossings.
 ///
 /// This type is implemented by [`Line`], but users may also implement
@@ -134,12 +133,19 @@ pub struct Crossing<C: Crossable> {
 /// ```
 ///
 /// [Bentley-Ottman]: //en.wikipedia.org/wiki/Bentley%E2%80%93Ottmann_algorithm
-pub struct CrossingsIter<C: Crossable + Clone> {
+pub struct CrossingsIter<C>
+where
+    C: Crossable + Clone,
+{
     sweep: Sweep<C>,
     segments: Vec<Crossing<C>>,
 }
 
-impl<C: Crossable + Clone> CrossingsIter<C> {
+impl<C> CrossingsIter<C>
+where
+    C: Crossable + Clone,
+    C::Scalar: Float,
+{
     /// Returns the segments that intersect the last point yielded by
     /// the iterator.
     pub fn intersections_mut(&mut self) -> &mut [Crossing<C>] {
@@ -155,7 +161,11 @@ impl<C: Crossable + Clone> CrossingsIter<C> {
     }
 }
 
-impl<C: Crossable + Clone> FromIterator<C> for CrossingsIter<C> {
+impl<C> FromIterator<C> for CrossingsIter<C>
+where
+    C: Crossable + Clone,
+    C::Scalar: Float,
+{
     fn from_iter<T: IntoIterator<Item = C>>(iter: T) -> Self {
         let iter = iter.into_iter();
         let size = {
@@ -168,7 +178,11 @@ impl<C: Crossable + Clone> FromIterator<C> for CrossingsIter<C> {
     }
 }
 
-impl<C: Crossable + Clone> Iterator for CrossingsIter<C> {
+impl<C> Iterator for CrossingsIter<C>
+where
+    C: Crossable + Clone,
+    C::Scalar: Float,
+{
     type Item = Coordinate<C::Scalar>;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -237,7 +251,11 @@ pub struct Intersections<C: Crossable + Clone> {
     pt: Option<Coordinate<C::Scalar>>,
 }
 
-impl<C: Crossable + Clone> FromIterator<C> for Intersections<C> {
+impl<C> FromIterator<C> for Intersections<C>
+where
+    C: Crossable + Clone,
+    C::Scalar: Float,
+{
     fn from_iter<T: IntoIterator<Item = C>>(iter: T) -> Self {
         Self {
             inner: FromIterator::from_iter(iter),
@@ -249,7 +267,11 @@ impl<C: Crossable + Clone> FromIterator<C> for Intersections<C> {
     }
 }
 
-impl<C: Crossable + Clone> Intersections<C> {
+impl<C> Intersections<C>
+where
+    C: Crossable + Clone,
+    C::Scalar: Float,
+{
     fn intersection(&mut self) -> Option<(C, C, LineIntersection<C::Scalar>)> {
         let (si, sj) = {
             let segments = self.inner.intersections_mut();
@@ -281,7 +303,8 @@ impl<C: Crossable + Clone> Intersections<C> {
     fn step(&mut self) -> bool {
         let seg_len = self.inner.intersections_mut().len();
         if 1 + self.jdx < seg_len {
-            self.is_overlap = self.is_overlap && self.inner.intersections_mut()[self.jdx].has_overlap;
+            self.is_overlap =
+                self.is_overlap && self.inner.intersections_mut()[self.jdx].has_overlap;
             self.jdx += 1;
         } else {
             self.idx += 1;
@@ -304,7 +327,11 @@ impl<C: Crossable + Clone> Intersections<C> {
     }
 }
 
-impl<C: Crossable + Clone> Iterator for Intersections<C> {
+impl<C> Iterator for Intersections<C>
+where
+    C: Crossable + Clone,
+    C::Scalar: Float,
+{
     type Item = (C, C, LineIntersection<C::Scalar>);
 
     fn next(&mut self) -> Option<Self::Item> {

@@ -74,11 +74,13 @@ impl<T: PartialOrd> PartialOrd for Active<T> {
 }
 
 /// Assert total ordering same as `PartialOrd` impl.
-impl<T: PartialOrd> Ord for Active<T> {
+impl<T: PartialOrd + Debug> Ord for Active<T> {
     #[inline]
     fn cmp(&self, other: &Self) -> Ordering {
         self.partial_cmp(other)
-            .expect("unable to compare active segments!")
+            .unwrap_or_else(|| {
+                panic!("couldn't compare active segments: {self:?} <=> {other:?}", self = self);
+            })
     }
 }
 
@@ -91,7 +93,7 @@ pub trait Access: Default {
     fn remove_key(&mut self, key: usize, storage: &Slab<Self::SegmentType>);
 }
 
-impl<T: PartialOrd> Access for BTreeSet<Active<T>> {
+impl<T: PartialOrd + Debug> Access for BTreeSet<Active<T>> {
     type SegmentType = T;
 
     #[inline]
@@ -137,7 +139,7 @@ impl<T: Ord> Default for SplayWrap<T> {
     }
 }
 
-impl<T: PartialOrd> Access for SplayWrap<Active<T>> {
+impl<T: PartialOrd + Debug> Access for SplayWrap<Active<T>> {
     type SegmentType = T;
 
     fn prev_key(&self, key: usize, storage: &Slab<Self::SegmentType>) -> Option<usize> {

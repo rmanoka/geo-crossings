@@ -3,11 +3,11 @@ use std::{cell::Cell, cmp::Ordering, iter::FromIterator};
 use geo::{GeoFloat, Polygon};
 use log::trace;
 
-use crate::{Crossable, Crossing, CrossingsIter, LineOrPoint};
+use crate::{Crossable, Crossing, CrossingsIter, LineOrPoint, Float};
 
 use super::Ring;
 
-pub fn assemble<T: GeoFloat>(rings: Vec<Ring<T>>) -> Vec<Polygon<T>> {
+pub fn assemble<T: Float>(rings: Vec<Ring<T>>) -> Vec<Polygon<T>> {
     let mut parents = vec![0; rings.len()];
     let edges: Vec<Edge<_>> = rings
         .iter()

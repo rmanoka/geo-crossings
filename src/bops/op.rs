@@ -4,28 +4,29 @@ use std::{cmp::Ordering, iter::FromIterator};
 
 use super::*;
 use crate::{
-    line_or_point::LineOrPoint, utils::winding_inverse, Crossable, Crossing, CrossingsIter,
+    utils::winding_inverse, Crossable, Crossing, CrossingsIter,
+    LineOrPoint, Float,
 };
 
 #[derive(Debug, Clone)]
-pub struct Op<T: GeoFloat> {
+pub struct Op<T: Float> {
     ty: OpType,
     edges: Vec<Edge<T>>,
 }
 
-impl<T: GeoFloat> Op<T> {
-    pub fn new(first: &Polygon<T>, second: &Polygon<T>, ty: OpType) -> Self {
-        let capacity = first.coords_count() + second.coords_count();
-        let mut op = Op {
+impl<T: Float> Op<T> {
+    pub fn new(ty: OpType, capacity: usize) -> Self {
+        Op {
             ty,
             edges: Vec::with_capacity(capacity),
-        };
-        op.add_polygon(first, true);
-        op.add_polygon(second, false);
-        op
+        }
     }
 
-    fn add_polygon(&mut self, poly: &Polygon<T>, is_first: bool) {
+    pub(crate) fn add_multi_polygon(&mut self, mp: &MultiPolygon<T>, is_first: bool) {
+        mp.0.iter().for_each(|p| self.add_polygon(p, is_first));
+    }
+
+    pub(crate) fn add_polygon(&mut self, poly: &Polygon<T>, is_first: bool) {
         self.add_closed_ring(poly.exterior(), is_first, false);
         for hole in poly.interiors() {
             self.add_closed_ring(hole, is_first, true);
@@ -57,7 +58,7 @@ impl<T: GeoFloat> Op<T> {
             };
             debug!("processing: {lp:?} -> {winding:?}");
 
-            let region = Region::infinity();
+            let region = Region::infinity(self.ty);
             self.edges.push(Edge {
                 geom: lp,
                 is_first,
@@ -168,7 +169,7 @@ impl<T: GeoFloat> Op<T> {
             let mut region = prev
                 .as_ref()
                 .map(|c| c.region.get())
-                .unwrap_or_else(Region::infinity);
+                .unwrap_or_else(|| Region::infinity(self.ty));
             trace!("bot region: {region}");
 
             while idx < iter.intersections().len() {
@@ -205,6 +206,8 @@ impl<T: GeoFloat> Op<T> {
 pub enum OpType {
     Intersection,
     Union,
+    Difference,
+    Xor,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -224,10 +227,10 @@ impl Display for Region {
 }
 
 impl Region {
-    fn infinity() -> Self {
+    fn infinity(ty: OpType) -> Self {
         Region {
             is_first: false,
-            is_second: false,
+            is_second: matches!(ty, OpType::Difference),
         }
     }
     fn cross(&mut self, first: bool) {
@@ -239,21 +242,22 @@ impl Region {
     }
     fn is_ty(&self, ty: OpType) -> bool {
         match ty {
-            OpType::Intersection => self.is_first && self.is_second,
+            OpType::Intersection | OpType::Difference => self.is_first && self.is_second,
             OpType::Union => self.is_first || self.is_second,
+            OpType::Xor => self.is_first ^ self.is_second,
         }
     }
 }
 
 #[derive(Clone)]
-struct Edge<T: GeoFloat> {
+struct Edge<T: Float> {
     geom: LineOrPoint<T>,
     is_first: bool,
     region: Cell<Region>,
     winding: WindingOrder,
 }
 
-impl<T: GeoFloat> std::fmt::Debug for Edge<T> {
+impl<T: Float> std::fmt::Debug for Edge<T> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let line = self.geom.line();
         f.debug_struct("Edge")
@@ -271,7 +275,7 @@ impl<T: GeoFloat> std::fmt::Debug for Edge<T> {
     }
 }
 
-impl<T: GeoFloat> Crossable for Edge<T> {
+impl<T: Float> Crossable for Edge<T> {
     type Scalar = T;
 
     fn line(&self) -> Line<Self::Scalar> {

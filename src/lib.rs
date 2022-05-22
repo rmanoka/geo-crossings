@@ -52,7 +52,7 @@ mod events;
 pub use events::SweepPoint;
 
 mod line_or_point;
-pub use line_or_point::LineOrPoint;
+pub use line_or_point::{LineOrPoint, Float};
 
 mod active;
 
@@ -71,5 +71,9 @@ pub use splay::*;
 #[cfg(test)]
 #[path = "../benches/utils/random.rs"]
 pub mod random;
+
+#[cfg(test)]
+#[path = "../benches/utils/bops.rs"]
+pub mod bops_utils;
 
 pub(crate) mod utils;

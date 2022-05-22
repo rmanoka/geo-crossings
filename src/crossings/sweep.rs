@@ -1,11 +1,7 @@
-use geo::GeoFloat;
+use crate::line_or_point::Float;
 use log::trace;
 use slab::Slab;
-use std::{
-    cmp::Ordering,
-    collections::BinaryHeap,
-    fmt::Debug,
-};
+use std::{cmp::Ordering, collections::{BinaryHeap, BTreeSet}, fmt::Debug};
 
 use crate::{
     active::{Access, Active, SplayWrap},
@@ -104,7 +100,12 @@ impl<C: Crossable + Clone> Segment<C> {
     pub(crate) fn events(&self) -> [Event<C::Scalar>; 2] {
         [self.left_event(), self.right_event()]
     }
-
+}
+impl<C> Segment<C>
+where
+    C: Crossable + Clone,
+    C::Scalar: Float,
+{
     /// Split a line segment into pieces at points of intersection.
     ///
     /// The initial segment is mutated in place such that ordering
@@ -121,26 +122,26 @@ impl<C: Crossable + Clone> Segment<C> {
             Point(_) => panic!("attempt to adjust a point segment"),
             Line(p, q) => (p, q),
         };
-
         match intersection {
             // Handle point intersection
             Point(r) => {
                 debug_assert!(
-                    p <= r && r <= q,
-                    "intersection point was not ordered within the line!"
+                    p <= r,
+                    "intersection point was not ordered within the line: {p:?} <= {r:?} <= {q:?}",
+                    p = p
                 );
                 if p == r || q == r {
                     // If the intersection is at the end point, the
                     // segment doesn't need to be split.
                     Unchanged { overlap: false }
-                } else {
+                }  else {
                     // Otherwise, split it. Mutate `self` to be the
                     // first part, and return the second part.
                     self.geom = Line(p, r);
                     self.first_segment = false;
                     SplitOnce {
                         overlap: None,
-                        right: Line(r, q),
+                        right: if q > r { Line(r, q) } else { Line(q, r) },
                     }
                 }
             }
@@ -232,7 +233,8 @@ impl<C: Crossable> PartialOrd for Segment<C> {
 /// iterator interfaces built around this sweep.
 ///
 /// [Bentley-Ottman]: //en.wikipedia.org/wiki/Bentley%E2%80%93Ottmann_algorithm
-pub struct Sweep<C, A = SplayWrap<Active<Segment<C>>>>
+//SplayWrap<Active<Segment<C>>>>
+pub struct Sweep<C, A = BTreeSet<Active<Segment<C>>>>
 where
     C: Crossable + Clone,
     A: Access<SegmentType = Segment<C>>,
@@ -240,13 +242,12 @@ where
     segments: Box<Slab<Segment<C>>>,
     events: BinaryHeap<Event<C::Scalar>>,
     active_segments: A,
-    // active_segments: SplayWrap<Active<Segment<C>>>,
-    // active_segments: BTreeSet<Active<Segment<C>>>,
 }
 
 impl<C, A> Sweep<C, A>
 where
     C: Crossable + Clone,
+    C::Scalar: Float,
     A: Access<SegmentType = Segment<C>>,
 {
     pub fn new<I: IntoIterator<Item = C>>(iter: I) -> Self {
@@ -257,7 +258,7 @@ where
         };
 
         let mut sweep = Sweep {
-            segments: Slab::with_capacity(size).into(),
+            segments: Slab::with_capacity(16 * size).into(),
             events: BinaryHeap::with_capacity(size),
             active_segments: Default::default(),
         };
@@ -289,8 +290,11 @@ where
             let mut target_key = segment_key;
 
             while let Some(child_key) = child {
-                let child_overlapping = unsafe { self.segments.get_unchecked(child_key) }.overlapping;
-                let child_crossable = unsafe { self.segments.get_unchecked(child_key) }.crossable().clone();
+                let child_overlapping =
+                    unsafe { self.segments.get_unchecked(child_key) }.overlapping;
+                let child_crossable = unsafe { self.segments.get_unchecked(child_key) }
+                    .crossable()
+                    .clone();
 
                 let new_key =
                     Segment::new(&mut self.segments, child_crossable, Some(segment_geom)).key();
@@ -428,7 +432,9 @@ where
                         .segments
                         .get_mut(adj_key)
                         .expect("active segment not found in storage");
-                    if let Some(adj_intersection) = segment.geom.intersect_line(&adj_segment.geom) {
+                    if let Some(adj_intersection) =
+                        segment.geom.intersect_line_ordered(&adj_segment.geom)
+                    {
                         trace!("Found intersection (LL):\n\tsegment1: {:?}\n\tsegment2: {:?}\n\tintersection: {:?}", segment, adj_segment, adj_intersection);
                         // 1. Split adj_segment, and extra splits to storage
                         let adj_overlap_key = self.adjust_one_segment(adj_key, adj_intersection);
@@ -473,7 +479,9 @@ where
                                 // We do not need to continue iteration, but
                                 // should callback if the left event of the
                                 // now-parent has already been processed.
-                                if unsafe { self.segments.get_unchecked(adj_ovl_key) }.left_event_done {
+                                if unsafe { self.segments.get_unchecked(adj_ovl_key) }
+                                    .left_event_done
+                                {
                                     should_add = false;
                                     break;
                                 }
@@ -517,7 +525,7 @@ where
                 if let (Some(prev_key), Some(next_key)) = (prev, next) {
                     let prev_geom = unsafe { self.segments.get_unchecked(prev_key) }.geom;
                     let next_geom = unsafe { self.segments.get_unchecked(next_key) }.geom;
-                    if let Some(adj_intersection) = prev_geom.intersect_line(&next_geom) {
+                    if let Some(adj_intersection) = prev_geom.intersect_line_ordered(&next_geom) {
                         // 1. Split prev_segment, and extra splits to storage
                         let first = self
                             .adjust_one_segment(prev_key, adj_intersection)
@@ -538,7 +546,9 @@ where
                         .segments
                         .get_mut(adj_key)
                         .expect("active segment not found in storage");
-                    if let Some(adj_intersection) = segment.geom.intersect_line(&adj_segment.geom) {
+                    if let Some(adj_intersection) =
+                        segment.geom.intersect_line_ordered(&adj_segment.geom)
+                    {
                         trace!("Found intersection:\n\tsegment1: {:?}\n\tsegment2: {:?}\n\tintersection: {:?}", segment, adj_segment, adj_intersection);
                         // 1. Split adj_segment, and extra splits to storage
                         let adj_overlap_key = self.adjust_one_segment(adj_key, adj_intersection);
@@ -592,7 +602,7 @@ where
 /// Stores the type of split and extra geometries from adjusting a
 /// segment for intersection.
 #[derive(Debug)]
-enum SplitSegments<T: GeoFloat> {
+enum SplitSegments<T: Float> {
     Unchanged {
         overlap: bool,
     },
@@ -611,7 +621,7 @@ mod tests {
 
     use super::*;
 
-    impl<T: GeoFloat> PartialEq for SplitSegments<T> {
+    impl<T: Float> PartialEq for SplitSegments<T> {
         fn eq(&self, other: &Self) -> bool {
             match (self, other) {
                 (
@@ -659,7 +669,7 @@ mod tests {
 
         impl TestCase {
             fn assert_equality(&self, slab: &Slab<Segment<Line<f64>>>) {
-                let isec = slab[self.a].geom.intersect_line(&slab[self.b].geom);
+                let isec = slab[self.a].geom.intersect_line_ordered(&slab[self.b].geom);
                 assert_eq!(isec, self.isec);
 
                 if isec.is_none() {
