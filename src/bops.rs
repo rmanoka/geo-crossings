@@ -121,8 +121,12 @@ mod tests {
 
     fn check_sweep(wkt1: &str, wkt2: &str, ty: OpType) -> Result<MultiPolygon<f64>> {
         init_log();
-        let poly1 = MultiPolygon::<f64>::try_from_wkt_str(wkt1).unwrap();
-        let poly2 = MultiPolygon::try_from_wkt_str(wkt2).unwrap();
+        let poly1 = MultiPolygon::<f64>::try_from_wkt_str(wkt1).or_else(|_| {
+            Polygon::<f64>::try_from_wkt_str(wkt1).map(|p| MultiPolygon::from(p))
+        }).unwrap();
+        let poly2 = MultiPolygon::try_from_wkt_str(wkt2).or_else(|_| {
+            Polygon::<f64>::try_from_wkt_str(wkt2).map(|p| MultiPolygon::from(p))
+        }).unwrap();
         let mut bop = Op::new(ty, 0);
         bop.add_multi_polygon(&poly1, true);
         bop.add_multi_polygon(&poly2, false);
