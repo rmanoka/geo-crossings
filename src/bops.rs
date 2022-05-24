@@ -179,13 +179,12 @@ mod tests {
     }
 
     #[test]
-    #[ignore]
     fn generate_ds() -> Result<(), Box<dyn Error>> {
         init_log();
 
         let proj_path = std::env::var("CARGO_MANIFEST_DIR").unwrap();
         let mut cases = vec![];
-        for fix in glob(&format!("{proj_path}/fixtures/**/*.geojson"))? {
+        for fix in glob(&format!("{proj_path}/fixtures/rust-geo-booleanop-fixtures/**/*.geojson"))? {
             let fix = fix?;
             info!("Running fixture {fix}...", fix = fix.display());
             match try_run_fixture(&fix) {
@@ -314,7 +313,7 @@ mod tests {
                                     }
                                     Err(e) => {
                                         let msg = panic_message(e);
-                                        error!("compute panicked: {msg}!");
+                                        error!("diff-compute panicked: {msg}!");
                                         format!("diff-panic: {msg}")
                                     },
                                 };

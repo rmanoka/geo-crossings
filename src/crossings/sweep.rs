@@ -233,8 +233,8 @@ impl<C: Crossable> PartialOrd for Segment<C> {
 /// iterator interfaces built around this sweep.
 ///
 /// [Bentley-Ottman]: //en.wikipedia.org/wiki/Bentley%E2%80%93Ottmann_algorithm
-//SplayWrap<Active<Segment<C>>>>
-pub struct Sweep<C, A = BTreeSet<Active<Segment<C>>>>
+//>
+pub struct Sweep<C, A = SplayWrap<Active<Segment<C>>>>
 where
     C: Crossable + Clone,
     A: Access<SegmentType = Segment<C>>,
