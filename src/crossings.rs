@@ -156,8 +156,8 @@ where
         &self.segments
     }
 
-    pub(crate) fn prev_active(&self, c: &Crossing<C>) -> Option<&C> {
-        self.sweep.prev_active(c).map(|s| s.crossable())
+    pub(crate) fn prev_active(&self, c: &Crossing<C>) -> Option<(LineOrPoint<C::Scalar>, &C)> {
+        self.sweep.prev_active(c).map(|s| (s.geom, s.crossable()))
     }
 }
 

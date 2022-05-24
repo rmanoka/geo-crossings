@@ -45,7 +45,7 @@ pub fn assemble<T: Float>(rings: Vec<Ring<T>>) -> Vec<Polygon<T>> {
             }
             let active = sweep.prev_active(first);
             trace!("active of {first_geom:?}: {active:?}", first_geom = first.crossable.geom);
-            active.map(|b| {
+            active.map(|(_, b)| {
                 b.region.get()
             }).unwrap_or(None)
         };
