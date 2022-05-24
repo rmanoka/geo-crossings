@@ -164,9 +164,6 @@ impl<T: Float> Op<T> {
                     c = idx - jdx + 1,
                 );
                 while jdx <= idx {
-                    // FIXME: this is related to the
-                    // ordering issue while finding
-                    // intersections.
                     let gpiece = iter.intersections()[jdx].line;
                     iter.intersections()[jdx].crossable.set_region(region, gpiece);
                     jdx += 1;
@@ -236,6 +233,20 @@ struct Edge<T: Float> {
 
 impl<T: Float> Edge<T> {
     fn get_region(&self, piece: LineOrPoint<T>) -> Region {
+        // Note: This is related to the ordering of intersection
+        // with respect to the complete geometry. Due to
+        // finite-precision errors, intersection points might lie
+        // outside the end-points in lexicographic ordering.
+        //
+        // Thus, while processing, the segment, we might be looking at it from
+        // end-to-start as opposed to the typical start-to-end (with respect to
+        // the complete geom. the segment is a part of).
+        //
+        // In this case, the region set/get procedure queries different sides of
+        // the segment. Thus, we detect this and store both sides of the region.
+        // Finally, note that we need to store both sides of the segment, as
+        // this cannot be computed from the current edge alone (it may depend on
+        // more overlapping edges).
         if piece.first() < self.geom.second() {
             self._region.get()
         } else {

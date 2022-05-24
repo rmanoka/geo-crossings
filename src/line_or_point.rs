@@ -116,6 +116,32 @@ impl<T: Float> LineOrPoint<T> {
     pub fn intersect_line_ordered(&self, other: &Self) -> Option<Self> {
         match self.intersect_line(other) {
             Some(LineOrPoint::Point(mut pt)) => {
+                // NOTE: A key issue with using non-exact numbers (f64, etc.) in
+                // this algo. is that line-intersection may return
+                // counter-intuitive points.
+                //
+                // Specifically, this causes two issues:
+                //
+                // 1. The point of intersection r lies between the end-points in
+                // the lexicographic ordering. However, with finite repr., the
+                // line (1, 1) - (1 + eps, -1), where eps is ulp(1), does not
+                // admit r that lies between the end-points. Further, the
+                // end-points may be a very bad approximation to the actual
+                // intersection points (eg. intersect with x-axis).
+                //
+                // We detect and force r to be greater than both end-points; the
+                // other case is not easy to handle as the sweep has already
+                // progressed to a p strictly > r already.
+                //
+                // 2. The more severe issue is that in general r may not lie
+                // exactly on the line. Thus, with the segment stored on the
+                // active-segments tree (B-Tree / Splay), this may in adverse
+                // cases, cause the ordering between the segments to be
+                // incorrect, hence invalidating the segments. This is not easy
+                // to correct without a intrusive data-structure built
+                // specifically for this algo., that can track the neighbors of
+                // tree-nodes, and fix / report this issue. The crate
+                // `btree-slab` seems like a great starting point.
                 let (mut x, y) = pt.coord().x_y();
 
                 let c = self.first().coord();
@@ -141,10 +167,6 @@ impl<T: Float> LineOrPoint<T> {
                     lp3 = other.first(),
                     lp4 = other.second(),
                 );
-                // FIXME: line_Intersection may return points
-                // that are not "within the line bounds" as per
-                // the ordering. This causes issues with the
-                // sweep.
                 Some(LineOrPoint::Point(pt))
             },
             e => e,
